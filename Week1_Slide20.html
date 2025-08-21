@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS5720 - Week 1 Summary & Week 2 Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .slide-container {
+            flex: 1;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .slide-title {
+            font-size: 3.5em;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #16a34a;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: slideInFromTop 1.2s ease-out;
+            font-weight: 700;
+        }
+
+        .content-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .summary-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromLeft 1s ease-out 0.3s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .preview-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromRight 1s ease-out 0.3s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #064e3b;
+            margin-bottom: 25px;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #16a34a, #22c55e);
+            border-radius: 2px;
+        }
+
+        .summary-grid {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .summary-item {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #16a34a;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(22, 163, 74, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .summary-item:hover::before {
+            left: 100%;
+        }
+
+        .summary-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.15);
+        }
+
+        .summary-icon {
+            font-size: 1.5em;
+            margin-bottom: 8px;
+        }
+
+        .summary-topic {
+            font-weight: 600;
+            color: #064e3b;
+            margin-bottom: 5px;
+        }
+
+        .summary-desc {
+            font-size: 0.9em;
+            color: #475569;
+            line-height: 1.4;
+        }
+
+        .preview-cards {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .preview-card {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #f59e0b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .preview-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.15);
+        }
+
+        .preview-icon {
+            font-size: 1.5em;
+            margin-bottom: 8px;
+        }
+
+        .preview-topic {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 5px;
+        }
+
+        .preview-desc {
+            font-size: 0.9em;
+            color: #78350f;
+            line-height: 1.4;
+        }
+
+        .achievement-section {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromBottom 1s ease-out 0.6s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+            text-align: center;
+        }
+
+        .achievement-title {
+            font-size: 2em;
+            color: #064e3b;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .achievement-badges {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #16a34a;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .badge:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 30px rgba(22, 163, 74, 0.3);
+        }
+
+        .badge-icon {
+            font-size: 2.5em;
+            margin-bottom: 8px;
+        }
+
+        .badge-text {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #064e3b;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            border-radius: 30px;
+            color: #1e293b;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(22, 163, 74, 0.4);
+        }
+
+        .slide-number, .course-info {
+            position: fixed;
+            top: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .slide-number { right: 30px; }
+        .course-info { left: 30px; }
+
+        @keyframes slideInFromTop {
+            from { transform: translateY(-80px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromLeft {
+            from { transform: translateX(-60px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromRight {
+            from { transform: translateX(60px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromBottom {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            .content-layout { grid-template-columns: 1fr; }
+            .slide-title { font-size: 2.5em; }
+            .achievement-badges { gap: 20px; }
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-backdrop.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            color: #064e3b;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(22, 163, 74, 0.1);
+            color: #064e3b;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #334155;
+        }
+
+        .modal-body strong {
+            color: #064e3b;
+            font-weight: 600;
+        }
+
+        .modal-body em {
+            color: #16a34a;
+            font-style: normal;
+            font-weight: 500;
+        }
+
+        .modal-example {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #16a34a;
+        }
+
+        .modal-code {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            overflow-x: auto;
+        }
+
+        .modal-tip {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .modal-tip-title {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+
+        .modal-checklist {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .modal-checklist li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .modal-checklist li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #16a34a;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 20px;
+                padding: 30px 25px;
+            }
+            .modal-title {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="course-info">CS5720 - Week 1</div>
+    <div class="slide-number">Slide 20 of 20</div>
+    
+    <div class="slide-container">
+        <h1 class="slide-title">Week 1 Summary & Week 2 Preview</h1>
+        
+        <div class="content-layout">
+            <div class="summary-section">
+                <h2 class="section-title">Week 1: What We've Learned</h2>
+                
+                <div class="summary-grid">
+                    <div class="summary-item" onclick="showSummaryDetail('neural-intro')">
+                        <div class="summary-icon">🧠</div>
+                        <div class="summary-topic">Neural Networks Fundamentals</div>
+                        <div class="summary-desc">From biological inspiration to artificial neurons</div>
+                    </div>
+                    
+                    <div class="summary-item" onclick="showSummaryDetail('perceptron')">
+                        <div class="summary-icon">⚡</div>
+                        <div class="summary-topic">The Perceptron</div>
+                        <div class="summary-desc">Simplest neural network and its limitations</div>
+                    </div>
+                    
+                    <div class="summary-item" onclick="showSummaryDetail('mlp')">
+                        <div class="summary-icon">🔗</div>
+                        <div class="summary-topic">Multi-Layer Perceptrons</div>
+                        <div class="summary-desc">Building deeper networks for complex problems</div>
+                    </div>
+                    
+                    <div class="summary-item" onclick="showSummaryDetail('activation')">
+                        <div class="summary-icon">📈</div>
+                        <div class="summary-topic">Activation Functions</div>
+                        <div class="summary-desc">Non-linearity for powerful representations</div>
+                    </div>
+                    
+                    <div class="summary-item" onclick="showSummaryDetail('forward')">
+                        <div class="summary-icon">➡️</div>
+                        <div class="summary-topic">Forward Propagation</div>
+                        <div class="summary-desc">How data flows through the network</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-section">
+                <h2 class="section-title">Week 2: What's Coming Next</h2>
+                
+                <div class="preview-cards">
+                    <div class="preview-card" onclick="showPreviewDetail('learning')">
+                        <div class="preview-icon">🎯</div>
+                        <div class="preview-topic">The Learning Problem</div>
+                        <div class="preview-desc">How neural networks learn from data</div>
+                    </div>
+                    
+                    <div class="preview-card" onclick="showPreviewDetail('loss')">
+                        <div class="preview-icon">📉</div>
+                        <div class="preview-topic">Loss Functions</div>
+                        <div class="preview-desc">Measuring and minimizing errors</div>
+                    </div>
+                    
+                    <div class="preview-card" onclick="showPreviewDetail('gradient')">
+                        <div class="preview-icon">⛰️</div>
+                        <div class="preview-topic">Gradient Descent</div>
+                        <div class="preview-desc">The optimization algorithm that powers learning</div>
+                    </div>
+                    
+                    <div class="preview-card" onclick="showPreviewDetail('backprop')">
+                        <div class="preview-icon">🔄</div>
+                        <div class="preview-topic">Backpropagation</div>
+                        <div class="preview-desc">The magic behind neural network training</div>
+                    </div>
+                    
+                    <div class="preview-card" onclick="showPreviewDetail('practical')">
+                        <div class="preview-icon">💻</div>
+                        <div class="preview-topic">Hands-On Training</div>
+                        <div class="preview-desc">Build and train your first neural network!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="achievement-section">
+            <h2 class="achievement-title">🎉 Week 1 Achievements Unlocked!</h2>
+            
+            <div class="achievement-badges">
+                <div class="badge pulse-animation" onclick="showAchievement('foundation')">
+                    <div class="badge-icon">🏗️</div>
+                    <div class="badge-text">Foundation<br>Builder</div>
+                </div>
+                
+                <div class="badge pulse-animation" onclick="showAchievement('neuron')">
+                    <div class="badge-icon">🧬</div>
+                    <div class="badge-text">Neuron<br>Navigator</div>
+                </div>
+                
+                <div class="badge pulse-animation" onclick="showAchievement('perceptron')">
+                    <div class="badge-icon">⚔️</div>
+                    <div class="badge-text">Perceptron<br>Master</div>
+                </div>
+                
+                <div class="badge pulse-animation" onclick="showAchievement('ready')">
+                    <div class="badge-icon">🚀</div>
+                    <div class="badge-text">Ready for<br>Week 2</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <a href="Week1_Slide19.html" class="nav-btn">← Previous</a>
+        <a href="Week2_Slide21.html" class="nav-btn">Next →</a>
+    </div>
+
+    <div style="position: fixed; bottom: 30px; left: 30px; color: #64748b; font-size: 0.9em;">
+        <strong>Prepared by Dr. Gorkem Kar</strong>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal-backdrop" id="modalBackdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Modal Title</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                Modal content goes here...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal functionality
+        const modal = document.getElementById('modalBackdrop');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+
+        function showModal(title, content) {
+            modalTitle.textContent = title;
+            modalBody.innerHTML = content;
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('show')) {
+                closeModal();
+            }
+        });
+
+        // Summary details content
+        function showSummaryDetail(topic) {
+            const summaryDetails = {
+                'neural-intro': {
+                    title: 'Neural Networks Fundamentals',
+                    content: `
+                        <p><strong>The Journey Begins!</strong></p>
+                        <p>This week, we explored the fascinating world of neural networks, starting from their biological inspiration to their artificial implementation.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Key Concepts Covered:</strong><br>
+                            • What are Neural Networks? - Systems that learn patterns from data<br>
+                            • Biological vs Artificial Neurons - How we simplified nature's design<br>
+                            • Historical Milestones - From 1943 to today's deep learning revolution<br>
+                            • Real-World Applications - Image recognition, language processing, and more
+                        </div>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">💡 Remember This</div>
+                            Neural networks are <em>universal function approximators</em> - given enough neurons and layers, they can learn to approximate any continuous function!
+                        </div>
+                        
+                        <p>We learned that neural networks are inspired by the brain but work quite differently. Each artificial neuron:</p>
+                        <ul class="modal-checklist">
+                            <li>Receives multiple inputs (like dendrites)</li>
+                            <li>Computes a weighted sum</li>
+                            <li>Applies an activation function</li>
+                            <li>Produces an output (like an axon)</li>
+                        </ul>
+                    `
+                },
+                'perceptron': {
+                    title: 'The Perceptron - Where It All Started',
+                    content: `
+                        <p><strong>The Simplest Neural Network</strong></p>
+                        <p>The perceptron, invented by Frank Rosenblatt in 1957, is the building block of modern neural networks.</p>
+                        
+                        <div class="modal-example">
+                            <strong>What We Learned:</strong><br>
+                            • Linear decision boundaries<br>
+                            • AND, OR gates can be learned<br>
+                            • The XOR problem - perceptron's limitation<br>
+                            • Need for multi-layer networks
+                        </div>
+                        
+                        <div class="modal-code">
+# Simple Perceptron Decision
+def perceptron(x1, x2, w1, w2, bias):
+    weighted_sum = x1*w1 + x2*w2 + bias
+    return 1 if weighted_sum > 0 else 0
+
+# Example: AND gate
+# w1=1, w2=1, bias=-1.5
+# (1,1) → 1*1 + 1*1 - 1.5 = 0.5 > 0 → Output: 1 ✓
+# (0,1) → 0*1 + 1*1 - 1.5 = -0.5 < 0 → Output: 0 ✓
+                        </div>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🎯 Key Limitation</div>
+                            Perceptrons can only solve <em>linearly separable</em> problems. The XOR problem showed us we need hidden layers to create non-linear decision boundaries.
+                        </div>
+                    `
+                },
+                'mlp': {
+                    title: 'Multi-Layer Perceptrons (MLPs)',
+                    content: `
+                        <p><strong>Adding Depth for Power</strong></p>
+                        <p>By stacking multiple layers of neurons, we create networks capable of learning complex, non-linear patterns.</p>
+                        
+                        <div class="modal-example">
+                            <strong>MLP Architecture:</strong><br>
+                            • Input Layer - Receives raw data<br>
+                            • Hidden Layer(s) - Extract features and patterns<br>
+                            • Output Layer - Produces final predictions<br>
+                            • Connections - Fully connected between layers
+                        </div>
+                        
+                        <p>The "deep" in deep learning comes from having many hidden layers. Each layer learns increasingly abstract representations:</p>
+                        
+                        <div class="modal-code">
+# MLP Structure Example
+Input Layer:   [x1, x2, x3]     # Raw features
+     ↓              ↓
+Hidden Layer 1: [h1, h2, h3, h4] # Low-level patterns
+     ↓              ↓  
+Hidden Layer 2: [h5, h6, h7]     # High-level concepts
+     ↓              ↓
+Output Layer:   [y1, y2]         # Final predictions
+                        </div>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🔑 Power of Depth</div>
+                            Each additional layer allows the network to learn more complex features. Like building with LEGO blocks - simple pieces combine to create complex structures!
+                        </div>
+                    `
+                },
+                'activation': {
+                    title: 'Activation Functions - Adding Non-linearity',
+                    content: `
+                        <p><strong>The Secret Sauce of Neural Networks</strong></p>
+                        <p>Without activation functions, even deep networks would only learn linear transformations. Activation functions introduce the non-linearity that gives neural networks their power.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Common Activation Functions:</strong>
+                        </div>
+                        
+                        <div class="modal-code">
+# 1. Sigmoid - Squashes values to [0,1]
+sigmoid(x) = 1 / (1 + e^(-x))
+# Smooth, differentiable, but suffers from vanishing gradients
+
+# 2. ReLU - Simple but effective
+relu(x) = max(0, x)
+# Fast to compute, helps with vanishing gradients
+
+# 3. Tanh - Centered around zero [-1,1]
+tanh(x) = (e^x - e^(-x)) / (e^x + e^(-x))
+# Often better than sigmoid for hidden layers
+                        </div>
+                        
+                        <div class="modal-example">
+                            <strong>Why Non-linearity Matters:</strong><br>
+                            • Linear functions composed = Still linear<br>
+                            • f(g(x)) where both are linear = Just another line!<br>
+                            • Non-linear activation = Can approximate curves<br>
+                            • Stack them = Approximate any function!
+                        </div>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">💡 Pro Tip</div>
+                            ReLU is the most popular activation for hidden layers due to its simplicity and effectiveness. Use sigmoid/softmax for output layers in classification tasks.
+                        </div>
+                    `
+                },
+                'forward': {
+                    title: 'Forward Propagation - Data Flow',
+                    content: `
+                        <p><strong>How Information Flows Through the Network</strong></p>
+                        <p>Forward propagation is the process of passing input data through the network to generate predictions.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Step-by-Step Process:</strong><br>
+                            1. Input data enters the network<br>
+                            2. Each neuron computes: output = activation(Σ(weights × inputs) + bias)<br>
+                            3. Outputs become inputs for the next layer<br>
+                            4. Process repeats until final output
+                        </div>
+                        
+                        <div class="modal-code">
+# Forward Pass Example
+def forward_pass(input_data, network):
+    current = input_data
+    
+    for layer in network.layers:
+        # Linear transformation
+        z = np.dot(current, layer.weights) + layer.bias
+        
+        # Apply activation
+        current = layer.activation(z)
+    
+    return current  # Final prediction
+
+# Data flows: Input → Hidden1 → Hidden2 → Output
+# Each arrow represents weights being applied
+                        </div>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🎯 Key Insight</div>
+                            Forward propagation is deterministic - given the same input and weights, you'll always get the same output. The magic happens during training when we adjust the weights!
+                        </div>
+                        
+                        <p>Think of it like a factory assembly line where each station (layer) transforms the product (data) in a specific way.</p>
+                    `
+                }
+            };
+            
+            const detail = summaryDetails[topic];
+            if (detail) {
+                showModal(detail.title, detail.content);
+            }
+        }
+
+        // Preview details content
+        function showPreviewDetail(topic) {
+            const previewDetails = {
+                'learning': {
+                    title: 'The Learning Problem - Week 2 Preview',
+                    content: `
+                        <p><strong>How Do Neural Networks Learn?</strong></p>
+                        <p>Next week, we'll dive into the fundamental question: How do we automatically find the right weights?</p>
+                        
+                        <div class="modal-example">
+                            <strong>What You'll Learn:</strong><br>
+                            • The optimization perspective of learning<br>
+                            • Training data, validation data, and test data<br>
+                            • The iterative learning process<br>
+                            • Measuring improvement over time
+                        </div>
+                        
+                        <p>We'll see that learning is essentially an optimization problem where we:</p>
+                        <ul class="modal-checklist">
+                            <li>Start with random weights</li>
+                            <li>Make predictions</li>
+                            <li>Measure how wrong we are</li>
+                            <li>Adjust weights to be less wrong</li>
+                            <li>Repeat until satisfied</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🎯 Get Ready!</div>
+                            Think about how you learn from mistakes. Neural networks do something similar - they learn by gradually correcting their errors!
+                        </div>
+                    `
+                },
+                'loss': {
+                    title: 'Loss Functions - Measuring Errors',
+                    content: `
+                        <p><strong>How Wrong Are We?</strong></p>
+                        <p>To improve, we need to measure our mistakes. Loss functions quantify the difference between predictions and reality.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Common Loss Functions:</strong><br>
+                            • <em>Mean Squared Error (MSE)</em> - For regression<br>
+                            • <em>Cross-Entropy</em> - For classification<br>
+                            • <em>Custom Losses</em> - For specific problems
+                        </div>
+                        
+                        <div class="modal-code">
+# Example: Mean Squared Error
+# If we predict house prices:
+predicted = [200K, 350K, 180K]
+actual    = [210K, 340K, 190K]
+
+# MSE measures average squared difference
+# Lower loss = Better predictions!
+                        </div>
+                        
+                        <p>The loss function is like a score in a game - it tells us how well we're doing. Our goal is to minimize this score!</p>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">💡 Key Concept</div>
+                            Different problems need different loss functions. Choosing the right one is crucial for successful training!
+                        </div>
+                    `
+                },
+                'gradient': {
+                    title: 'Gradient Descent - Finding the Way',
+                    content: `
+                        <p><strong>The Optimization Algorithm</strong></p>
+                        <p>Gradient descent is like hiking down a mountain in the fog - we can't see the bottom, but we can feel which way is downhill!</p>
+                        
+                        <div class="modal-example">
+                            <strong>The Basic Idea:</strong><br>
+                            1. Calculate the slope (gradient) at current position<br>
+                            2. Take a step in the downhill direction<br>
+                            3. Repeat until we reach the bottom (minimum loss)
+                        </div>
+                        
+                        <p>Key concepts we'll explore:</p>
+                        <ul class="modal-checklist">
+                            <li>Learning rate - How big are our steps?</li>
+                            <li>Batch vs Stochastic - Use all data or samples?</li>
+                            <li>Momentum - Adding memory to our steps</li>
+                            <li>Local minima - Getting stuck in valleys</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🏔️ Analogy</div>
+                            Imagine you're blindfolded on a hillside trying to find the lowest point. You feel the ground's slope with your feet and take small steps downhill. That's gradient descent!
+                        </div>
+                    `
+                },
+                'backprop': {
+                    title: 'Backpropagation - The Chain Rule Magic',
+                    content: `
+                        <p><strong>The Heart of Deep Learning</strong></p>
+                        <p>Backpropagation is the algorithm that makes training deep networks possible. It efficiently calculates how to update each weight.</p>
+                        
+                        <div class="modal-example">
+                            <strong>The Magic:</strong><br>
+                            • Forward pass: Calculate predictions<br>
+                            • Backward pass: Propagate errors back<br>
+                            • Update weights based on their contribution to error<br>
+                            • Uses calculus chain rule (but don't worry!)
+                        </div>
+                        
+                        <p>Think of it like a game of telephone in reverse:</p>
+                        <div class="modal-code">
+Output: "I was wrong by 10"
+   ↓ (How much did Hidden2 contribute?)
+Hidden2: "I contributed 3 to that error"
+   ↓ (How much did Hidden1 contribute?)
+Hidden1: "I contributed 1.5 to that"
+   ↓ (How much did inputs contribute?)
+Adjust all weights proportionally!
+                        </div>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🔮 Don't Worry!</div>
+                            We'll build intuition for backprop without heavy math. The key insight: errors flow backward, allowing each weight to learn from the final mistake.
+                        </div>
+                    `
+                },
+                'practical': {
+                    title: 'Hands-On Neural Network Training',
+                    content: `
+                        <p><strong>Your First Neural Network!</strong></p>
+                        <p>By the end of Week 2, you'll build and train your own neural network from scratch!</p>
+                        
+                        <div class="modal-example">
+                            <strong>What You'll Build:</strong><br>
+                            • A network that learns to classify handwritten digits<br>
+                            • See training in action with real-time visualizations<br>
+                            • Experiment with different architectures<br>
+                            • Watch the loss decrease and accuracy improve!
+                        </div>
+                        
+                        <div class="modal-code">
+# Preview of what's coming:
+model = NeuralNetwork([
+    Layer(784, 128, activation='relu'),    # Input to hidden
+    Layer(128, 64, activation='relu'),     # Hidden to hidden  
+    Layer(64, 10, activation='softmax')    # Hidden to output
+])
+
+# Train on MNIST digits
+for epoch in range(10):
+    model.train(X_train, y_train)
+    print(f"Accuracy: {model.evaluate(X_test, y_test)}")
+# Watch it learn! 📈
+                        </div>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🚀 Get Excited!</div>
+                            You'll see your network go from random guessing (10% accuracy) to recognizing digits with >95% accuracy. It's like watching a baby learn to read!
+                        </div>
+                    `
+                }
+            };
+            
+            const detail = previewDetails[topic];
+            if (detail) {
+                showModal(detail.title, detail.content);
+            }
+        }
+
+        // Achievement details
+        function showAchievement(type) {
+            const achievements = {
+                'foundation': {
+                    title: '🏗️ Foundation Builder',
+                    content: `
+                        <p><strong>Achievement Unlocked!</strong></p>
+                        <p>You've successfully built a strong foundation in neural networks!</p>
+                        
+                        <div class="modal-example">
+                            <strong>Skills Acquired:</strong><br>
+                            ✓ Understanding biological inspiration<br>
+                            ✓ Artificial neuron structure<br>
+                            ✓ Neural network terminology<br>
+                            ✓ Historical context and applications
+                        </div>
+                        
+                        <p>You now understand the fundamental concepts that power modern AI. This foundation will support everything we build in the coming weeks!</p>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🎉 Congratulations!</div>
+                            You're no longer a complete beginner. You can now speak the language of neural networks!
+                        </div>
+                    `
+                },
+                'neuron': {
+                    title: '🧬 Neuron Navigator',
+                    content: `
+                        <p><strong>Master of Artificial Neurons!</strong></p>
+                        <p>You've learned how artificial neurons process information and make decisions.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Neuron Mastery:</strong><br>
+                            ✓ Weighted inputs and bias<br>
+                            ✓ Activation functions<br>
+                            ✓ From inputs to outputs<br>
+                            ✓ Building blocks of intelligence
+                        </div>
+                        
+                        <div class="modal-code">
+# You can now understand:
+neuron_output = activation(
+    w1*x1 + w2*x2 + w3*x3 + bias
+)
+# Each piece has meaning!
+                        </div>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🧠 Level Up!</div>
+                            You understand the computational unit that, when combined with millions of others, can recognize faces, understand language, and drive cars!
+                        </div>
+                    `
+                },
+                'perceptron': {
+                    title: '⚔️ Perceptron Master',
+                    content: `
+                        <p><strong>Conquered the Classic Perceptron!</strong></p>
+                        <p>You've mastered the historical algorithm that started it all.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Perceptron Powers:</strong><br>
+                            ✓ Linear classification mastery<br>
+                            ✓ AND/OR gate implementation<br>
+                            ✓ Understanding limitations (XOR)<br>
+                            ✓ Motivation for deep networks
+                        </div>
+                        
+                        <p>You've traced the path from Rosenblatt's 1957 invention to today's deep learning revolution. You understand both the power and limitations of linear models.</p>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🏆 Historical Wisdom</div>
+                            By understanding where we started, you better appreciate where we are now. The XOR problem that stumped perceptrons is trivial for modern networks!
+                        </div>
+                    `
+                },
+                'ready': {
+                    title: '🚀 Ready for Week 2',
+                    content: `
+                        <p><strong>Prepared for the Learning Journey!</strong></p>
+                        <p>You're fully equipped to dive into how neural networks learn!</p>
+                        
+                        <div class="modal-example">
+                            <strong>Week 2 Readiness Checklist:</strong><br>
+                            ✅ Understand network structure<br>
+                            ✅ Know how data flows forward<br>
+                            ✅ Grasp activation functions<br>
+                            ✅ Ready to learn about learning!
+                        </div>
+                        
+                        <p>Next week will be transformative - you'll go from understanding <em>what</em> neural networks are to understanding <em>how</em> they learn. Get ready for:</p>
+                        
+                        <ul class="modal-checklist">
+                            <li>Loss functions and optimization</li>
+                            <li>The elegance of gradient descent</li>
+                            <li>The power of backpropagation</li>
+                            <li>Your first trained neural network!</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🎯 Pro Tip for Week 2</div>
+                            Come with curiosity! We'll build intuition first, then dive into implementation. By week's end, you'll have trained your first neural network!
+                        </div>
+                    `
+                }
+            };
+            
+            const achievement = achievements[type];
+            if (achievement) {
+                showModal(achievement.title, achievement.content);
+            }
+        }
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add staggered animation to summary items
+            const summaryItems = document.querySelectorAll('.summary-item');
+            summaryItems.forEach((item, index) => {
+                item.style.animationDelay = `${0.3 + index * 0.1}s`;
+            });
+            
+            // Add staggered animation to preview cards
+            const previewCards = document.querySelectorAll('.preview-card');
+            previewCards.forEach((card, index) => {
+                card.style.animationDelay = `${0.3 + index * 0.1}s`;
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                window.location.href = 'Week1_Slide19.html';
+            } else if (e.key === 'ArrowRight' || e.key === ' ') {
+                window.location.href = 'Week2_Slide21.html';
+            }
+        });
+    </script>
+</body>
+</html>

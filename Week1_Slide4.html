@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS5720 - Why Neural Networks Matter Today</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .slide-container {
+            flex: 1;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .slide-title {
+            font-size: 3.5em;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #16a34a;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: slideInFromTop 1.2s ease-out;
+            font-weight: 700;
+        }
+
+        .content-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .impact-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromLeft 1s ease-out 0.3s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .trends-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromRight 1s ease-out 0.3s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #064e3b;
+            margin-bottom: 25px;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #16a34a, #22c55e);
+            border-radius: 2px;
+        }
+
+        .impact-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid rgba(22, 163, 74, 0.2);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(22, 163, 74, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: #16a34a;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 1em;
+            color: #064e3b;
+            font-weight: 600;
+        }
+
+        .stat-desc {
+            font-size: 0.9em;
+            color: #475569;
+            margin-top: 8px;
+        }
+
+        .trend-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .trend-item {
+            padding: 20px;
+            margin: 15px 0;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 12px;
+            border-left: 4px solid #f59e0b;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trend-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .trend-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.15);
+        }
+
+        .trend-item:hover::before {
+            left: 100%;
+        }
+
+        .trend-icon {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .trend-title {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .trend-desc {
+            font-size: 0.95em;
+            color: #78350f;
+            line-height: 1.5;
+        }
+
+        .applications-showcase {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromBottom 1s ease-out 0.6s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .showcase-title {
+            font-size: 2em;
+            color: #064e3b;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .app-showcase-card {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border-radius: 15px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid rgba(22, 163, 74, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-showcase-card::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, rgba(22, 163, 74, 0.1));
+            transition: top 0.5s ease;
+        }
+
+        .app-showcase-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(22, 163, 74, 0.15);
+        }
+
+        .app-showcase-card:hover::before {
+            top: 100%;
+        }
+
+        .app-showcase-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .app-showcase-title {
+            font-weight: 700;
+            color: #064e3b;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            text-align: center;
+        }
+
+        .app-showcase-desc {
+            color: #475569;
+            line-height: 1.6;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .app-showcase-example {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            color: #374151;
+            font-style: italic;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            border-radius: 30px;
+            color: #1e293b;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(22, 163, 74, 0.4);
+        }
+
+        .slide-number, .course-info {
+            position: fixed;
+            top: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .slide-number { right: 30px; }
+        .course-info { left: 30px; }
+
+        @keyframes slideInFromTop {
+            from { transform: translateY(-80px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromLeft {
+            from { transform: translateX(-60px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromRight {
+            from { transform: translateX(60px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromBottom {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .content-layout { grid-template-columns: 1fr; }
+            .slide-title { font-size: 2.5em; }
+            .impact-stats { grid-template-columns: 1fr; }
+            .app-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-backdrop.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            color: #064e3b;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(22, 163, 74, 0.1);
+            color: #064e3b;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #334155;
+        }
+
+        .modal-body strong {
+            color: #064e3b;
+            font-weight: 600;
+        }
+
+        .modal-body em {
+            color: #16a34a;
+            font-style: normal;
+            font-weight: 500;
+        }
+
+        .modal-example {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #16a34a;
+        }
+
+        .modal-code {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            overflow-x: auto;
+        }
+
+        .modal-tip {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .modal-tip-title {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 20px;
+                padding: 30px 25px;
+            }
+            .modal-title {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="course-info">CS5720 - Week 1</div>
+    <div class="slide-number">Slide 4 of 20</div>
+    
+    <div class="slide-container">
+        <h1 class="slide-title">Why Neural Networks Matter Today</h1>
+        
+        <div class="content-layout">
+            <div class="impact-section">
+                <h2 class="section-title">Revolutionary Impact</h2>
+                
+                <div style="font-size: 1.1em; line-height: 1.7; color: #334155; margin-bottom: 25px;">
+                    Neural networks have transformed from academic curiosity to the driving force behind the world's most valuable companies and breakthrough technologies.
+                </div>
+                
+                <div class="impact-stats">
+                    <div class="stat-card" onclick="showStatDetails('market')">
+                        <div class="stat-number">$15T</div>
+                        <div class="stat-label">AI Market Value</div>
+                        <div class="stat-desc">Expected by 2030</div>
+                    </div>
+                    
+                    <div class="stat-card" onclick="showStatDetails('productivity')">
+                        <div class="stat-number">40%</div>
+                        <div class="stat-label">Productivity Gain</div>
+                        <div class="stat-desc">In knowledge work</div>
+                    </div>
+                    
+                    <div class="stat-card" onclick="showStatDetails('investment')">
+                        <div class="stat-number">$200B</div>
+                        <div class="stat-label">Global Investment</div>
+                        <div class="stat-desc">In AI in 2023</div>
+                    </div>
+                    
+                    <div class="stat-card" onclick="showStatDetails('jobs')">
+                        <div class="stat-number">97M</div>
+                        <div class="stat-label">New Jobs</div>
+                        <div class="stat-desc">AI will create</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="trends-section">
+                <h2 class="section-title">Current Trends</h2>
+                
+                <ul class="trend-list">
+                    <li class="trend-item" onclick="showTrendDetails('llm')">
+                        <span class="trend-icon">🤖</span>
+                        <div class="trend-title">Large Language Models</div>
+                        <div class="trend-desc">ChatGPT reached 100M users in 2 months - fastest in history</div>
+                    </li>
+                    
+                    <li class="trend-item" onclick="showTrendDetails('cv')">
+                        <span class="trend-icon">👁️</span>
+                        <div class="trend-title">Computer Vision</div>
+                        <div class="trend-desc">Autonomous vehicles, medical imaging, quality control</div>
+                    </li>
+                    
+                    <li class="trend-item" onclick="showTrendDetails('scientific')">
+                        <span class="trend-icon">🧬</span>
+                        <div class="trend-title">Scientific Discovery</div>
+                        <div class="trend-desc">Protein folding, drug discovery, climate modeling</div>
+                    </li>
+                    
+                    <li class="trend-item" onclick="showTrendDetails('edge')">
+                        <span class="trend-icon">📱</span>
+                        <div class="trend-title">Edge AI</div>
+                        <div class="trend-desc">AI running on phones, IoT devices, embedded systems</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="applications-showcase">
+            <h2 class="showcase-title">Transforming Industries Today</h2>
+            
+            <div class="app-grid">
+                <div class="app-showcase-card" onclick="showAppDetails('healthcare')">
+                    <div class="app-showcase-icon">🏥</div>
+                    <div class="app-showcase-title">Healthcare</div>
+                    <div class="app-showcase-desc">AI diagnoses diseases faster and more accurately than human doctors in many cases</div>
+                    <div class="app-showcase-example">"AI detected 50% more breast cancers than radiologists alone" - Google Health</div>
+                </div>
+                
+                <div class="app-showcase-card" onclick="showAppDetails('transportation')">
+                    <div class="app-showcase-icon">🚗</div>
+                    <div class="app-showcase-title">Transportation</div>
+                    <div class="app-showcase-desc">Self-driving cars promise to eliminate 90% of traffic accidents</div>
+                    <div class="app-showcase-example">"Waymo has driven 20+ million autonomous miles" - Alphabet</div>
+                </div>
+                
+                <div class="app-showcase-card" onclick="showAppDetails('education')">
+                    <div class="app-showcase-icon">🎓</div>
+                    <div class="app-showcase-title">Education</div>
+                    <div class="app-showcase-desc">Personalized learning adapts to each student's pace and style</div>
+                    <div class="app-showcase-example">"AI tutors provide 24/7 personalized help to millions of students" - Khan Academy</div>
+                </div>
+                
+                <div class="app-showcase-card" onclick="showAppDetails('finance')">
+                    <div class="app-showcase-icon">💰</div>
+                    <div class="app-showcase-title">Finance</div>
+                    <div class="app-showcase-desc">Fraud detection, algorithmic trading, credit scoring</div>
+                    <div class="app-showcase-example">"AI prevents $25B in fraud annually" - Financial Industry</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <a href="Week1_Slide3.html" class="nav-btn">← Previous</a>
+        <a href="Week1_Slide5.html" class="nav-btn">Next →</a>
+    </div>
+
+    <div style="position: fixed; bottom: 30px; left: 30px; color: #64748b; font-size: 0.9em;">
+        <strong>Prepared by Dr. Gorkem Kar</strong>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal-backdrop" id="modalBackdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Modal Title</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                Modal content goes here...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal functionality
+        const modal = document.getElementById('modalBackdrop');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+
+        function showModal(title, content) {
+            modalTitle.textContent = title;
+            modalBody.innerHTML = content;
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('show')) {
+                closeModal();
+            }
+        });
+
+        // Statistics details
+        function showStatDetails(type) {
+            const statDetails = {
+                'market': {
+                    title: 'AI Market Growth - $15 Trillion by 2030',
+                    content: `
+                        <p><strong>The AI Economy is Exploding</strong></p>
+                        <p>The global AI market is experiencing unprecedented growth, transforming from a niche technology to the foundation of the global economy.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Market Breakdown:</strong><br>
+                            • Software: $85B (largest segment)<br>
+                            • Hardware: $45B (GPUs, specialized chips)<br>
+                            • Services: $35B (consulting, implementation)<br>
+                            • Research: $15B (ongoing innovation)
+                        </div>
+                        
+                        <p><strong>Key Drivers:</strong></p>
+                        <ul>
+                            <li>Generative AI revolution (ChatGPT, DALL-E)</li>
+                            <li>Cloud computing democratization</li>
+                            <li>Enterprise digital transformation</li>
+                            <li>Government AI initiatives worldwide</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">💡 Career Opportunity</div>
+                            This massive growth means unprecedented career opportunities in AI. Learning neural networks now positions you at the forefront of the next industrial revolution.
+                        </div>
+                        
+                        <p><strong>Geographic Distribution:</strong></p>
+                        <ul>
+                            <li>North America: 40% of market</li>
+                            <li>Asia-Pacific: 35% of market</li>
+                            <li>Europe: 20% of market</li>
+                            <li>Rest of World: 5% of market</li>
+                        </ul>
+                    `
+                },
+                'productivity': {
+                    title: 'Productivity Revolution - 40% Gains in Knowledge Work',
+                    content: `
+                        <p><strong>AI is Supercharging Human Capabilities</strong></p>
+                        <p>Neural networks are not replacing humans but augmenting human intelligence, leading to massive productivity gains across knowledge-intensive industries.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Real Productivity Gains:</strong><br>
+                            • Software Development: 55% faster coding (GitHub Copilot)<br>
+                            • Content Creation: 60% faster writing (GPT-4)<br>
+                            • Data Analysis: 70% faster insights (AutoML)<br>
+                            • Customer Service: 50% faster resolution (AI chatbots)
+                        </div>
+                        
+                        <p><strong>McKinsey Global Institute Findings:</strong></p>
+                        <ul>
+                            <li>Generative AI could add $2.6-4.4 trillion annually to global economy</li>
+                            <li>75% of value in 4 areas: customer operations, marketing, software engineering, R&D</li>
+                            <li>Current technologies could automate 60-70% of employee time</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Example: AI-Assisted Programming
+# Before AI: 8 hours to write a complex function
+# With AI: 2 hours with GitHub Copilot assistance
+
+def complex_data_analysis(data):
+    # AI suggests optimized pandas operations
+    # AI helps with error handling
+    # AI recommends best practices
+    return processed_data
+                        </div>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🚀 Future of Work</div>
+                            The key is learning to work WITH AI, not fear being replaced BY AI. Those who master AI tools will be 10x more productive than those who don't.
+                        </div>
+                    `
+                },
+                'investment': {
+                    title: 'Investment Surge - $200B in AI in 2023',
+                    content: `
+                        <p><strong>Historic Investment Levels</strong></p>
+                        <p>2023 marked a watershed moment for AI investment, with record funding flowing into neural network research, development, and deployment.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Investment Breakdown:</strong><br>
+                            • Private Venture Capital: $70B<br>
+                            • Corporate R&D: $80B<br>
+                            • Government Funding: $30B<br>
+                            • Public Market Investments: $20B
+                        </div>
+                        
+                        <p><strong>Major Investment Rounds:</strong></p>
+                        <ul>
+                            <li>OpenAI: $10B from Microsoft</li>
+                            <li>Anthropic: $4B from Amazon</li>
+                            <li>Inflection AI: $1.3B Series A</li>
+                            <li>Character.AI: $1B Series A</li>
+                        </ul>
+                        
+                        <p><strong>Corporate AI Spending:</strong></p>
+                        <ul>
+                            <li>Google/Alphabet: $25B+ in AI R&D</li>
+                            <li>Microsoft: $20B+ including OpenAI partnership</li>
+                            <li>Meta: $15B+ in Reality Labs and AI</li>
+                            <li>Amazon: $12B+ in Alexa and AWS AI</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">💰 Investment Insight</div>
+                            This level of investment indicates that major corporations and governments view AI as critical infrastructure, not just a trend. The money follows the transformation.
+                        </div>
+                        
+                        <p><strong>Geographic Investment Distribution:</strong></p>
+                        <ul>
+                            <li>United States: 65% of global AI investment</li>
+                            <li>China: 20% of global AI investment</li>
+                            <li>Europe: 10% of global AI investment</li>
+                            <li>Other regions: 5% of global AI investment</li>
+                        </ul>
+                    `
+                },
+                'jobs': {
+                    title: 'Job Creation - 97 Million New AI Jobs',
+                    content: `
+                        <p><strong>AI Creates More Jobs Than It Eliminates</strong></p>
+                        <p>While AI will automate some roles, it's creating entirely new categories of jobs and augmenting existing ones, leading to net job growth.</p>
+                        
+                        <div class="modal-example">
+                            <strong>New Job Categories:</strong><br>
+                            • AI/ML Engineers: 30M new positions<br>
+                            • Data Scientists: 20M new positions<br>
+                            • AI Ethicists: 5M new positions<br>
+                            • Human-AI Interaction Designers: 15M<br>
+                            • AI Trainers & Prompt Engineers: 27M
+                        </div>
+                        
+                        <p><strong>World Economic Forum Projections:</strong></p>
+                        <ul>
+                            <li>85 million jobs displaced by AI by 2025</li>
+                            <li>97 million NEW jobs created by AI by 2025</li>
+                            <li>Net gain of 12 million jobs</li>
+                            <li>50% of all employees will need reskilling</li>
+                        </ul>
+                        
+                        <p><strong>Highest Demand Skills:</strong></p>
+                        <ul>
+                            <li>Machine Learning & Neural Networks</li>
+                            <li>Data Analysis & Visualization</li>
+                            <li>AI Ethics & Governance</li>
+                            <li>Human-Computer Interaction</li>
+                            <li>Cloud Computing & MLOps</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Career Path Example: AI Engineer
+Years 0-2: Learn neural networks, Python, TensorFlow
+Years 2-5: Specialize in computer vision or NLP
+Years 5+: Lead AI teams, architect AI systems
+
+Average Salary Progression:
+Entry Level: $85,000
+Mid Level: $150,000
+Senior Level: $250,000+
+                        </div>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🎯 Career Strategy</div>
+                            Start learning neural networks now! The demand for AI skills far exceeds supply. Companies are paying premium salaries for AI talent, and this trend will continue for decades.
+                        </div>
+                    `
+                }
+            };
+            
+            const detail = statDetails[type];
+            showModal(detail.title, detail.content);
+        }
+
+        // Trend details
+        function showTrendDetails(type) {
+            const trendDetails = {
+                'llm': {
+                    title: 'Large Language Models - The ChatGPT Phenomenon',
+                    content: `
+                        <p><strong>The Fastest Technology Adoption in History</strong></p>
+                        <p>ChatGPT's unprecedented growth demonstrates the massive demand for AI that can understand and generate human language.</p>
+                        
+                        <div class="modal-example">
+                            <strong>ChatGPT Growth Timeline:</strong><br>
+                            • Day 1: 1 million users<br>
+                            • Week 1: 10 million users<br>
+                            • Month 2: 100 million users<br>
+                            • Year 1: 1.8 billion visits/month
+                        </div>
+                        
+                        <p><strong>Technical Breakthroughs:</strong></p>
+                        <ul>
+                            <li><strong>Transformer Architecture:</strong> Attention mechanism revolutionized NLP</li>
+                            <li><strong>Scale:</strong> GPT-4 has 1.76 trillion parameters</li>
+                            <li><strong>Training Data:</strong> Trained on essentially the entire internet</li>
+                            <li><strong>Emergent Abilities:</strong> Capabilities that appear at scale</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Modern LLM capabilities:
+tasks = [
+    "Write code in any programming language",
+    "Translate between 100+ languages", 
+    "Solve complex math problems",
+    "Write creative stories and poems",
+    "Analyze data and create reports",
+    "Debug code and explain errors",
+    "Generate images from text descriptions",
+    "Have natural conversations"
+]
+
+for task in tasks:
+    llm.can_do(task)  # Returns: True
+                        </div>
+                        
+                        <p><strong>Industry Impact:</strong></p>
+                        <ul>
+                            <li>Microsoft integrated GPT into Office 365 (Copilot)</li>
+                            <li>Google launched Bard to compete</li>
+                            <li>Every major tech company building LLMs</li>
+                            <li>Open source alternatives (LLaMA, Alpaca)</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🌟 Why It Matters</div>
+                            LLMs represent the first AI that feels truly intelligent to everyday users. They're not just tools—they're AI assistants that can help with virtually any knowledge-based task.
+                        </div>
+                    `
+                },
+                'cv': {
+                    title: 'Computer Vision - Seeing is Believing',
+                    content: `
+                        <p><strong>AI Vision Surpassing Human Capabilities</strong></p>
+                        <p>Computer vision powered by convolutional neural networks has achieved superhuman performance in many visual recognition tasks.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Performance Milestones:</strong><br>
+                            • Image Classification: 99.9% accuracy (surpasses humans)<br>
+                            • Face Recognition: 99.97% accuracy<br>
+                            • Medical Imaging: 94% accuracy for cancer detection<br>
+                            • Object Detection: Real-time processing at 60 FPS
+                        </div>
+                        
+                        <p><strong>Autonomous Vehicles:</strong></p>
+                        <ul>
+                            <li>Tesla: 8 cameras process 2,300 frames/second</li>
+                            <li>Waymo: 20+ million autonomous miles driven</li>
+                            <li>Cruise: Operating robotaxis in San Francisco</li>
+                            <li>Future: Level 5 autonomy expected by 2030</li>
+                        </ul>
+                        
+                        <p><strong>Medical Imaging Revolution:</strong></p>
+                        <ul>
+                            <li>Radiology: AI detects tumors missed by doctors</li>
+                            <li>Ophthalmology: Diabetic retinopathy screening</li>
+                            <li>Pathology: Cancer cell detection in biopsies</li>
+                            <li>Cardiology: Heart disease prediction from ECGs</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Computer vision pipeline:
+import cv2
+import tensorflow as tf
+
+# Load pre-trained model
+model = tf.keras.applications.ResNet50(
+    weights='imagenet'
+)
+
+# Process image
+image = cv2.imread('medical_scan.jpg')
+prediction = model.predict(image)
+
+# Results: 95% confident diagnosis
+# Faster than human doctors
+# Available 24/7 worldwide
+                        </div>
+                        
+                        <p><strong>Industrial Applications:</strong></p>
+                        <ul>
+                            <li>Quality Control: 99.9% defect detection</li>
+                            <li>Security: Real-time threat identification</li>
+                            <li>Retail: Automated checkout systems</li>
+                            <li>Agriculture: Crop monitoring and yield prediction</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">👁️ Future Vision</div>
+                            Computer vision is becoming the "eyes" of AI systems. Every camera in the world is potentially an AI sensor, creating a global intelligent vision network.
+                        </div>
+                    `
+                },
+                'scientific': {
+                    title: 'Scientific Discovery - AI Accelerating Research',
+                    content: `
+                        <p><strong>AI Solving Problems That Stumped Scientists for Decades</strong></p>
+                        <p>Neural networks are accelerating scientific discovery at an unprecedented pace, solving complex problems in biology, chemistry, physics, and climate science.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Major Breakthroughs:</strong><br>
+                            • Protein Folding: AlphaFold solved 50-year-old problem<br>
+                            • Drug Discovery: 90% faster molecule identification<br>
+                            • Climate Modeling: 1000x faster weather predictions<br>
+                            • Materials Science: Novel compounds for batteries
+                        </div>
+                        
+                        <p><strong>AlphaFold - Protein Folding Revolution:</strong></p>
+                        <ul>
+                            <li>Predicted structure of 200+ million proteins</li>
+                            <li>Released all data freely to scientists worldwide</li>
+                            <li>Accelerating drug discovery by 10+ years</li>
+                            <li>Helping understand diseases like Alzheimer's</li>
+                        </ul>
+                        
+                        <p><strong>Drug Discovery Transformation:</strong></p>
+                        <ul>
+                            <li>Traditional: 10-15 years, $1-3 billion per drug</li>
+                            <li>AI-assisted: 3-5 years, $100-500 million</li>
+                            <li>Success rate: 2x higher with AI</li>
+                            <li>Target identification: 1000x faster</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Example: AI drug discovery pipeline
+import deepchem as dc
+from rdkit import Chem
+
+# Load molecular datasets
+dataset = dc.data.load_tox21()
+
+# Train neural network on molecular properties
+model = dc.models.GraphConvModel(
+    n_tasks=12,
+    mode='classification'
+)
+model.fit(dataset)
+
+# Predict toxicity of new compounds
+new_molecule = "CC(C)C[C@H](NC(=O)[C@H](CC1=CC=CC=C1)NC)C(=O)O"
+toxicity = model.predict(new_molecule)
+# Result: Safe for human trials
+                        </div>
+                        
+                        <p><strong>Climate Science Impact:</strong></p>
+                        <ul>
+                            <li>Weather prediction: 1000x faster than traditional models</li>
+                            <li>Climate modeling: Simulate 100-year scenarios in hours</li>
+                            <li>Carbon capture: Design new materials for CO2 removal</li>
+                            <li>Renewable energy: Optimize wind and solar placement</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🧬 Scientific Revolution</div>
+                            We're entering an era where AI can generate and test scientific hypotheses faster than human scientists. This could lead to solutions for humanity's greatest challenges.
+                        </div>
+                    `
+                },
+                'edge': {
+                    title: 'Edge AI - Intelligence Everywhere',
+                    content: `
+                        <p><strong>Bringing AI to Every Device</strong></p>
+                        <p>Edge AI brings neural network capabilities directly to phones, IoT devices, and embedded systems, enabling real-time AI without cloud connectivity.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Edge AI Growth:</strong><br>
+                            • Market Size: $8B in 2023, $40B by 2030<br>
+                            • Smartphone AI: 3B+ devices with AI chips<br>
+                            • IoT Deployment: 75B connected devices by 2025<br>
+                            • Latency: <1ms response time (vs 100ms cloud)
+                        </div>
+                        
+                        <p><strong>Why Edge AI Matters:</strong></p>
+                        <ul>
+                            <li><strong>Privacy:</strong> Data stays on device</li>
+                            <li><strong>Speed:</strong> No network latency</li>
+                            <li><strong>Reliability:</strong> Works offline</li>
+                            <li><strong>Cost:</strong> No cloud compute fees</li>
+                            <li><strong>Bandwidth:</strong> Reduces network traffic</li>
+                        </ul>
+                        
+                        <p><strong>Current Applications:</strong></p>
+                        <ul>
+                            <li>Smartphone cameras: Real-time photo enhancement</li>
+                            <li>Smart speakers: Voice recognition without internet</li>
+                            <li>Autonomous vehicles: Split-second decision making</li>
+                            <li>Industrial IoT: Predictive maintenance</li>
+                            <li>Wearables: Health monitoring and alerts</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Edge AI example: TensorFlow Lite
+import tensorflow as tf
+
+# Convert model for mobile deployment
+converter = tf.lite.TFLiteConverter.from_saved_model('model')
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+
+# Quantize for smaller size and faster inference
+converter.target_spec.supported_types = [tf.float16]
+tflite_model = converter.convert()
+
+# Deploy to mobile device
+# Model size: 50MB -> 5MB
+# Inference speed: 100ms -> 10ms
+# Power consumption: 50% reduction
+                        </div>
+                        
+                        <p><strong>Specialized AI Chips:</strong></p>
+                        <ul>
+                            <li>Apple A17 Bionic: 35 TOPS neural engine</li>
+                            <li>Google Pixel 8: Tensor G3 with dedicated AI</li>
+                            <li>Qualcomm Snapdragon: Hexagon AI processor</li>
+                            <li>NVIDIA Jetson: Edge AI computing platform</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🔄 Paradigm Shift</div>
+                            Edge AI represents a shift from "AI in the cloud" to "AI everywhere." Every device becomes an intelligent node in a global AI network.
+                        </div>
+                    `
+                }
+            };
+            
+            const detail = trendDetails[type];
+            showModal(detail.title, detail.content);
+        }
+
+        // Application details
+        function showAppDetails(type) {
+            const appDetails = {
+                'healthcare': {
+                    title: 'AI in Healthcare - Saving Lives with Intelligence',
+                    content: `
+                        <p><strong>Revolutionizing Medicine and Patient Care</strong></p>
+                        <p>Neural networks are transforming healthcare by enabling earlier diagnosis, personalized treatment, and improved patient outcomes across all medical specialties.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Diagnostic Accuracy Improvements:</strong><br>
+                            • Breast Cancer: AI + Radiologist = 99.5% accuracy<br>
+                            • Skin Cancer: AI matches dermatologist performance<br>
+                            • Eye Disease: 95% accuracy in diabetic retinopathy<br>
+                            • Heart Disease: Predicts heart attacks 5 years early
+                        </div>
+                        
+                        <p><strong>Current AI Applications:</strong></p>
+                        <ul>
+                            <li><strong>Medical Imaging:</strong> X-rays, MRIs, CT scans analysis</li>
+                            <li><strong>Drug Discovery:</strong> 10x faster molecule identification</li>
+                            <li><strong>Personalized Medicine:</strong> Treatment based on genetics</li>
+                            <li><strong>Robot Surgery:</strong> Precision operations with AI guidance</li>
+                            <li><strong>Electronic Health Records:</strong> AI-powered insights</li>
+                        </ul>
+                        
+                        <p><strong>Real-World Success Stories:</strong></p>
+                        <ul>
+                            <li>Google DeepMind: Reduced acute kidney injury by 30%</li>
+                            <li>IBM Watson: Oncology treatment recommendations</li>
+                            <li>PathAI: Improved cancer diagnosis accuracy</li>
+                            <li>Tempus: Precision medicine for cancer patients</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Medical AI pipeline example
+import tensorflow as tf
+import medical_imaging_toolkit as mit
+
+# Load medical imaging model
+model = tf.keras.models.load_model('chest_xray_classifier')
+
+# Process patient X-ray
+xray_image = mit.load_dicom('patient_001.dcm')
+processed = mit.preprocess(xray_image)
+
+# AI diagnosis
+prediction = model.predict(processed)
+confidence = prediction.max()
+
+if confidence > 0.95:
+    diagnosis = "Pneumonia detected with 95% confidence"
+    recommendation = "Immediate antibiotic treatment recommended"
+else:
+    diagnosis = "No abnormalities detected"
+    recommendation = "Routine follow-up in 6 months"
+                        </div>
+                        
+                        <p><strong>Future of Healthcare AI:</strong></p>
+                        <ul>
+                            <li>Continuous health monitoring via wearables</li>
+                            <li>AI-powered robotic surgeons</li>
+                            <li>Gene therapy optimization</li>
+                            <li>Mental health chatbots and therapy</li>
+                            <li>Pandemic prediction and prevention</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🏥 Healthcare Revolution</div>
+                            AI in healthcare isn't just improving outcomes—it's making quality healthcare accessible to billions of people worldwide who previously lacked access to expert medical care.
+                        </div>
+                    `
+                },
+                'transportation': {
+                    title: 'AI in Transportation - The Self-Driving Revolution',
+                    content: `
+                        <p><strong>Autonomous Vehicles and Smart Transportation</strong></p>
+                        <p>Neural networks are powering the transition to fully autonomous transportation, promising to eliminate human error and revolutionize mobility.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Safety Impact Projections:</strong><br>
+                            • 94% of serious crashes due to human error<br>
+                            • Autonomous vehicles could prevent 90% of accidents<br>
+                            • Save 1.35 million lives globally per year<br>
+                            • Reduce transportation costs by 40%
+                        </div>
+                        
+                        <p><strong>Current Autonomous Vehicle Leaders:</strong></p>
+                        <ul>
+                            <li><strong>Waymo:</strong> 20+ million miles, fully driverless service</li>
+                            <li><strong>Tesla:</strong> 3+ billion Autopilot miles, FSD beta</li>
+                            <li><strong>Cruise:</strong> Operating robotaxis in San Francisco</li>
+                            <li><strong>Aurora:</strong> Highway truck automation</li>
+                            <li><strong>Baidu Apollo:</strong> Autonomous taxi service in China</li>
+                        </ul>
+                        
+                        <p><strong>AI Technologies Enabling Autonomy:</strong></p>
+                        <ul>
+                            <li><strong>Computer Vision:</strong> Object detection and tracking</li>
+                            <li><strong>Sensor Fusion:</strong> Combining camera, LiDAR, radar</li>
+                            <li><strong>Path Planning:</strong> Optimal route calculation</li>
+                            <li><strong>Behavioral Prediction:</strong> Anticipating other drivers</li>
+                            <li><strong>Real-time Processing:</strong> Split-second decisions</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Simplified autonomous driving pipeline
+import numpy as np
+import cv2
+
+class AutonomousVehicle:
+    def __init__(self):
+        self.perception_model = load_perception_model()
+        self.planning_model = load_planning_model()
+        
+    def drive(self, sensor_data):
+        # 1. Perception: What's around us?
+        objects = self.perception_model.detect(sensor_data)
+        
+        # 2. Prediction: What will others do?
+        predictions = self.predict_behavior(objects)
+        
+        # 3. Planning: What should we do?
+        trajectory = self.planning_model.plan(
+            current_state=self.state,
+            objects=objects,
+            predictions=predictions
+        )
+        
+        # 4. Control: Execute the plan
+        steering, acceleration = self.execute(trajectory)
+        return steering, acceleration
+                        </div>
+                        
+                        <p><strong>Beyond Cars - Transportation AI:</strong></p>
+                        <ul>
+                            <li><strong>Aviation:</strong> AI-powered flight optimization</li>
+                            <li><strong>Maritime:</strong> Autonomous ships and ports</li>
+                            <li><strong>Rail:</strong> Predictive maintenance and scheduling</li>
+                            <li><strong>Urban Planning:</strong> Traffic flow optimization</li>
+                            <li><strong>Logistics:</strong> Delivery drones and robots</li>
+                        </ul>
+                        
+                        <p><strong>Societal Benefits:</strong></p>
+                        <ul>
+                            <li>Mobility for elderly and disabled populations</li>
+                            <li>Reduced parking needs (shared autonomous fleets)</li>
+                            <li>Lower transportation costs</li>
+                            <li>Reduced traffic congestion</li>
+                            <li>Environmental benefits (electric + autonomous)</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🚗 Transformation Timeline</div>
+                            Most experts predict Level 4 autonomy (fully self-driving in specific areas) by 2025-2027, with Level 5 (fully autonomous everywhere) by 2030-2035.
+                        </div>
+                    `
+                },
+                'education': {
+                    title: 'AI in Education - Personalized Learning for Everyone',
+                    content: `
+                        <p><strong>Transforming How We Learn and Teach</strong></p>
+                        <p>Neural networks are enabling personalized education at scale, adapting to each student's learning style, pace, and needs.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Learning Effectiveness Gains:</strong><br>
+                            • Personalized learning: 30% faster mastery<br>
+                            • AI tutoring: Available 24/7 for every student<br>
+                            • Adaptive testing: 40% more accurate assessment<br>
+                            • Language learning: 2x faster fluency acquisition
+                        </div>
+                        
+                        <p><strong>Current AI Education Applications:</strong></p>
+                        <ul>
+                            <li><strong>Intelligent Tutoring:</strong> One-on-one AI teaching assistants</li>
+                            <li><strong>Adaptive Learning:</strong> Curriculum adjusts to student progress</li>
+                            <li><strong>Automated Grading:</strong> Instant feedback on assignments</li>
+                            <li><strong>Content Generation:</strong> AI creates personalized exercises</li>
+                            <li><strong>Learning Analytics:</strong> Track and optimize learning</li>
+                        </ul>
+                        
+                        <p><strong>Leading AI Education Platforms:</strong></p>
+                        <ul>
+                            <li><strong>Khan Academy:</strong> AI-powered personalized learning</li>
+                            <li><strong>Duolingo:</strong> Adaptive language learning with AI</li>
+                            <li><strong>Coursera:</strong> AI course recommendations</li>
+                            <li><strong>Squirrel AI:</strong> Personalized K-12 education in China</li>
+                            <li><strong>Carnegie Learning:</strong> AI math tutoring</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# AI tutoring system example
+class IntelligentTutor:
+    def __init__(self, subject="mathematics"):
+        self.knowledge_model = load_domain_model(subject)
+        self.student_model = StudentModel()
+        self.pedagogy_model = TeachingStrategies()
+    
+    def teach(self, student_id, topic):
+        # Assess current knowledge
+        knowledge_gaps = self.assess_student(student_id, topic)
+        
+        # Select appropriate teaching strategy
+        strategy = self.pedagogy_model.select_strategy(
+            gaps=knowledge_gaps,
+            learning_style=self.student_model.get_style(student_id),
+            motivation_level=self.student_model.get_motivation(student_id)
+        )
+        
+        # Generate personalized content
+        lesson = self.generate_lesson(topic, strategy)
+        exercises = self.generate_exercises(topic, difficulty_level)
+        
+        return lesson, exercises
+    
+    def provide_feedback(self, student_response):
+        # Immediate, constructive feedback
+        if correct:
+            return "Excellent! Here's why your approach worked..."
+        else:
+            return "Good attempt! Let me show you another way..."
+                        </code>
+                        
+                        <p><strong>Benefits for Students:</strong></p>
+                        <ul>
+                            <li>Learn at their own pace</li>
+                            <li>Receive immediate feedback</li>
+                            <li>Access to world-class content</li>
+                            <li>Overcome learning disabilities with adaptive tools</li>
+                            <li>Practice in safe, non-judgmental environment</li>
+                        </ul>
+                        
+                        <p><strong>Benefits for Educators:</strong></p>
+                        <ul>
+                            <li>Automate routine tasks (grading, admin)</li>
+                            <li>Gain insights into student learning patterns</li>
+                            <li>Focus on high-value teaching activities</li>
+                            <li>Identify struggling students early</li>
+                            <li>Access to best teaching practices via AI</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🎓 Education Democracy</div>
+                            AI is democratizing access to high-quality education. A student in rural Africa can now receive the same quality AI tutoring as a student in Silicon Valley.
+                        </div>
+                    `
+                },
+                'finance': {
+                    title: 'AI in Finance - Smart Money Management',
+                    content: `
+                        <p><strong>Revolutionizing Financial Services and Investment</strong></p>
+                        <p>Neural networks are transforming finance through fraud detection, algorithmic trading, risk assessment, and personalized financial services.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Financial Impact:</strong><br>
+                            • Fraud Prevention: $25B saved annually<br>
+                            • Trading Efficiency: 70% of trades now algorithmic<br>
+                            • Credit Decisions: 60% faster loan approvals<br>
+                            • Cost Reduction: 40% lower operational costs
+                        </div>
+                        
+                        <p><strong>Core AI Applications in Finance:</strong></p>
+                        <ul>
+                            <li><strong>Fraud Detection:</strong> Real-time transaction monitoring</li>
+                            <li><strong>Algorithmic Trading:</strong> High-frequency automated trading</li>
+                            <li><strong>Credit Scoring:</strong> AI-powered risk assessment</li>
+                            <li><strong>Robo-advisors:</strong> Automated investment management</li>
+                            <li><strong>RegTech:</strong> Compliance and regulatory reporting</li>
+                        </ul>
+                        
+                        <p><strong>Major Players Using AI:</strong></p>
+                        <ul>
+                            <li><strong>JPMorgan Chase:</strong> COIN for legal document analysis</li>
+                            <li><strong>Goldman Sachs:</strong> Marcus robo-advisor platform</li>
+                            <li><strong>BlackRock:</strong> Aladdin risk management system</li>
+                            <li><strong>Visa:</strong> AI fraud detection processes 150B transactions</li>
+                            <li><strong>Betterment:</strong> Robo-advisor with $30B+ assets</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Financial AI example: Fraud detection
+import pandas as pd
+import tensorflow as tf
+
+class FraudDetectionSystem:
+    def __init__(self):
+        self.model = tf.keras.models.load_model('fraud_detector.h5')
+        self.feature_columns = [
+            'transaction_amount', 'merchant_category', 
+            'time_of_day', 'location', 'previous_transactions'
+        ]
+    
+    def detect_fraud(self, transaction):
+        # Extract features from transaction
+        features = self.extract_features(transaction)
+        
+        # Real-time prediction
+        fraud_probability = self.model.predict(features)[0]
+        
+        if fraud_probability > 0.85:
+            action = "BLOCK_TRANSACTION"
+            alert_level = "HIGH"
+        elif fraud_probability > 0.50:
+            action = "REQUIRE_ADDITIONAL_AUTH"
+            alert_level = "MEDIUM"
+        else:
+            action = "APPROVE"
+            alert_level = "LOW"
+            
+        return {
+            'action': action,
+            'confidence': fraud_probability,
+            'alert_level': alert_level,
+            'processing_time': '< 50ms'
+        }
+                        </div>
+                        
+                        <p><strong>Algorithmic Trading Revolution:</strong></p>
+                        <ul>
+                            <li>High-frequency trading: Microsecond decisions</li>
+                            <li>Pattern recognition: Identify market trends</li>
+                            <li>Risk management: Real-time portfolio optimization</li>
+                            <li>Sentiment analysis: Social media and news impact</li>
+                            <li>Arbitrage: Exploit price differences across markets</li>
+                        </ul>
+                        
+                        <p><strong>Personal Finance AI:</strong></p>
+                        <ul>
+                            <li>Budgeting apps with spending prediction</li>
+                            <li>Investment advice based on goals and risk tolerance</li>
+                            <li>Credit score optimization recommendations</li>
+                            <li>Insurance premium calculations</li>
+                            <li>Retirement planning with AI projections</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">💰 Financial Democratization</div>
+                            AI is making sophisticated financial tools available to everyone, not just wealthy investors. Robo-advisors provide institutional-quality investment management for anyone with $1.
+                        </div>
+                    `
+                }
+            };
+            
+            const detail = appDetails[type];
+            showModal(detail.title, detail.content);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                window.location.href = 'Week1_Slide3.html';
+            } else if (e.key === 'ArrowRight' || e.key === ' ') {
+                window.location.href = 'Week1_Slide5.html';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS5720 - History of Neural Networks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .slide-container {
+            flex: 1;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .slide-title {
+            font-size: 3.5em;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #064e3b;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: slideInFromTop 1.2s ease-out;
+            font-weight: 700;
+        }
+
+        .timeline-container {
+            position: relative;
+            padding: 40px 0;
+            margin-bottom: 40px;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: linear-gradient(180deg, #16a34a, #22c55e, #16a34a);
+            transform: translateX(-50%);
+            border-radius: 3px;
+            box-shadow: 0 0 10px rgba(22, 163, 74, 0.3);
+        }
+
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 0;
+            background: linear-gradient(180deg, #ffffff, #bbf7d0);
+            transform: translateX(-50%);
+            animation: timelineProgress 3s ease-out forwards;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes timelineProgress {
+            to { height: 100%; }
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 50px;
+            display: flex;
+            align-items: center;
+            animation: fadeIn 1s ease-out forwards;
+            opacity: 0;
+        }
+
+        .timeline-item:nth-child(odd) {
+            justify-content: flex-start;
+            padding-right: 50%;
+            padding-left: 20px;
+        }
+
+        .timeline-item:nth-child(even) {
+            justify-content: flex-end;
+            padding-left: 50%;
+            padding-right: 20px;
+        }
+
+        .timeline-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            max-width: 500px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .timeline-content:hover {
+            transform: scale(1.02) translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+
+        .timeline-content::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, transparent, rgba(22, 163, 74, 0.1));
+            border-radius: 22px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .timeline-content:hover::before {
+            opacity: 1;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 4px solid #bbf7d0;
+            z-index: 1;
+            box-shadow: 0 0 20px rgba(22, 163, 74, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .timeline-dot:hover {
+            transform: translate(-50%, -50%) scale(1.2);
+            box-shadow: 0 0 30px rgba(22, 163, 74, 0.6);
+        }
+
+        .timeline-dot.golden-age {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        }
+
+        .timeline-dot.ai-winter {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+        }
+
+        .timeline-dot.renaissance {
+            background: linear-gradient(135deg, #ec4899, #be185d);
+        }
+
+        .era-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .era-badge.golden-age {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+            border: 2px solid #fbbf24;
+        }
+
+        .era-badge.ai-winter {
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            color: #3730a3;
+            border: 2px solid #6366f1;
+        }
+
+        .era-badge.renaissance {
+            background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+            color: #831843;
+            border: 2px solid #ec4899;
+        }
+
+        .timeline-year {
+            font-size: 2.2em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .timeline-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #064e3b;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timeline-icon {
+            font-size: 1.2em;
+            padding: 8px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .timeline-desc {
+            font-size: 0.95em;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .timeline-person {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #16a34a;
+            font-style: italic;
+        }
+
+        .era-summary {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 25px;
+            padding: 50px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            text-align: center;
+            animation: slideInFromBottom 1s ease-out 0.8s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .era-summary::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(22, 163, 74, 0.05), transparent);
+            animation: summaryShimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes summaryShimmer {
+            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .era-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .era-card {
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .era-golden {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid #fbbf24;
+        }
+
+        .era-winter {
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            border: 2px solid #6366f1;
+        }
+
+        .era-renaissance {
+            background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+            border: 2px solid #ec4899;
+        }
+
+        .era-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .era-card.active {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            animation: eraHighlight 2s ease-in-out infinite;
+        }
+
+        @keyframes eraHighlight {
+            0%, 100% { box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
+            50% { box-shadow: 0 20px 45px rgba(0,0,0,0.25); }
+        }
+
+        .era-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: neuronFloat 20s linear infinite;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            border-radius: 30px;
+            color: #1e293b;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(22, 163, 74, 0.4);
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .course-info {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        @keyframes slideInFromTop {
+            from { transform: translateY(-80px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromBottom {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes progressiveReveal {
+            0% { 
+                opacity: 0; 
+                transform: translateX(-50px) scale(0.8);
+                filter: blur(5px);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translateX(-10px) scale(0.95);
+                filter: blur(2px);
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateX(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes timelinePulse {
+            0%, 100% { 
+                box-shadow: 0 0 20px rgba(22, 163, 74, 0.4);
+            }
+            50% { 
+                box-shadow: 0 0 40px rgba(22, 163, 74, 0.8);
+            }
+        }
+
+        @keyframes neuronFloat {
+            0% { transform: translateY(100vh) translateX(-30px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100px) translateX(100px) rotate(360deg); opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .timeline-item:nth-child(odd),
+            .timeline-item:nth-child(even) {
+                padding-left: 60px;
+                padding-right: 20px;
+                justify-content: flex-start;
+            }
+            .timeline-line {
+                left: 30px;
+            }
+            .timeline-dot {
+                left: 30px;
+            }
+            .era-grid {
+                grid-template-columns: 1fr;
+            }
+            .slide-title { font-size: 2.5em; }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 25px;
+            max-width: 900px;
+            max-height: 85vh;
+            width: 90%;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+            position: relative;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            padding: 30px;
+            position: relative;
+            border-bottom: 2px solid rgba(22, 163, 74, 0.2);
+        }
+
+        .modal-title {
+            font-size: 2em;
+            color: #064e3b;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(22, 163, 74, 0.3);
+            font-size: 1.5em;
+            color: #064e3b;
+        }
+
+        .modal-close:hover {
+            background: #ef4444;
+            color: white;
+            transform: scale(1.1);
+            border-color: #dc2626;
+        }
+
+        .modal-body {
+            padding: 30px;
+            max-height: calc(85vh - 180px);
+            overflow-y: auto;
+            line-height: 1.8;
+        }
+
+        .modal-body h3 {
+            color: #16a34a;
+            font-size: 1.5em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .modal-body h3:first-child {
+            margin-top: 0;
+        }
+
+        .modal-body h4 {
+            color: #064e3b;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .modal-body p {
+            color: #334155;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        .modal-body ul {
+            color: #475569;
+            font-size: 1.05em;
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+
+        .modal-body li {
+            margin-bottom: 10px;
+        }
+
+        .code-example {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            font-size: 0.95em;
+        }
+
+        .example-box {
+            background: rgba(22, 163, 74, 0.1);
+            border-left: 4px solid #16a34a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .example-box strong {
+            color: #064e3b;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .quote-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+            font-style: italic;
+        }
+
+        .quote-box .author {
+            text-align: right;
+            margin-top: 10px;
+            font-weight: 600;
+            color: #92400e;
+        }
+
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .impact-item {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid rgba(22, 163, 74, 0.2);
+        }
+
+        .impact-item h5 {
+            color: #16a34a;
+            margin-bottom: 10px;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-30px) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Scrollbar styling for modal */
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements" id="floatingElements"></div>
+    
+    <div class="course-info">CS5720 - Week 1</div>
+    <div class="slide-number">Slide 3 of 20</div>
+    
+    <div class="slide-container">
+        <h1 class="slide-title">History of Neural Networks - Key Milestones</h1>
+        
+        <div class="timeline-container">
+            <div class="timeline-line"></div>
+            
+            <div class="timeline-item" style="animation: progressiveReveal 1s ease-out 0.2s both;">
+                <div class="timeline-content">
+                    <span class="era-badge golden-age">🌅 Golden Age</span>
+                    <div class="timeline-year">1943</div>
+                    <div class="timeline-title">
+                        <span class="timeline-icon">🧠</span>
+                        First Mathematical Model
+                    </div>
+                    <div class="timeline-desc">McCulloch and Pitts create the first mathematical model of a neural network, laying the foundation for artificial neurons with binary threshold logic.</div>
+                    <div class="timeline-person">👥 Warren McCulloch & Walter Pitts</div>
+                </div>
+                <div class="timeline-dot golden-age" style="animation: timelinePulse 3s ease-in-out infinite 0.2s;">🧠</div>
+            </div>
+
+            <div class="timeline-item" style="animation: progressiveReveal 1s ease-out 0.4s both;">
+                <div class="timeline-content">
+                    <span class="era-badge golden-age">🌅 Golden Age</span>
+                    <div class="timeline-year">1958</div>
+                    <div class="timeline-title">
+                        <span class="timeline-icon">⚡</span>
+                        The Perceptron
+                    </div>
+                    <div class="timeline-desc">Frank Rosenblatt develops the Perceptron, the first algorithm that could learn from data through supervised learning, inspiring dreams of thinking machines.</div>
+                    <div class="timeline-person">👤 Frank Rosenblatt</div>
+                </div>
+                <div class="timeline-dot golden-age" style="animation: timelinePulse 3s ease-in-out infinite 0.4s;">⚡</div>
+            </div>
+
+            <div class="timeline-item" style="animation: progressiveReveal 1s ease-out 0.6s both;">
+                <div class="timeline-content">
+                    <span class="era-badge ai-winter">❄️ AI Winter</span>
+                    <div class="timeline-year">1969</div>
+                    <div class="timeline-title">
+                        <span class="timeline-icon">📚</span>
+                        Perceptron Limitations
+                    </div>
+                    <div class="timeline-desc">Minsky and Papert publish "Perceptrons," highlighting fundamental limitations like the XOR problem, leading to dramatically reduced funding and research interest.</div>
+                    <div class="timeline-person">👥 Marvin Minsky & Seymour Papert</div>
+                </div>
+                <div class="timeline-dot ai-winter" style="animation: timelinePulse 3s ease-in-out infinite 0.6s;">📚</div>
+            </div>
+
+            <div class="timeline-item" style="animation: progressiveReveal 1s ease-out 0.8s both;">
+                <div class="timeline-content">
+                    <span class="era-badge renaissance">🚀 Renaissance</span>
+                    <div class="timeline-year">1986</div>
+                    <div class="timeline-title">
+                        <span class="timeline-icon">🔄</span>
+                        Backpropagation
+                    </div>
+                    <div class="timeline-desc">Rumelhart, Hinton, and Williams popularize backpropagation, enabling training of multi-layer networks and solving the XOR problem that ended the golden age.</div>
+                    <div class="timeline-person">👥 Rumelhart, Hinton & Williams</div>
+                </div>
+                <div class="timeline-dot renaissance" style="animation: timelinePulse 3s ease-in-out infinite 0.8s;">🔄</div>
+            </div>
+
+            <div class="timeline-item" style="animation: progressiveReveal 1s ease-out 1.0s both;">
+                <div class="timeline-content">
+                    <span class="era-badge renaissance">🚀 Renaissance</span>
+                    <div class="timeline-year">2012</div>
+                    <div class="timeline-title">
+                        <span class="timeline-icon">🖼️</span>
+                        Deep Learning Breakthrough
+                    </div>
+                    <div class="timeline-desc">AlexNet wins ImageNet competition by a massive margin (15.3% vs 26.2% error), marking the beginning of the deep learning revolution and renewed industrial interest.</div>
+                    <div class="timeline-person">👥 Alex Krizhevsky, Ilya Sutskever & Geoffrey Hinton</div>
+                </div>
+                <div class="timeline-dot renaissance" style="animation: timelinePulse 3s ease-in-out infinite 1.0s;">🖼️</div>
+            </div>
+
+            <div class="timeline-item" style="animation: progressiveReveal 1s ease-out 1.2s both;">
+                <div class="timeline-content">
+                    <span class="era-badge renaissance">🚀 Renaissance</span>
+                    <div class="timeline-year">2023</div>
+                    <div class="timeline-title">
+                        <span class="timeline-icon">🤖</span>
+                        Transformer Revolution
+                    </div>
+                    <div class="timeline-desc">Large Language Models like GPT-4 and ChatGPT demonstrate unprecedented capabilities in natural language understanding, reasoning, and generation, reaching mainstream adoption.</div>
+                    <div class="timeline-person">🏢 OpenAI, Google, Anthropic & others</div>
+                </div>
+                <div class="timeline-dot renaissance" style="animation: timelinePulse 3s ease-in-out infinite 1.2s;">🤖</div>
+            </div>
+        </div>
+
+        <div class="era-summary">
+            <h2 style="font-size: 1.8em; color: #064e3b; margin-bottom: 20px;">Three Major Eras</h2>
+            
+            <div class="era-grid">
+                <div class="era-card era-golden">
+                    <div class="era-icon">🌅</div>
+                    <h3>Golden Age</h3>
+                    <p>1940s-1960s</p>
+                    <p style="font-size: 0.9em; margin-top: 10px;">Initial excitement and fundamental discoveries</p>
+                </div>
+                
+                <div class="era-card era-winter">
+                    <div class="era-icon">❄️</div>
+                    <h3>AI Winter</h3>
+                    <p>1970s-1980s</p>
+                    <p style="font-size: 0.9em; margin-top: 10px;">Reduced funding due to unmet expectations</p>
+                </div>
+                
+                <div class="era-card era-renaissance">
+                    <div class="era-icon">🚀</div>
+                    <h3>Renaissance</h3>
+                    <p>1990s-Present</p>
+                    <p style="font-size: 0.9em; margin-top: 10px;">Breakthrough algorithms and computational power</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <a href="Week1_Slide2.html" class="nav-btn">← Previous</a>
+        <a href="Week1_Slide4.html" class="nav-btn">Next →</a>
+    </div>
+
+    <div style="position: fixed; bottom: 30px; left: 30px; color: #64748b; font-size: 0.9em;">
+        <strong>Prepared by Dr. Gorkem Kar</strong>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal-overlay" id="infoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Modal Title</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal functions
+        function openModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('infoModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('infoModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('infoModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('infoModal').classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Create floating elements
+        function createFloatingElements() {
+            const container = document.getElementById('floatingElements');
+            for (let i = 0; i < 30; i++) {
+                const element = document.createElement('div');
+                element.className = 'floating-element';
+                element.style.left = Math.random() * 100 + '%';
+                element.style.animationDelay = Math.random() * 20 + 's';
+                element.style.animationDuration = (Math.random() * 10 + 15) + 's';
+                container.appendChild(element);
+            }
+        }
+
+        // Enhanced interactive timeline items with detailed information
+        document.querySelectorAll('.timeline-content').forEach((item, index) => {
+            item.addEventListener('click', function() {
+                const year = this.querySelector('.timeline-year').textContent;
+                const title = this.querySelector('.timeline-title').textContent.trim();
+                const desc = this.querySelector('.timeline-desc').textContent;
+                const person = this.querySelector('.timeline-person').textContent;
+                
+                const detailedInfo = {
+                    '1943': {
+                        modalTitle: '1943: The Birth of Neural Networks',
+                        content: `
+                            <h3>McCulloch-Pitts Neuron Model</h3>
+                            <p>${desc}</p>
+                            
+                            <h3>The Revolutionary Paper</h3>
+                            <p>Warren McCulloch (neuroscientist) and Walter Pitts (mathematician) published "A Logical Calculus of Ideas Immanent in Nervous Activity," which became the foundation of neural network theory.</p>
+                            
+                            <h3>Key Contributions</h3>
+                            <ul>
+                                <li><strong>Binary Threshold Logic:</strong> Neurons as simple on/off switches</li>
+                                <li><strong>Boolean Functions:</strong> Showed neurons could compute ANY logical function</li>
+                                <li><strong>Network Architecture:</strong> Multiple neurons could be combined for complex computations</li>
+                                <li><strong>Mathematical Formalism:</strong> First mathematical model of neural activity</li>
+                            </ul>
+                            
+                            <h3>The Model</h3>
+                            <div class="code-example">
+# McCulloch-Pitts Neuron
+output = 1 if (Σ inputs × weights) ≥ threshold else 0
+
+# Example: AND gate
+input1 = 1, input2 = 1
+weight1 = 1, weight2 = 1
+threshold = 2
+output = 1 if (1×1 + 1×1) ≥ 2 else 0 = 1
+                            </div>
+                            
+                            <h3>Historical Context</h3>
+                            <p>This work emerged during WWII, influenced by:</p>
+                            <ul>
+                                <li>Alan Turing's work on computation</li>
+                                <li>Early cybernetics movement</li>
+                                <li>Advances in neurophysiology</li>
+                                <li>Boolean algebra and logic circuits</li>
+                            </ul>
+                            
+                            <h3>Impact & Legacy</h3>
+                            <div class="example-box">
+                                <strong>Immediate Impact</strong>
+                                <p>• Established AI as a legitimate field of study<br>
+                                • Influenced von Neumann's computer architecture<br>
+                                • Inspired a generation of AI researchers</p>
+                            </div>
+                            
+                            <div class="example-box">
+                                <strong>Long-term Legacy</strong>
+                                <p>• Foundation for all modern neural networks<br>
+                                • Bridge between neuroscience and computer science<br>
+                                • Proved computation could emerge from simple units</p>
+                            </div>
+                            
+                            <div class="quote-box">
+                                "What we thought we were doing was treating the brain as a Turing machine."
+                                <div class="author">- Warren McCulloch</div>
+                            </div>
+                        `
+                    },
+                    '1958': {
+                        modalTitle: '1958: The Perceptron Revolution',
+                        content: `
+                            <h3>Frank Rosenblatt's Perceptron</h3>
+                            <p>${desc}</p>
+                            
+                            <h3>What Made It Revolutionary</h3>
+                            <p>The Perceptron was the first machine that could <strong>learn from experience</strong>. Unlike fixed logic circuits, it could adjust its behavior based on examples.</p>
+                            
+                            <h3>Technical Innovation</h3>
+                            <div class="code-example">
+# Perceptron Learning Algorithm (1958)
+for each training example:
+    prediction = sign(w · x + b)
+    if prediction != target:
+        w = w + learning_rate × (target - prediction) × x
+        b = b + learning_rate × (target - prediction)
+                            </div>
+                            
+                            <h3>Hardware Implementation</h3>
+                            <ul>
+                                <li><strong>Mark 1 Perceptron:</strong> Custom-built machine at Cornell</li>
+                                <li><strong>400 photocells:</strong> 20×20 image input array</li>
+                                <li><strong>512 motors:</strong> Implemented adjustable weights</li>
+                                <li><strong>Potentiometers:</strong> Physical weight storage</li>
+                            </ul>
+                            
+                            <h3>Capabilities Demonstrated</h3>
+                            <div class="impact-grid">
+                                <div class="impact-item">
+                                    <h5>Pattern Recognition</h5>
+                                    <p>Could distinguish simple shapes and letters</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Generalization</h5>
+                                    <p>Recognized patterns it hadn't seen before</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Noise Tolerance</h5>
+                                    <p>Worked with partially obscured inputs</p>
+                                </div>
+                            </div>
+                            
+                            <h3>Media Sensation</h3>
+                            <p>The New York Times reported: "The Navy revealed the embryo of an electronic computer today that it expects will be able to walk, talk, see, write, reproduce itself and be conscious of its existence."</p>
+                            
+                            <h3>Rosenblatt's Predictions</h3>
+                            <div class="quote-box">
+                                "Within a decade, perceptrons will be able to recognize people, call out their names, and instantly translate speech in one language to speech or writing in another."
+                                <div class="author">- Frank Rosenblatt, 1958</div>
+                            </div>
+                            
+                            <h3>Why It Mattered</h3>
+                            <ul>
+                                <li><strong>Proof of Concept:</strong> Machines could learn, not just compute</li>
+                                <li><strong>Convergence Theorem:</strong> Guaranteed to find solution if one exists</li>
+                                <li><strong>Inspired Investment:</strong> Triggered first wave of AI funding</li>
+                                <li><strong>Practical Applications:</strong> Not just theoretical</li>
+                            </ul>
+                            
+                            <h3>Technical Legacy</h3>
+                            <p>The Perceptron introduced concepts still used today:</p>
+                            <ul>
+                                <li>Supervised learning paradigm</li>
+                                <li>Weight adjustment through error correction</li>
+                                <li>Iterative training processes</li>
+                                <li>Convergence guarantees for linearly separable problems</li>
+                            </ul>
+                        `
+                    },
+                    '1969': {
+                        modalTitle: '1969: The Great Disillusionment',
+                        content: `
+                            <h3>Perceptrons: An MIT Press Book</h3>
+                            <p>${desc}</p>
+                            
+                            <h3>The XOR Problem</h3>
+                            <p>Minsky and Papert proved mathematically that single-layer perceptrons could not solve problems that weren't linearly separable.</p>
+                            
+                            <div class="code-example">
+# XOR Truth Table - The Impossible Problem
+Input1  Input2  Output
+  0       0       0
+  0       1       1    # Can't draw a single line
+  1       0       1    # to separate 0s from 1s
+  1       1       0
+
+# Linear separability test fails:
+# No weights w1, w2, b exist such that:
+# sign(w1×x1 + w2×x2 + b) = XOR(x1, x2) for all inputs
+                            </div>
+                            
+                            <h3>Mathematical Limitations Exposed</h3>
+                            <ul>
+                                <li><strong>Linear Separability:</strong> Only problems with linear decision boundaries</li>
+                                <li><strong>No Feature Learning:</strong> Cannot create internal representations</li>
+                                <li><strong>Limited Expressiveness:</strong> Cannot approximate arbitrary functions</li>
+                                <li><strong>Scaling Issues:</strong> Performance degraded with problem complexity</li>
+                            </ul>
+                            
+                            <h3>The Book's Impact</h3>
+                            <div class="example-box">
+                                <strong>Immediate Consequences</strong>
+                                <p>• Funding agencies lost confidence<br>
+                                • Researchers abandoned neural networks<br>
+                                • Graduate students avoided the field<br>
+                                • Industry investment dried up</p>
+                            </div>
+                            
+                            <h3>The Irony</h3>
+                            <p>Minsky and Papert acknowledged that multi-layer networks could solve these problems, but argued they would be too difficult to train. They wrote:</p>
+                            
+                            <div class="quote-box">
+                                "The perceptron has shown itself worthy of study despite (and even because of) its severe limitations. It has many features to attract attention: its linearity; its intriguing learning theorem; its clear paradigmatic simplicity as a kind of parallel computation."
+                                <div class="author">- Minsky & Papert, 1969</div>
+                            </div>
+                            
+                            <h3>Hidden in the Critique</h3>
+                            <p>The book actually contained seeds of the solution:</p>
+                            <ul>
+                                <li>Mentioned multi-layer networks could solve XOR</li>
+                                <li>Discussed the need for hidden layers</li>
+                                <li>Identified the credit assignment problem</li>
+                                <li>Suggested parallel distributed processing</li>
+                            </ul>
+                            
+                            <h3>The AI Winter Begins</h3>
+                            <div class="impact-grid">
+                                <div class="impact-item">
+                                    <h5>1969-1974</h5>
+                                    <p>70% reduction in AI funding</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Neural Net Papers</h5>
+                                    <p>Dropped from 100s to <10 per year</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Researchers</h5>
+                                    <p>Many switched to symbolic AI</p>
+                                </div>
+                            </div>
+                            
+                            <h3>Silver Lining</h3>
+                            <p>The critique forced researchers to:</p>
+                            <ul>
+                                <li>Develop rigorous mathematical foundations</li>
+                                <li>Focus on the training problem for deep networks</li>
+                                <li>Explore alternative architectures</li>
+                                <li>Build better theoretical understanding</li>
+                            </ul>
+                            
+                            <div class="quote-box">
+                                "In science, a negative result is just as valuable as a positive one."
+                                <div class="author">- Seymour Papert (reflecting years later)</div>
+                            </div>
+                        `
+                    },
+                    '1986': {
+                        modalTitle: '1986: The Backpropagation Breakthrough',
+                        content: `
+                            <h3>Rediscovering Backpropagation</h3>
+                            <p>${desc}</p>
+                            
+                            <h3>The Credit Assignment Problem</h3>
+                            <p>For decades, the key question was: How do you train hidden layers when you don't know what their outputs should be?</p>
+                            
+                            <h3>The Backpropagation Solution</h3>
+                            <div class="code-example">
+# Backpropagation Algorithm (simplified)
+# 1. Forward Pass
+for layer in network:
+    output = activation(weights @ input + bias)
+    
+# 2. Compute Error
+error = loss_function(output, target)
+
+# 3. Backward Pass - The Magic!
+for layer in reversed(network):
+    # Gradient of error w.r.t. weights
+    grad_weights = error * activation_derivative * input
+    
+    # Propagate error backwards
+    error = weights.T @ error * activation_derivative
+    
+    # Update weights
+    weights -= learning_rate * grad_weights
+                            </div>
+                            
+                            <h3>Why It Worked</h3>
+                            <ul>
+                                <li><strong>Chain Rule:</strong> Elegantly handles deep networks</li>
+                                <li><strong>Gradient Descent:</strong> Systematic weight optimization</li>
+                                <li><strong>Differentiable Activations:</strong> Smooth error landscapes</li>
+                                <li><strong>Local Computation:</strong> Each layer only needs local information</li>
+                            </ul>
+                            
+                            <h3>The Key Players</h3>
+                            <div class="impact-grid">
+                                <div class="impact-item">
+                                    <h5>David Rumelhart</h5>
+                                    <p>Cognitive scientist who formalized the algorithm</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Geoffrey Hinton</h5>
+                                    <p>Showed practical applications and improvements</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Ronald Williams</h5>
+                                    <p>Mathematical analysis and convergence proofs</p>
+                                </div>
+                            </div>
+                            
+                            <h3>The XOR Problem - Solved!</h3>
+                            <div class="code-example">
+# 2-layer network solves XOR
+Layer 1: 
+  Neuron 1: Detects (NOT x1) AND x2
+  Neuron 2: Detects x1 AND (NOT x2)
+  
+Layer 2:
+  Output: Neuron1 OR Neuron2 = XOR!
+                            </div>
+                            
+                            <h3>Immediate Applications</h3>
+                            <ul>
+                                <li><strong>NETtalk (1987):</strong> Text-to-speech synthesis</li>
+                                <li><strong>Digit Recognition:</strong> Handwritten ZIP codes</li>
+                                <li><strong>Sonar Classification:</strong> Mines vs rocks</li>
+                                <li><strong>Medical Diagnosis:</strong> Early disease detection</li>
+                            </ul>
+                            
+                            <h3>The Nature Paper</h3>
+                            <div class="quote-box">
+                                "We describe a new learning procedure, back-propagation, for networks of neurone-like units. The procedure repeatedly adjusts the weights of the connections in the network so as to minimize a measure of the difference between the actual output vector of the net and the desired output vector."
+                                <div class="author">- Rumelhart, Hinton & Williams, Nature 1986</div>
+                            </div>
+                            
+                            <h3>Historical Note</h3>
+                            <p>Backpropagation was actually discovered multiple times:</p>
+                            <ul>
+                                <li>1970: Seppo Linnainmaa (automatic differentiation)</li>
+                                <li>1974: Paul Werbos (PhD thesis)</li>
+                                <li>1982: Parker (rediscovered independently)</li>
+                                <li>1986: Rumelhart et al. (popularized it)</li>
+                            </ul>
+                            
+                            <h3>Why 1986 Succeeded</h3>
+                            <ul>
+                                <li><strong>Better Computers:</strong> Could actually train networks</li>
+                                <li><strong>Clear Presentation:</strong> Accessible to wider audience</li>
+                                <li><strong>Practical Demos:</strong> Showed real applications</li>
+                                <li><strong>Timing:</strong> Field ready after AI winter</li>
+                            </ul>
+                        `
+                    },
+                    '2012': {
+                        modalTitle: '2012: The Deep Learning Revolution',
+                        content: `
+                            <h3>AlexNet Wins ImageNet</h3>
+                            <p>${desc}</p>
+                            
+                            <h3>The ImageNet Challenge</h3>
+                            <p>1.2 million images, 1000 categories. Previous best error rate: 26.2%. AlexNet achieved: <strong>15.3%</strong> - nearly 50% improvement!</p>
+                            
+                            <h3>The AlexNet Architecture</h3>
+                            <div class="code-example">
+# AlexNet (2012) - 60 million parameters
+Layer 1: Conv 11×11, 96 filters, stride 4, ReLU
+Layer 2: MaxPool 3×3, stride 2
+Layer 3: Conv 5×5, 256 filters, ReLU
+Layer 4: MaxPool 3×3, stride 2
+Layer 5: Conv 3×3, 384 filters, ReLU
+Layer 6: Conv 3×3, 384 filters, ReLU
+Layer 7: Conv 3×3, 256 filters, ReLU
+Layer 8: MaxPool 3×3, stride 2
+Layer 9: Fully connected, 4096 units, ReLU
+Layer 10: Fully connected, 4096 units, ReLU
+Layer 11: Fully connected, 1000 units, Softmax
+                            </div>
+                            
+                            <h3>Key Innovations</h3>
+                            <ul>
+                                <li><strong>ReLU Activation:</strong> f(x) = max(0, x) - faster training</li>
+                                <li><strong>Dropout:</strong> Randomly drop 50% of neurons - prevent overfitting</li>
+                                <li><strong>Data Augmentation:</strong> Generate variations of training images</li>
+                                <li><strong>GPU Training:</strong> 2 GTX 580 GPUs - 6 days of training</li>
+                                <li><strong>Local Response Normalization:</strong> Biological inspiration</li>
+                            </ul>
+                            
+                            <h3>Why GPUs Changed Everything</h3>
+                            <div class="impact-grid">
+                                <div class="impact-item">
+                                    <h5>Parallelization</h5>
+                                    <p>1000s of cores vs CPU's dozens</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Matrix Operations</h5>
+                                    <p>Optimized for convolutions</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Cost Efficiency</h5>
+                                    <p>$1000 GPU = $10000s CPU cluster</p>
+                                </div>
+                            </div>
+                            
+                            <h3>The Deep Learning Explosion</h3>
+                            <p>After AlexNet's victory:</p>
+                            <ul>
+                                <li>2013: All top entries used CNNs</li>
+                                <li>2014: GoogLeNet (22 layers) wins</li>
+                                <li>2015: ResNet (152 layers) surpasses human performance</li>
+                                <li>Industry adoption accelerates exponentially</li>
+                            </ul>
+                            
+                            <h3>The Team</h3>
+                            <ul>
+                                <li><strong>Alex Krizhevsky:</strong> Primary architect and coder</li>
+                                <li><strong>Ilya Sutskever:</strong> Optimization and theory</li>
+                                <li><strong>Geoffrey Hinton:</strong> Advisor and deep learning pioneer</li>
+                            </ul>
+                            
+                            <h3>Immediate Industry Impact</h3>
+                            <div class="example-box">
+                                <strong>The Talent War Begins</strong>
+                                <p>• Google acquires Hinton's company for $44M<br>
+                                • Facebook creates FAIR (AI Research)<br>
+                                • Baidu hires Andrew Ng<br>
+                                • Everyone wants deep learning experts</p>
+                            </div>
+                            
+                            <h3>What Made 2012 Different</h3>
+                            <ul>
+                                <li><strong>Big Data:</strong> Internet provided massive labeled datasets</li>
+                                <li><strong>Compute Power:</strong> GPUs made training feasible</li>
+                                <li><strong>Better Algorithms:</strong> ReLU, Dropout, better optimization</li>
+                                <li><strong>Open Competition:</strong> Public benchmark for comparison</li>
+                            </ul>
+                            
+                            <div class="quote-box">
+                                "I've been working on this for 30 years, and I've never seen anything like this. We're at a tipping point."
+                                <div class="author">- Geoffrey Hinton, 2012</div>
+                            </div>
+                        `
+                    },
+                    '2023': {
+                        modalTitle: '2023: The AI Transformation Era',
+                        content: `
+                            <h3>ChatGPT and the LLM Revolution</h3>
+                            <p>${desc}</p>
+                            
+                            <h3>The Scale of Modern AI</h3>
+                            <div class="impact-grid">
+                                <div class="impact-item">
+                                    <h5>GPT-4 Parameters</h5>
+                                    <p>~1.76 trillion (estimated)</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Training Cost</h5>
+                                    <p>$100+ million per model</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Users</h5>
+                                    <p>100M+ in 2 months</p>
+                                </div>
+                            </div>
+                            
+                            <h3>The Transformer Architecture</h3>
+                            <div class="code-example">
+# Transformer Key Innovation: Self-Attention
+def self_attention(query, key, value):
+    # Compute attention scores
+    scores = query @ key.T / sqrt(dimension)
+    
+    # Apply softmax for probabilities
+    attention_weights = softmax(scores)
+    
+    # Weighted sum of values
+    output = attention_weights @ value
+    
+    return output
+
+# "Attention is all you need" - No RNNs or CNNs!
+                            </div>
+                            
+                            <h3>Breakthrough Capabilities</h3>
+                            <ul>
+                                <li><strong>Natural Conversation:</strong> Maintains context over long dialogues</li>
+                                <li><strong>Code Generation:</strong> Writes functional programs in any language</li>
+                                <li><strong>Reasoning:</strong> Solves complex multi-step problems</li>
+                                <li><strong>Creativity:</strong> Generates stories, poems, ideas</li>
+                                <li><strong>Multimodal:</strong> Understands text, images, code together</li>
+                            </ul>
+                            
+                            <h3>The Speed of Adoption</h3>
+                            <p>Fastest growing consumer application in history:</p>
+                            <ul>
+                                <li>Day 1: 1 million users</li>
+                                <li>Week 1: 10 million users</li>
+                                <li>Month 2: 100 million users</li>
+                                <li>Microsoft invests $10 billion</li>
+                                <li>Google declares "code red"</li>
+                            </ul>
+                            
+                            <h3>Foundation Models</h3>
+                            <div class="example-box">
+                                <strong>One Model, Many Tasks</strong>
+                                <p>Unlike specialized models, foundation models can:<br>
+                                • Translate languages without specific training<br>
+                                • Write code without being a code model<br>
+                                • Answer questions without fine-tuning<br>
+                                • Learn new tasks from just a few examples</p>
+                            </div>
+                            
+                            <h3>Emergent Abilities</h3>
+                            <p>Capabilities that appear suddenly at scale:</p>
+                            <ul>
+                                <li><strong>Chain-of-thought reasoning:</strong> Breaking down complex problems</li>
+                                <li><strong>In-context learning:</strong> Learning from examples in the prompt</li>
+                                <li><strong>Theory of mind:</strong> Understanding beliefs and intentions</li>
+                                <li><strong>Self-correction:</strong> Identifying and fixing its own mistakes</li>
+                            </ul>
+                            
+                            <h3>The New AI Landscape</h3>
+                            <ul>
+                                <li><strong>OpenAI:</strong> GPT-4, DALL-E 3, Codex</li>
+                                <li><strong>Google:</strong> PaLM, Gemini, Bard</li>
+                                <li><strong>Anthropic:</strong> Claude series</li>
+                                <li><strong>Meta:</strong> LLaMA, Open source push</li>
+                                <li><strong>Stability AI:</strong> Stable Diffusion</li>
+                            </ul>
+                            
+                            <h3>Societal Impact</h3>
+                            <div class="impact-grid">
+                                <div class="impact-item">
+                                    <h5>Education</h5>
+                                    <p>Personalized tutoring at scale</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Work</h5>
+                                    <p>Automation of knowledge tasks</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Creativity</h5>
+                                    <p>AI as creative partner</p>
+                                </div>
+                            </div>
+                            
+                            <h3>The Debates</h3>
+                            <ul>
+                                <li>AI safety and alignment</li>
+                                <li>Job displacement concerns</li>
+                                <li>Misinformation and deepfakes</li>
+                                <li>Concentration of power</li>
+                                <li>Environmental impact</li>
+                            </ul>
+                            
+                            <div class="quote-box">
+                                "We've reached a point where AI is not just a tool, but a partner in human creativity and problem-solving. The question is no longer if AI will transform society, but how we'll shape that transformation."
+                                <div class="author">- Sam Altman, OpenAI CEO, 2023</div>
+                            </div>
+                        `
+                    }
+                };
+                
+                const info = detailedInfo[year];
+                if (info) {
+                    openModal(info.modalTitle, info.content);
+                }
+            });
+            
+            // Add hover effect for timeline items
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.02) translateY(-5px)';
+                const dot = this.parentElement.querySelector('.timeline-dot');
+                if (dot) {
+                    dot.style.transform = 'translate(-50%, -50%) scale(1.3)';
+                }
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+                const dot = this.parentElement.querySelector('.timeline-dot');
+                if (dot) {
+                    dot.style.transform = 'translate(-50%, -50%) scale(1)';
+                }
+            });
+        });
+
+        // Enhanced interactive era cards with era progression
+        let currentEraIndex = 0;
+        const eras = ['Golden Age', 'AI Winter', 'Renaissance'];
+        
+        document.querySelectorAll('.era-card').forEach((card, index) => {
+            card.addEventListener('click', function() {
+                // Remove active class from all cards
+                document.querySelectorAll('.era-card').forEach(c => c.classList.remove('active'));
+                // Add active class to clicked card
+                this.classList.add('active');
+                currentEraIndex = index;
+                
+                const era = this.querySelector('h3').textContent;
+                
+                const detailedEraInfo = {
+                    'Golden Age': {
+                        modalTitle: '🎭 The Golden Age of AI (1940s-1960s)',
+                        content: `
+                            <h3>An Era of Unbridled Optimism</h3>
+                            <p>The early days of AI were marked by tremendous enthusiasm and bold predictions about the future of intelligent machines.</p>
+                            
+                            <h3>The Mood of the Era</h3>
+                            <div class="quote-box">
+                                "Machines will be capable of doing any work a man can do."
+                                <div class="author">- Herbert Simon, 1965</div>
+                            </div>
+                            
+                            <p>Researchers genuinely believed that human-level AI was just around the corner - perhaps 20 years away at most.</p>
+                            
+                            <h3>Key Breakthroughs</h3>
+                            <ul>
+                                <li><strong>1943:</strong> McCulloch-Pitts model of neurons</li>
+                                <li><strong>1950:</strong> Turing Test proposed</li>
+                                <li><strong>1956:</strong> Dartmouth Conference - AI officially born</li>
+                                <li><strong>1958:</strong> Rosenblatt's Perceptron</li>
+                                <li><strong>1959:</strong> Arthur Samuel's checkers program</li>
+                            </ul>
+                            
+                            <h3>Funding Landscape</h3>
+                            <div class="example-box">
+                                <strong>Government Support</strong>
+                                <p>• DARPA (then ARPA) funding<br>
+                                • Office of Naval Research<br>
+                                • National Science Foundation<br>
+                                • Cold War competition drove investment</p>
+                            </div>
+                            
+                            <h3>Notable Achievements</h3>
+                            <div class="impact-grid">
+                                <div class="impact-item">
+                                    <h5>General Problem Solver (1957)</h5>
+                                    <p>Newell & Simon's program that could solve puzzles</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>ELIZA (1966)</h5>
+                                    <p>First chatbot that could hold conversations</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Shakey Robot (1969)</h5>
+                                    <p>First mobile robot with AI planning</p>
+                                </div>
+                            </div>
+                            
+                            <h3>The Optimistic Predictions</h3>
+                            <ul>
+                                <li>🤖 "Machines will be capable of doing any work" (1965)</li>
+                                <li>🧠 "Within 10 years a computer will be world chess champion" (1958)</li>
+                                <li>📝 "Machines will be capable of literary creation" (1960)</li>
+                                <li>🎯 "Complete AI within a generation" (1967)</li>
+                            </ul>
+                            
+                            <h3>Why the Optimism?</h3>
+                            <ul>
+                                <li><strong>Early Successes:</strong> Simple problems solved easily</li>
+                                <li><strong>Moore's Law:</strong> Computing power doubling rapidly</li>
+                                <li><strong>Cold War:</strong> Pressure to outpace Soviet research</li>
+                                <li><strong>Media Hype:</strong> Press loved AI stories</li>
+                            </ul>
+                            
+                            <h3>The Seeds of Trouble</h3>
+                            <p>Despite the optimism, fundamental challenges were emerging:</p>
+                            <ul>
+                                <li>Combinatorial explosion in search problems</li>
+                                <li>Limited computational resources</li>
+                                <li>Lack of training data</li>
+                                <li>Oversimplified view of intelligence</li>
+                            </ul>
+                            
+                            <div class="quote-box">
+                                "We propose that a 2 month, 10 man study of artificial intelligence be carried out... We think that a significant advance can be made in one or more of these problems if a carefully selected group of scientists work on it together for a summer."
+                                <div class="author">- Dartmouth Proposal, 1956</div>
+                            </div>
+                        `
+                    },
+                    'AI Winter': {
+                        modalTitle: '❄️ The AI Winter (1970s-1980s)',
+                        content: `
+                            <h3>The Great Disillusionment</h3>
+                            <p>After the optimism of the 1960s, reality set in. AI had promised too much and delivered too little.</p>
+                            
+                            <h3>The Mood Shifts</h3>
+                            <div class="quote-box">
+                                "AI has been brain-dead since the 1970s."
+                                <div class="author">- Marvin Minsky, 1982</div>
+                            </div>
+                            
+                            <h3>What Triggered the Winter?</h3>
+                            <ul>
+                                <li><strong>1969:</strong> Minsky & Papert's "Perceptrons" book</li>
+                                <li><strong>1973:</strong> Lighthill Report (UK) - scathing critique</li>
+                                <li><strong>1974:</strong> DARPA cuts AI funding dramatically</li>
+                                <li><strong>Failed Promises:</strong> Machine translation, speech recognition</li>
+                            </ul>
+                            
+                            <h3>The Funding Drought</h3>
+                            <div class="impact-grid">
+                                <div class="impact-item">
+                                    <h5>Before (1960s)</h5>
+                                    <p>$20M+ annually from DARPA alone</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>During Winter</h5>
+                                    <p><$3M annually - 85% reduction</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Researchers</h5>
+                                    <p>Many left field entirely</p>
+                                </div>
+                            </div>
+                            
+                            <h3>The Lighthill Report (1973)</h3>
+                            <div class="example-box">
+                                <strong>Sir James Lighthill's Conclusions</strong>
+                                <p>• "In no part of the field have discoveries made so far produced the major impact that was promised"<br>
+                                • Recommended ending all AI research in UK<br>
+                                • Led to disbanding of AI groups at major universities<br>
+                                • Influence spread globally</p>
+                            </div>
+                            
+                            <h3>Technical Challenges</h3>
+                            <ul>
+                                <li><strong>Combinatorial Explosion:</strong> Problems grew exponentially</li>
+                                <li><strong>Common Sense Problem:</strong> Machines lacked basic reasoning</li>
+                                <li><strong>Frame Problem:</strong> What changes, what stays the same?</li>
+                                <li><strong>Computational Limits:</strong> Not enough memory or speed</li>
+                            </ul>
+                            
+                            <h3>The Hidden Progress</h3>
+                            <p>Despite the "winter," important theoretical work continued:</p>
+                            <ul>
+                                <li>Hopfield Networks (1982)</li>
+                                <li>Boltzmann Machines (1985)</li>
+                                <li>Hidden Markov Models</li>
+                                <li>Decision tree learning</li>
+                                <li>Theoretical foundations of learning</li>
+                            </ul>
+                            
+                            <h3>Survival Strategies</h3>
+                            <p>How AI research survived:</p>
+                            <ul>
+                                <li><strong>Rebranding:</strong> Called it "expert systems" or "knowledge engineering"</li>
+                                <li><strong>Industry:</strong> Some companies quietly continued research</li>
+                                <li><strong>Japan:</strong> Fifth Generation project kept some funding alive</li>
+                                <li><strong>Academia:</strong> Small groups persisted against the tide</li>
+                            </ul>
+                            
+                            <h3>Lessons Learned</h3>
+                            <div class="example-box">
+                                <strong>What the Winter Taught Us</strong>
+                                <p>• Don't overpromise - manage expectations<br>
+                                • Focus on specific problems, not general AI<br>
+                                • Need better theoretical foundations<br>
+                                • Importance of computational resources<br>
+                                • Value of persistence in research</p>
+                            </div>
+                            
+                            <div class="quote-box">
+                                "In the long run, the AI winter was beneficial. It forced us to be more rigorous, more mathematical, and more honest about what we could and couldn't do."
+                                <div class="author">- Geoffrey Hinton, reflecting in 2010</div>
+                            </div>
+                        `
+                    },
+                    'Renaissance': {
+                        modalTitle: '🌱 The AI Renaissance (1990s-Present)',
+                        content: `
+                            <h3>The Resurgence of Neural Networks</h3>
+                            <p>After the long winter, AI experienced a dramatic revival driven by better algorithms, more data, and vastly more computational power.</p>
+                            
+                            <h3>The New Optimism</h3>
+                            <div class="quote-box">
+                                "AI is the new electricity. It will transform every industry."
+                                <div class="author">- Andrew Ng, 2017</div>
+                            </div>
+                            
+                            <h3>Key Enablers of the Renaissance</h3>
+                            <div class="impact-grid">
+                                <div class="impact-item">
+                                    <h5>Big Data</h5>
+                                    <p>Internet provided massive training datasets</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>GPU Computing</h5>
+                                    <p>1000x speedup for neural networks</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Better Algorithms</h5>
+                                    <p>Backprop, ReLU, Dropout, Batch Norm</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Open Source</h5>
+                                    <p>TensorFlow, PyTorch democratized AI</p>
+                                </div>
+                            </div>
+                            
+                            <h3>Timeline of Revival</h3>
+                            <ul>
+                                <li><strong>1997:</strong> Deep Blue defeats Kasparov at chess</li>
+                                <li><strong>2006:</strong> Hinton's deep belief networks</li>
+                                <li><strong>2009:</strong> ImageNet dataset created</li>
+                                <li><strong>2012:</strong> AlexNet wins ImageNet by huge margin</li>
+                                <li><strong>2016:</strong> AlphaGo defeats world Go champion</li>
+                                <li><strong>2017:</strong> Transformer architecture invented</li>
+                                <li><strong>2020:</strong> GPT-3 shows emergent abilities</li>
+                                <li><strong>2022:</strong> ChatGPT reaches 100M users</li>
+                            </ul>
+                            
+                            <h3>The Funding Explosion</h3>
+                            <div class="example-box">
+                                <strong>Investment Scale</strong>
+                                <p>• 2010: $1B global AI investment<br>
+                                • 2015: $5B investment<br>
+                                • 2020: $40B investment<br>
+                                • 2023: $150B+ investment<br>
+                                • Every major tech company has AI division</p>
+                            </div>
+                            
+                            <h3>Breakthrough Applications</h3>
+                            <ul>
+                                <li><strong>Computer Vision:</strong> Surpassing human performance</li>
+                                <li><strong>Speech Recognition:</strong> Near-perfect accuracy</li>
+                                <li><strong>Machine Translation:</strong> Real-time, high quality</li>
+                                <li><strong>Game Playing:</strong> Superhuman at all major games</li>
+                                <li><strong>Language Models:</strong> Human-like text generation</li>
+                                <li><strong>Protein Folding:</strong> 50-year problem solved</li>
+                            </ul>
+                            
+                            <h3>The New Challenges</h3>
+                            <p>With great power comes great responsibility:</p>
+                            <ul>
+                                <li><strong>Interpretability:</strong> Understanding black box models</li>
+                                <li><strong>Bias and Fairness:</strong> Ensuring equitable AI</li>
+                                <li><strong>Privacy:</strong> Protecting personal data</li>
+                                <li><strong>Safety:</strong> Aligning AI with human values</li>
+                                <li><strong>Environmental:</strong> Energy consumption concerns</li>
+                                <li><strong>Economic:</strong> Job displacement fears</li>
+                            </ul>
+                            
+                            <h3>The State of AI Today</h3>
+                            <div class="impact-grid">
+                                <div class="impact-item">
+                                    <h5>Ubiquitous</h5>
+                                    <p>AI in every smartphone and app</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Transformative</h5>
+                                    <p>Changing how we work and create</p>
+                                </div>
+                                <div class="impact-item">
+                                    <h5>Accelerating</h5>
+                                    <p>Progress faster than ever</p>
+                                </div>
+                            </div>
+                            
+                            <h3>Looking Forward</h3>
+                            <ul>
+                                <li><strong>AGI Predictions:</strong> 2030-2050 timeframe debated</li>
+                                <li><strong>Multimodal AI:</strong> Text, image, audio, video together</li>
+                                <li><strong>Embodied AI:</strong> Robots with common sense</li>
+                                <li><strong>Scientific AI:</strong> Accelerating discovery</li>
+                                <li><strong>Personal AI:</strong> Custom models for everyone</li>
+                            </ul>
+                            
+                            <div class="quote-box">
+                                "We are at an inflection point. The next decade of AI will make the last decade look like a warm-up."
+                                <div class="author">- Demis Hassabis, DeepMind CEO, 2023</div>
+                            </div>
+                        `
+                    }
+                };
+                
+                const info = detailedEraInfo[era];
+                if (info) {
+                    openModal(info.modalTitle, info.content);
+                }
+            });
+        });
+        
+        // Era progression function
+        function progressToNextEra() {
+            document.querySelectorAll('.era-card').forEach(c => c.classList.remove('active'));
+            currentEraIndex = (currentEraIndex + 1) % eras.length;
+            document.querySelectorAll('.era-card')[currentEraIndex].classList.add('active');
+        }
+        
+        // Automatic era progression every 4 seconds
+        setInterval(progressToNextEra, 4000);
+        
+        // Timeline dot interactions
+        document.querySelectorAll('.timeline-dot').forEach(dot => {
+            dot.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                // Get the era class and show relevant information
+                const era = this.classList.contains('golden-age') ? 'Golden Age' :
+                           this.classList.contains('ai-winter') ? 'AI Winter' : 'Renaissance';
+                
+                // Highlight corresponding era card
+                document.querySelectorAll('.era-card').forEach(c => c.classList.remove('active'));
+                const eraCard = document.querySelector('.era-card h3').parentElement;
+                if (eraCard.querySelector('h3').textContent === era) {
+                    eraCard.classList.add('active');
+                }
+                
+                // Show era information
+                const eraDetails = {
+                    'Golden Age': {
+                        title: 'The Golden Age Era',
+                        content: `
+                            <h3>Era of Foundational Discoveries</h3>
+                            <p>The Golden Age (1940s-1960s) was characterized by groundbreaking theoretical work and optimistic predictions about artificial intelligence.</p>
+                            
+                            <h3>Key Characteristics</h3>
+                            <ul>
+                                <li>First mathematical models of neurons</li>
+                                <li>Development of the Perceptron</li>
+                                <li>Establishment of AI as a field</li>
+                                <li>Government and military funding</li>
+                                <li>Bold predictions about the future</li>
+                            </ul>
+                            
+                            <p><strong>Click on specific timeline events or era cards to learn more about this period!</strong></p>
+                        `
+                    },
+                    'AI Winter': {
+                        title: 'The AI Winter Era',
+                        content: `
+                            <h3>Period of Disillusionment</h3>
+                            <p>The AI Winter (1970s-1980s) saw dramatically reduced funding and interest due to unmet expectations and revealed technical limitations.</p>
+                            
+                            <h3>What Happened</h3>
+                            <ul>
+                                <li>Perceptron limitations exposed</li>
+                                <li>Funding cuts across the board</li>
+                                <li>Researchers leaving the field</li>
+                                <li>Public skepticism growing</li>
+                                <li>Focus shifted to other approaches</li>
+                            </ul>
+                            
+                            <p><strong>Click on specific timeline events or era cards to explore this challenging period!</strong></p>
+                        `
+                    },
+                    'Renaissance': {
+                        title: 'The AI Renaissance Era',
+                        content: `
+                            <h3>Modern Era of Breakthroughs</h3>
+                            <p>The Renaissance (1990s-Present) brought breakthrough achievements and widespread practical applications of neural networks.</p>
+                            
+                            <h3>Driving Forces</h3>
+                            <ul>
+                                <li>Backpropagation algorithm success</li>
+                                <li>Massive computational power (GPUs)</li>
+                                <li>Big data from the internet</li>
+                                <li>Deep learning revolution</li>
+                                <li>Real-world applications everywhere</li>
+                            </ul>
+                            
+                            <p><strong>Click on specific timeline events or era cards to discover the modern AI revolution!</strong></p>
+                        `
+                    }
+                };
+                
+                const detail = eraDetails[era];
+                if (detail) {
+                    openModal(detail.title, detail.content);
+                }
+            });
+        });
+
+        // Initialize
+        createFloatingElements();
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                window.location.href = 'Week1_Slide4.html';
+            } else if (e.key === 'ArrowLeft') {
+                window.location.href = 'Week1_Slide2.html';
+            }
+        });
+    </script>
+</body>
+</html>

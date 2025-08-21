@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS5720 - Layers, Nodes, and Connections</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .slide-container {
+            flex: 1;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .slide-title {
+            font-size: 3.5em;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #16a34a;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: slideInFromTop 1.2s ease-out;
+            font-weight: 700;
+        }
+
+        .content-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .components-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromLeft 1s ease-out 0.3s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .architecture-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromRight 1s ease-out 0.3s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #064e3b;
+            margin-bottom: 25px;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #16a34a, #22c55e);
+            border-radius: 2px;
+        }
+
+        .component-card {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .component-card:hover {
+            transform: translateX(10px);
+            border-color: #16a34a;
+            box-shadow: 0 10px 25px rgba(22, 163, 74, 0.2);
+        }
+
+        .component-title {
+            font-weight: 600;
+            color: #064e3b;
+            margin-bottom: 8px;
+            font-size: 1.2em;
+        }
+
+        .component-desc {
+            color: #475569;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .interactive-network {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromBottom 1s ease-out 0.6s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+            text-align: center;
+        }
+
+        .network-explorer {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            height: 500px;
+            margin: 20px auto;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-radius: 15px;
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            overflow: hidden;
+        }
+
+        .layer-container {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .neuron-node {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .neuron-node:hover {
+            transform: scale(1.2);
+            z-index: 10;
+        }
+
+        .neuron-label {
+            font-size: 0.9em;
+        }
+
+        .connection {
+            stroke: #86efac;
+            stroke-width: 2;
+            fill: none;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .connection:hover {
+            stroke: #22c55e;
+            stroke-width: 4;
+            opacity: 1;
+        }
+
+        .weight-label {
+            fill: #064e3b;
+            font-size: 12px;
+            font-weight: 600;
+            pointer-events: none;
+        }
+
+        .control-panel {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.3);
+        }
+
+        .depth-comparison {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromBottom 1s ease-out 0.9s both;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            margin-top: 40px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .network-card {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .network-card:hover {
+            transform: translateY(-5px);
+            border-color: #3b82f6;
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.2);
+        }
+
+        .network-metrics {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #1e40af;
+        }
+
+        .metric-label {
+            font-size: 0.85em;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            border-radius: 30px;
+            color: #1e293b;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(22, 163, 74, 0.4);
+        }
+
+        .slide-number, .course-info {
+            position: fixed;
+            top: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .slide-number { right: 30px; }
+        .course-info { left: 30px; }
+
+        @keyframes slideInFromTop {
+            from { transform: translateY(-80px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromLeft {
+            from { transform: translateX(-60px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromRight {
+            from { transform: translateX(60px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromBottom {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-backdrop.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            color: #064e3b;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(22, 163, 74, 0.1);
+            color: #064e3b;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #334155;
+        }
+
+        .modal-code {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            overflow-x: auto;
+        }
+
+        .modal-example {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #16a34a;
+        }
+
+        @media (max-width: 768px) {
+            .content-layout { grid-template-columns: 1fr; }
+            .slide-title { font-size: 2.5em; }
+            .comparison-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="course-info">CS5720 - Week 1</div>
+    <div class="slide-number">Slide 11 of 20</div>
+    
+    <div class="slide-container">
+        <h1 class="slide-title">Layers, Nodes, and Connections</h1>
+        
+        <div class="content-layout">
+            <div class="components-section">
+                <h2 class="section-title">Network Components</h2>
+                
+                <div class="component-card" onclick="showComponentDetails('layers')">
+                    <div class="component-title">🏗️ Layers</div>
+                    <div class="component-desc">Organized groups of neurons that process information at different abstraction levels</div>
+                </div>
+
+                <div class="component-card" onclick="showComponentDetails('nodes')">
+                    <div class="component-title">🔮 Nodes (Neurons)</div>
+                    <div class="component-desc">Basic computational units that receive, process, and transmit signals</div>
+                </div>
+
+                <div class="component-card" onclick="showComponentDetails('connections')">
+                    <div class="component-title">🔗 Connections (Weights)</div>
+                    <div class="component-desc">Learnable parameters that determine signal strength between neurons</div>
+                </div>
+
+                <div class="component-card" onclick="showComponentDetails('biases')">
+                    <div class="component-title">⚖️ Biases</div>
+                    <div class="component-desc">Threshold adjustments that shift activation functions</div>
+                </div>
+            </div>
+
+            <div class="architecture-section">
+                <h2 class="section-title">Understanding Depth vs Width</h2>
+                
+                <div style="font-size: 1.1em; line-height: 1.7; color: #334155; margin-bottom: 20px;">
+                    Neural network architecture is defined by two key dimensions:
+                </div>
+
+                <div style="background: linear-gradient(135deg, #ecfdf5, #d1fae5); padding: 20px; border-radius: 12px; margin: 15px 0; border-left: 4px solid #16a34a;">
+                    <strong style="color: #064e3b;">Depth:</strong> Number of layers (how deep)
+                    <br>More layers = More abstract representations
+                </div>
+
+                <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 20px; border-radius: 12px; margin: 15px 0; border-left: 4px solid #f59e0b;">
+                    <strong style="color: #92400e;">Width:</strong> Number of neurons per layer (how wide)
+                    <br>More neurons = More features per layer
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <strong style="color: #064e3b;">Architecture Trade-offs:</strong>
+                    <ul style="margin-top: 10px; margin-left: 20px; line-height: 1.8;">
+                        <li>Deep & Narrow: Efficient but harder to train</li>
+                        <li>Shallow & Wide: Easy to train but less efficient</li>
+                        <li>Optimal: Problem-dependent balance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="interactive-network">
+            <h2 class="section-title" style="text-align: center;">Interactive Network Explorer</h2>
+            
+            <div class="network-explorer" id="networkExplorer">
+                <svg width="100%" height="100%" viewBox="0 0 900 500">
+                    <g id="connectionGroup"></g>
+                    <g id="neuronGroup"></g>
+                    <g id="labelGroup"></g>
+                </svg>
+            </div>
+
+            <div class="control-panel">
+                <button class="control-btn" onclick="changeNetwork('simple')">Simple (2-3-1)</button>
+                <button class="control-btn" onclick="changeNetwork('medium')">Medium (3-5-3-1)</button>
+                <button class="control-btn" onclick="changeNetwork('deep')">Deep (2-4-4-4-2)</button>
+                <button class="control-btn" onclick="animateSignal()">Animate Signal</button>
+                <button class="control-btn" onclick="showWeights()">Show Weights</button>
+            </div>
+        </div>
+
+        <div class="depth-comparison">
+            <h2 class="section-title" style="text-align: center; color: #1e40af;">Network Topology Comparison</h2>
+            
+            <div class="comparison-grid">
+                <div class="network-card" onclick="showTopologyDetails('shallow')">
+                    <h3 style="color: #1e40af; margin-bottom: 15px;">Shallow Network</h3>
+                    <div style="font-size: 2em; margin: 20px 0;">
+                        ⚪→⚪⚪⚪⚪⚪→⚪
+                    </div>
+                    <div class="network-metrics">
+                        <div class="metric">
+                            <div class="metric-value">2</div>
+                            <div class="metric-label">Layers</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">30</div>
+                            <div class="metric-label">Parameters</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="network-card" onclick="showTopologyDetails('deep')">
+                    <h3 style="color: #1e40af; margin-bottom: 15px;">Deep Network</h3>
+                    <div style="font-size: 2em; margin: 20px 0;">
+                        ⚪→⚪⚪→⚪⚪→⚪⚪→⚪
+                    </div>
+                    <div class="network-metrics">
+                        <div class="metric">
+                            <div class="metric-value">5</div>
+                            <div class="metric-label">Layers</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">24</div>
+                            <div class="metric-label">Parameters</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="network-card" onclick="showTopologyDetails('wide')">
+                    <h3 style="color: #1e40af; margin-bottom: 15px;">Wide Network</h3>
+                    <div style="font-size: 2em; margin: 20px 0;">
+                        ⚪⚪→⚪⚪⚪⚪⚪⚪⚪⚪→⚪⚪
+                    </div>
+                    <div class="network-metrics">
+                        <div class="metric">
+                            <div class="metric-value">3</div>
+                            <div class="metric-label">Layers</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">40</div>
+                            <div class="metric-label">Parameters</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <a href="Week1_Slide10.html" class="nav-btn">← Previous</a>
+        <a href="Week1_Slide12.html" class="nav-btn">Next →</a>
+    </div>
+
+    <div style="position: fixed; bottom: 30px; left: 30px; color: #64748b; font-size: 0.9em;">
+        <strong>Prepared by Dr. Gorkem Kar</strong>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal-backdrop" id="modalBackdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Modal Title</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                Modal content goes here...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Network configurations
+        const networks = {
+            simple: {
+                layers: [2, 3, 1],
+                name: 'Simple Network'
+            },
+            medium: {
+                layers: [3, 5, 3, 1],
+                name: 'Medium Network'
+            },
+            deep: {
+                layers: [2, 4, 4, 4, 2],
+                name: 'Deep Network'
+            }
+        };
+
+        let currentNetwork = 'simple';
+        let showingWeights = false;
+
+        // Initialize network
+        window.onload = function() {
+            drawNetwork(networks[currentNetwork]);
+        };
+
+        // Draw network
+        function drawNetwork(network) {
+            const svg = document.querySelector('#networkExplorer svg');
+            const connectionGroup = document.getElementById('connectionGroup');
+            const neuronGroup = document.getElementById('neuronGroup');
+            const labelGroup = document.getElementById('labelGroup');
+            
+            // Clear existing elements
+            connectionGroup.innerHTML = '';
+            neuronGroup.innerHTML = '';
+            labelGroup.innerHTML = '';
+            
+            const width = 900;
+            const height = 500;
+            const layerSpacing = width / (network.layers.length + 1);
+            
+            // Calculate neuron positions
+            const neurons = [];
+            network.layers.forEach((layerSize, layerIndex) => {
+                const x = layerSpacing * (layerIndex + 1);
+                const neuronSpacing = height / (layerSize + 1);
+                
+                for (let i = 0; i < layerSize; i++) {
+                    const y = neuronSpacing * (i + 1);
+                    neurons.push({
+                        x: x,
+                        y: y,
+                        layer: layerIndex,
+                        index: i,
+                        id: `n${layerIndex}_${i}`
+                    });
+                }
+            });
+            
+            // Draw connections
+            neurons.forEach(fromNeuron => {
+                neurons.forEach(toNeuron => {
+                    if (toNeuron.layer === fromNeuron.layer + 1) {
+                        const connection = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        connection.setAttribute('class', 'connection');
+                        connection.setAttribute('x1', fromNeuron.x);
+                        connection.setAttribute('y1', fromNeuron.y);
+                        connection.setAttribute('x2', toNeuron.x);
+                        connection.setAttribute('y2', toNeuron.y);
+                        connection.setAttribute('data-from', fromNeuron.id);
+                        connection.setAttribute('data-to', toNeuron.id);
+                        connection.addEventListener('click', () => showConnectionDetails(fromNeuron, toNeuron));
+                        connectionGroup.appendChild(connection);
+                        
+                        // Add weight label (hidden by default)
+                        const weight = (Math.random() * 2 - 1).toFixed(2);
+                        const weightLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                        weightLabel.setAttribute('class', 'weight-label');
+                        weightLabel.setAttribute('x', (fromNeuron.x + toNeuron.x) / 2);
+                        weightLabel.setAttribute('y', (fromNeuron.y + toNeuron.y) / 2);
+                        weightLabel.setAttribute('text-anchor', 'middle');
+                        weightLabel.textContent = weight;
+                        weightLabel.style.display = 'none';
+                        labelGroup.appendChild(weightLabel);
+                    }
+                });
+            });
+            
+            // Draw neurons
+            neurons.forEach(neuron => {
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                g.setAttribute('transform', `translate(${neuron.x}, ${neuron.y})`);
+                g.style.cursor = 'pointer';
+                g.addEventListener('click', () => showNeuronDetails(neuron));
+                
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('r', 25);
+                circle.setAttribute('class', 'neuron-node');
+                
+                // Color based on layer
+                if (neuron.layer === 0) {
+                    circle.style.fill = '#3b82f6';
+                } else if (neuron.layer === network.layers.length - 1) {
+                    circle.style.fill = '#16a34a';
+                } else {
+                    circle.style.fill = '#f59e0b';
+                }
+                
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('dy', '0.3em');
+                text.setAttribute('class', 'neuron-label');
+                text.style.fill = 'white';
+                text.style.fontWeight = 'bold';
+                
+                if (neuron.layer === 0) {
+                    text.textContent = `x${neuron.index + 1}`;
+                } else if (neuron.layer === network.layers.length - 1) {
+                    text.textContent = `y${neuron.index + 1}`;
+                } else {
+                    text.textContent = `h${neuron.layer}${neuron.index + 1}`;
+                }
+                
+                g.appendChild(circle);
+                g.appendChild(text);
+                neuronGroup.appendChild(g);
+            });
+            
+            // Add layer labels
+            network.layers.forEach((layerSize, layerIndex) => {
+                const x = layerSpacing * (layerIndex + 1);
+                const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                label.setAttribute('x', x);
+                label.setAttribute('y', 30);
+                label.setAttribute('text-anchor', 'middle');
+                label.style.fontSize = '16px';
+                label.style.fontWeight = 'bold';
+                label.style.fill = '#064e3b';
+                
+                if (layerIndex === 0) {
+                    label.textContent = 'Input Layer';
+                } else if (layerIndex === network.layers.length - 1) {
+                    label.textContent = 'Output Layer';
+                } else {
+                    label.textContent = `Hidden Layer ${layerIndex}`;
+                }
+                
+                labelGroup.appendChild(label);
+            });
+        }
+
+        // Change network
+        function changeNetwork(type) {
+            currentNetwork = type;
+            drawNetwork(networks[type]);
+            showingWeights = false;
+        }
+
+        // Animate signal propagation
+        function animateSignal() {
+            const connections = document.querySelectorAll('.connection');
+            const neurons = document.querySelectorAll('.neuron-node');
+            
+            // Reset styles
+            connections.forEach(conn => {
+                conn.style.stroke = '#86efac';
+                conn.style.strokeWidth = '2';
+            });
+            neurons.forEach(neuron => {
+                neuron.style.filter = '';
+            });
+            
+            // Animate layer by layer
+            const network = networks[currentNetwork];
+            let delay = 0;
+            
+            for (let layer = 0; layer < network.layers.length - 1; layer++) {
+                setTimeout(() => {
+                    // Activate neurons in current layer
+                    neurons.forEach((neuron, index) => {
+                        const g = neuron.parentElement;
+                        const transform = g.getAttribute('transform');
+                        const match = transform.match(/translate\((\d+),/);
+                        if (match) {
+                            const x = parseInt(match[1]);
+                            const expectedX = (900 / (network.layers.length + 1)) * (layer + 1);
+                            if (Math.abs(x - expectedX) < 10) {
+                                neuron.style.filter = 'brightness(1.5)';
+                                neuron.style.animation = 'pulse 0.5s ease-in-out';
+                            }
+                        }
+                    });
+                    
+                    // Activate connections from this layer
+                    connections.forEach(conn => {
+                        const x1 = parseInt(conn.getAttribute('x1'));
+                        const expectedX = (900 / (network.layers.length + 1)) * (layer + 1);
+                        if (Math.abs(x1 - expectedX) < 10) {
+                            conn.style.stroke = '#22c55e';
+                            conn.style.strokeWidth = '4';
+                            conn.style.opacity = '1';
+                        }
+                    });
+                }, delay);
+                
+                delay += 500;
+            }
+            
+            // Activate output layer
+            setTimeout(() => {
+                neurons.forEach((neuron, index) => {
+                    const g = neuron.parentElement;
+                    const transform = g.getAttribute('transform');
+                    const match = transform.match(/translate\((\d+),/);
+                    if (match) {
+                        const x = parseInt(match[1]);
+                        const expectedX = (900 / (network.layers.length + 1)) * network.layers.length;
+                        if (Math.abs(x - expectedX) < 10) {
+                            neuron.style.filter = 'brightness(1.5)';
+                            neuron.style.animation = 'pulse 0.5s ease-in-out';
+                        }
+                    }
+                });
+            }, delay);
+        }
+
+        // Show/hide weights
+        function showWeights() {
+            showingWeights = !showingWeights;
+            const weightLabels = document.querySelectorAll('.weight-label');
+            weightLabels.forEach(label => {
+                label.style.display = showingWeights ? 'block' : 'none';
+            });
+        }
+
+        // Show component details
+        function showComponentDetails(component) {
+            const details = {
+                layers: {
+                    title: 'Neural Network Layers',
+                    content: `
+                        <p><strong>Understanding Layers in Neural Networks</strong></p>
+                        <p>Layers are the fundamental organizational structure of neural networks, grouping neurons that process information at the same level of abstraction.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Types of Layers:</strong><br>
+                            • <strong>Input Layer:</strong> Receives raw data (no computation)<br>
+                            • <strong>Hidden Layers:</strong> Learn representations (main computation)<br>
+                            • <strong>Output Layer:</strong> Produces final predictions
+                        </div>
+                        
+                        <p><strong>Layer Properties:</strong></p>
+                        <ul>
+                            <li><strong>Fully Connected:</strong> Each neuron connects to all neurons in the next layer</li>
+                            <li><strong>Layer Size:</strong> Number of neurons in the layer</li>
+                            <li><strong>Activation Function:</strong> Non-linear transformation applied</li>
+                            <li><strong>Layer Depth:</strong> Position in the network (0 = input)</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Defining layers in code
+import tensorflow as tf
+
+model = tf.keras.Sequential([
+    # Input layer (implicit)
+    tf.keras.layers.Dense(128, activation='relu', input_shape=(784,)),
+    # Hidden layer 1
+    tf.keras.layers.Dense(64, activation='relu'),
+    # Hidden layer 2  
+    tf.keras.layers.Dense(32, activation='relu'),
+    # Output layer
+    tf.keras.layers.Dense(10, activation='softmax')
+])
+
+# Total layers: 4 (including input)
+# Total trainable parameters: 109,386
+                        </div>
+                        
+                        <p><strong>Why Multiple Layers?</strong></p>
+                        <ul>
+                            <li><strong>Feature Hierarchy:</strong> Each layer learns increasingly abstract features</li>
+                            <li><strong>Non-linear Transformations:</strong> Multiple layers create complex decision boundaries</li>
+                            <li><strong>Efficiency:</strong> Deep networks need fewer parameters than shallow ones</li>
+                            <li><strong>Representation Learning:</strong> Automatic feature extraction</li>
+                        </ul>
+                    `
+                },
+                nodes: {
+                    title: 'Nodes (Neurons)',
+                    content: `
+                        <p><strong>The Computational Units</strong></p>
+                        <p>Nodes, also called neurons or units, are the basic processing elements of neural networks that compute weighted sums and apply activation functions.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Neuron Computation:</strong><br>
+                            1. Receive inputs from previous layer<br>
+                            2. Compute weighted sum + bias<br>
+                            3. Apply activation function<br>
+                            4. Send output to next layer
+                        </div>
+                        
+                        <div class="modal-code">
+# Single neuron computation
+def neuron_output(inputs, weights, bias, activation_fn):
+    # Step 1: Weighted sum
+    z = sum(x * w for x, w in zip(inputs, weights)) + bias
+    
+    # Step 2: Activation
+    output = activation_fn(z)
+    
+    return output
+
+# Example with ReLU activation
+inputs = [0.5, 0.8, -0.2]
+weights = [0.7, -0.3, 0.9]
+bias = 0.1
+
+z = 0.5*0.7 + 0.8*(-0.3) + (-0.2)*0.9 + 0.1
+# z = 0.35 - 0.24 - 0.18 + 0.1 = 0.03
+
+output = max(0, z)  # ReLU
+# output = 0.03
+                        </div>
+                        
+                        <p><strong>Neuron Properties:</strong></p>
+                        <ul>
+                            <li><strong>Input Connections:</strong> Receives signals from previous layer</li>
+                            <li><strong>Weights:</strong> Learnable parameters for each input</li>
+                            <li><strong>Bias:</strong> Learnable threshold adjustment</li>
+                            <li><strong>Activation:</strong> Non-linear transformation function</li>
+                            <li><strong>Output:</strong> Single value sent to next layer</li>
+                        </ul>
+                        
+                        <p><strong>Types of Neurons:</strong></p>
+                        <ul>
+                            <li><strong>Linear Neurons:</strong> No activation (for regression)</li>
+                            <li><strong>Binary Neurons:</strong> Step function activation</li>
+                            <li><strong>Sigmoid Neurons:</strong> Smooth S-curve activation</li>
+                            <li><strong>ReLU Neurons:</strong> Rectified linear activation</li>
+                        </ul>
+                    `
+                },
+                connections: {
+                    title: 'Connections (Weights)',
+                    content: `
+                        <p><strong>The Learning Parameters</strong></p>
+                        <p>Connections represent the weighted links between neurons, storing the learned knowledge of the network.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Weight Properties:</strong><br>
+                            • <strong>Value Range:</strong> Typically -1 to 1 or unbounded<br>
+                            • <strong>Initialization:</strong> Random or structured (Xavier, He)<br>
+                            • <strong>Learning:</strong> Updated during backpropagation<br>
+                            • <strong>Regularization:</strong> May be constrained or penalized
+                        </div>
+                        
+                        <p><strong>Weight Matrix Organization:</strong></p>
+                        <div class="modal-code">
+# Weights between layers
+# Layer 1 (3 neurons) → Layer 2 (2 neurons)
+
+W = [[w11, w12],  # From neuron 1 to neurons 1,2
+     [w21, w22],  # From neuron 2 to neurons 1,2  
+     [w31, w32]]  # From neuron 3 to neurons 1,2
+
+# Shape: (input_size, output_size)
+# Total connections: 3 × 2 = 6
+
+# Forward pass computation
+layer1_output = [0.5, 0.8, -0.2]
+layer2_input = np.dot(layer1_output, W)
+                        </div>
+                        
+                        <p><strong>Weight Initialization:</strong></p>
+                        <ul>
+                            <li><strong>Random:</strong> Small random values (avoid symmetry)</li>
+                            <li><strong>Xavier/Glorot:</strong> Scaled by fan-in and fan-out</li>
+                            <li><strong>He:</strong> Optimized for ReLU activations</li>
+                            <li><strong>Pre-trained:</strong> Transfer learning from other models</li>
+                        </ul>
+                        
+                        <p><strong>Weight Updates:</strong></p>
+                        <div class="modal-code">
+# Gradient descent weight update
+new_weight = old_weight - learning_rate * gradient
+
+# With momentum
+velocity = momentum * velocity - learning_rate * gradient
+new_weight = old_weight + velocity
+
+# Adaptive methods (Adam)
+# Adjusts learning rate per parameter
+                        </div>
+                        
+                        <p><strong>Connection Patterns:</strong></p>
+                        <ul>
+                            <li><strong>Dense/Fully Connected:</strong> Every neuron connects to every neuron in next layer</li>
+                            <li><strong>Sparse:</strong> Only some connections exist (CNNs, pruned networks)</li>
+                            <li><strong>Skip Connections:</strong> Direct connections across layers (ResNet)</li>
+                            <li><strong>Recurrent:</strong> Connections loop back (RNNs)</li>
+                        </ul>
+                    `
+                },
+                biases: {
+                    title: 'Biases',
+                    content: `
+                        <p><strong>The Threshold Parameters</strong></p>
+                        <p>Biases are learnable parameters that shift the activation function, allowing neurons to adjust their firing threshold.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Why Biases Matter:</strong><br>
+                            Without bias, a neuron can only create decision boundaries that pass through the origin. Bias allows shifting these boundaries to fit the data better.
+                        </div>
+                        
+                        <p><strong>Bias in Action:</strong></p>
+                        <div class="modal-code">
+# Neuron without bias
+z = w1*x1 + w2*x2
+# Decision boundary: w1*x1 + w2*x2 = 0 (passes through origin)
+
+# Neuron with bias
+z = w1*x1 + w2*x2 + b
+# Decision boundary: w1*x1 + w2*x2 + b = 0 (can be anywhere)
+
+# Example: Simple AND gate
+# Without bias: Cannot learn AND properly
+# With bias: Can set threshold correctly
+x1=1, x2=1: z = 1*1 + 1*1 + (-1.5) = 0.5 > 0 ✓
+x1=0, x2=1: z = 1*0 + 1*1 + (-1.5) = -0.5 < 0 ✓
+                        </div>
+                        
+                        <p><strong>Bias Properties:</strong></p>
+                        <ul>
+                            <li><strong>One per neuron:</strong> Each neuron has its own bias</li>
+                            <li><strong>Always active:</strong> Bias input is always 1</li>
+                            <li><strong>Learnable:</strong> Updated during training like weights</li>
+                            <li><strong>Initialization:</strong> Often initialized to 0</li>
+                        </ul>
+                        
+                        <p><strong>Mathematical Role:</strong></p>
+                        <div class="modal-code">
+# Linear transformation with bias
+y = Wx + b
+
+# Equivalent to augmented matrix
+# Add 1 to input: x' = [x, 1]
+# Combine weights and bias: W' = [W; b]
+# Then: y = W'x'
+
+# In practice, bias is handled separately for efficiency
+                        </div>
+                        
+                        <p><strong>Practical Importance:</strong></p>
+                        <ul>
+                            <li>Enables learning of any affine transformation</li>
+                            <li>Critical for proper function approximation</li>
+                            <li>Allows neurons to have different activation thresholds</li>
+                            <li>Essential for learning patterns that don't center at origin</li>
+                        </ul>
+                    `
+                }
+            };
+            
+            const detail = details[component];
+            showModal(detail.title, detail.content);
+        }
+
+        // Show neuron details
+        function showNeuronDetails(neuron) {
+            const network = networks[currentNetwork];
+            const layerType = neuron.layer === 0 ? 'Input' : 
+                            neuron.layer === network.layers.length - 1 ? 'Output' : 'Hidden';
+            
+            showModal(`${layerType} Neuron Details`, `
+                <p><strong>Neuron Information</strong></p>
+                
+                <div class="modal-example">
+                    <strong>Properties:</strong><br>
+                    • Layer: ${neuron.layer} (${layerType})<br>
+                    • Position: ${neuron.index + 1} of ${network.layers[neuron.layer]}<br>
+                    • Connections In: ${neuron.layer > 0 ? network.layers[neuron.layer - 1] : 0}<br>
+                    • Connections Out: ${neuron.layer < network.layers.length - 1 ? network.layers[neuron.layer + 1] : 0}
+                </div>
+                
+                <p><strong>Computation Flow:</strong></p>
+                <div class="modal-code">
+# This neuron's computation
+${neuron.layer === 0 ? `# Input neuron - no computation
+output = input_value` : `# Weighted sum of inputs
+inputs = [outputs from layer ${neuron.layer - 1}]
+weights = [${neuron.layer > 0 ? network.layers[neuron.layer - 1] : 0} weight values]
+bias = bias_value
+
+z = sum(inputs[i] * weights[i] for i in range(len(inputs))) + bias
+
+# Activation function
+output = activation_function(z)`}
+                </div>
+                
+                <p><strong>Role in Network:</strong></p>
+                <ul>
+                    ${neuron.layer === 0 ? 
+                    `<li>Receives raw input features</li>
+                    <li>No computation performed</li>
+                    <li>Passes values to hidden layer</li>` :
+                    neuron.layer === network.layers.length - 1 ?
+                    `<li>Produces final network output</li>
+                    <li>Activation depends on task (sigmoid, softmax, linear)</li>
+                    <li>Output used for loss calculation</li>` :
+                    `<li>Learns intermediate representations</li>
+                    <li>Combines features from previous layer</li>
+                    <li>Creates new features for next layer</li>`}
+                </ul>
+                
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li>Incoming weights: ${neuron.layer > 0 ? network.layers[neuron.layer - 1] : 0}</li>
+                    <li>Bias: ${neuron.layer > 0 ? 1 : 0}</li>
+                    <li>Total parameters: ${neuron.layer > 0 ? network.layers[neuron.layer - 1] + 1 : 0}</li>
+                </ul>
+            `);
+        }
+
+        // Show connection details
+        function showConnectionDetails(fromNeuron, toNeuron) {
+            const weight = (Math.random() * 2 - 1).toFixed(3);
+            
+            showModal('Connection Details', `
+                <p><strong>Weight Connection</strong></p>
+                
+                <div class="modal-example">
+                    <strong>Connection:</strong><br>
+                    From: Layer ${fromNeuron.layer}, Neuron ${fromNeuron.index + 1}<br>
+                    To: Layer ${toNeuron.layer}, Neuron ${toNeuron.index + 1}<br>
+                    Weight value: ${weight}
+                </div>
+                
+                <p><strong>Signal Computation:</strong></p>
+                <div class="modal-code">
+# Signal transmission
+from_output = 0.75  # Example output from source neuron
+weight = ${weight}
+
+# Contribution to target neuron
+signal = from_output * weight
+signal = 0.75 * ${weight} = ${(0.75 * parseFloat(weight)).toFixed(3)}
+
+# This is added to weighted sum at target neuron
+                </div>
+                
+                <p><strong>Weight Properties:</strong></p>
+                <ul>
+                    <li><strong>Magnitude:</strong> ${Math.abs(weight)} (${Math.abs(weight) > 0.5 ? 'Strong' : 'Weak'} connection)</li>
+                    <li><strong>Sign:</strong> ${weight > 0 ? 'Positive (excitatory)' : 'Negative (inhibitory)'}</li>
+                    <li><strong>Gradient:</strong> Computed during backpropagation</li>
+                    <li><strong>Update rule:</strong> w = w - α * ∂L/∂w</li>
+                </ul>
+                
+                <p><strong>During Training:</strong></p>
+                <ul>
+                    <li>Weight starts randomly initialized</li>
+                    <li>Adjusted based on error gradient</li>
+                    <li>May be regularized (L1/L2 penalty)</li>
+                    <li>Can be pruned if near zero</li>
+                </ul>
+            `);
+        }
+
+        // Show topology details
+        function showTopologyDetails(type) {
+            const topologyInfo = {
+                shallow: {
+                    title: 'Shallow Networks',
+                    content: `
+                        <p><strong>Characteristics of Shallow Networks</strong></p>
+                        <p>Shallow networks have few layers but many neurons per layer, resembling a "wide" architecture.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Typical Structure:</strong><br>
+                            • 1-2 hidden layers<br>
+                            • Many neurons per layer (100s-1000s)<br>
+                            • Large parameter count<br>
+                            • Fast forward/backward pass per layer
+                        </div>
+                        
+                        <p><strong>Advantages:</strong></p>
+                        <ul>
+                            <li><strong>Easy to train:</strong> Gradients flow easily</li>
+                            <li><strong>Fast convergence:</strong> Fewer layers to update</li>
+                            <li><strong>Good for simple patterns:</strong> Linear and slightly non-linear</li>
+                            <li><strong>Parallelizable:</strong> Many neurons can compute simultaneously</li>
+                        </ul>
+                        
+                        <p><strong>Disadvantages:</strong></p>
+                        <ul>
+                            <li><strong>Parameter inefficient:</strong> Needs many parameters</li>
+                            <li><strong>Limited abstraction:</strong> Cannot learn hierarchical features</li>
+                            <li><strong>Poor generalization:</strong> May overfit on complex tasks</li>
+                            <li><strong>Computational cost:</strong> Large matrix operations</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Shallow network example
+model = Sequential([
+    Dense(1000, activation='relu', input_shape=(784,)),
+    Dense(10, activation='softmax')
+])
+
+# Parameters: 784*1000 + 1000 + 1000*10 + 10 = 795,010
+# Very wide but only 2 layers
+                        </div>
+                        
+                        <p><strong>When to Use:</strong></p>
+                        <ul>
+                            <li>Simple classification/regression tasks</li>
+                            <li>When training data is limited</li>
+                            <li>Need for interpretability</li>
+                            <li>Real-time inference requirements</li>
+                        </ul>
+                    `
+                },
+                deep: {
+                    title: 'Deep Networks',
+                    content: `
+                        <p><strong>The Power of Depth</strong></p>
+                        <p>Deep networks have many layers with fewer neurons per layer, creating a hierarchical feature learning structure.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Typical Structure:</strong><br>
+                            • 5-100+ hidden layers<br>
+                            • Moderate neurons per layer (10s-100s)<br>
+                            • Hierarchical representations<br>
+                            • Complex but efficient
+                        </div>
+                        
+                        <p><strong>Advantages:</strong></p>
+                        <ul>
+                            <li><strong>Feature hierarchy:</strong> Learns from simple to complex</li>
+                            <li><strong>Parameter efficient:</strong> Fewer parameters for same capacity</li>
+                            <li><strong>Better generalization:</strong> Captures abstract patterns</li>
+                            <li><strong>Exponential expressiveness:</strong> Can represent complex functions</li>
+                        </ul>
+                        
+                        <p><strong>Challenges:</strong></p>
+                        <ul>
+                            <li><strong>Vanishing gradients:</strong> Signals weaken through layers</li>
+                            <li><strong>Training difficulty:</strong> Requires careful initialization</li>
+                            <li><strong>Longer training time:</strong> More layers to optimize</li>
+                            <li><strong>Overfitting risk:</strong> High capacity needs regularization</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Deep network example
+model = Sequential([
+    Dense(128, activation='relu', input_shape=(784,)),
+    Dense(64, activation='relu'),
+    Dense(32, activation='relu'),
+    Dense(16, activation='relu'),
+    Dense(10, activation='softmax')
+])
+
+# Parameters: 784*128 + 128 + 128*64 + 64 + ... = 109,386
+# Fewer parameters but 5 layers deep
+                        </div>
+                        
+                        <p><strong>Techniques for Deep Networks:</strong></p>
+                        <ul>
+                            <li><strong>Batch Normalization:</strong> Stabilizes training</li>
+                            <li><strong>Skip Connections:</strong> Helps gradient flow (ResNet)</li>
+                            <li><strong>Dropout:</strong> Prevents overfitting</li>
+                            <li><strong>Advanced optimizers:</strong> Adam, RMSprop</li>
+                        </ul>
+                        
+                        <p><strong>Applications:</strong></p>
+                        <ul>
+                            <li>Computer vision (CNNs with 100+ layers)</li>
+                            <li>Natural language processing (Transformers)</li>
+                            <li>Speech recognition</li>
+                            <li>Complex pattern recognition</li>
+                        </ul>
+                    `
+                },
+                wide: {
+                    title: 'Wide Networks',
+                    content: `
+                        <p><strong>Maximizing Width</strong></p>
+                        <p>Wide networks emphasize having many neurons per layer, creating a broad processing capacity at each level.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Design Philosophy:</strong><br>
+                            • Maximize neurons per layer<br>
+                            • Parallel feature extraction<br>
+                            • High redundancy<br>
+                            • Robust representations
+                        </div>
+                        
+                        <p><strong>Width Benefits:</strong></p>
+                        <ul>
+                            <li><strong>Ensemble effect:</strong> Many neurons vote on output</li>
+                            <li><strong>Redundancy:</strong> Robust to neuron failures</li>
+                            <li><strong>Parallel features:</strong> Learn many patterns simultaneously</li>
+                            <li><strong>Smooth optimization:</strong> Many paths to solution</li>
+                        </ul>
+                        
+                        <p><strong>Width Challenges:</strong></p>
+                        <ul>
+                            <li><strong>Memory intensive:</strong> Large weight matrices</li>
+                            <li><strong>Computational cost:</strong> Big matrix multiplications</li>
+                            <li><strong>Diminishing returns:</strong> Benefits plateau</li>
+                            <li><strong>Overfitting:</strong> Too much capacity</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Wide vs Narrow comparison
+wide_model = Sequential([
+    Dense(2048, activation='relu', input_shape=(100,)),
+    Dense(1024, activation='relu'),
+    Dense(1, activation='sigmoid')
+])
+# Parameters: 100*2048 + 2048 + 2048*1024 + 1024 + 1024*1 + 1
+# = 2,302,977 parameters
+
+narrow_model = Sequential([
+    Dense(64, activation='relu', input_shape=(100,)),
+    Dense(32, activation='relu'),
+    Dense(16, activation='relu'),
+    Dense(8, activation='relu'),
+    Dense(1, activation='sigmoid')
+])
+# Parameters: 100*64 + 64 + 64*32 + 32 + ... 
+# = 8,889 parameters (260x fewer!)
+                        </div>
+                        
+                        <p><strong>Optimal Width Guidelines:</strong></p>
+                        <ul>
+                            <li><strong>Start narrow:</strong> Increase if underfitting</li>
+                            <li><strong>Monitor efficiency:</strong> Parameters vs performance</li>
+                            <li><strong>Consider data size:</strong> More data supports wider networks</li>
+                            <li><strong>Task complexity:</strong> Complex tasks may need width</li>
+                        </ul>
+                        
+                        <p><strong>Modern Approaches:</strong></p>
+                        <ul>
+                            <li>Wide ResNets: Combining width with skip connections</li>
+                            <li>EfficientNet: Balanced scaling of width and depth</li>
+                            <li>Mixture of Experts: Selective activation of wide networks</li>
+                        </ul>
+                    `
+                }
+            };
+            
+            const info = topologyInfo[type];
+            showModal(info.title, info.content);
+        }
+
+        // Modal functions
+        function showModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('modalBackdrop').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modalBackdrop').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modalBackdrop').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('modalBackdrop').classList.contains('show')) {
+                closeModal();
+            }
+            
+            // Navigation
+            if (e.key === 'ArrowLeft') {
+                window.location.href = 'Week1_Slide10.html';
+            } else if (e.key === 'ArrowRight' || e.key === ' ') {
+                window.location.href = 'Week1_Slide12.html';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS5720 - Interactive Perceptron Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .slide-container {
+            flex: 1;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .slide-title {
+            font-size: 3.5em;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #16a34a;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: slideInFromTop 1.2s ease-out;
+            font-weight: 700;
+        }
+
+        .demo-container {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromBottom 1s ease-out 0.3s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .visualization-panel {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            position: relative;
+            min-height: 400px;
+        }
+
+        .control-panel {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid rgba(22, 163, 74, 0.3);
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            cursor: crosshair;
+        }
+
+        #perceptronCanvas {
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            height: 100%;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-label {
+            font-weight: 600;
+            color: #064e3b;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 1.1em;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slider {
+            flex: 1;
+            height: 8px;
+            background: rgba(22, 163, 74, 0.2);
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.5);
+        }
+
+        .slider-value {
+            min-width: 60px;
+            text-align: center;
+            font-weight: 600;
+            color: #16a34a;
+            font-size: 1.1em;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 8px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.3);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .control-btn.secondary {
+            background: linear-gradient(135deg, #94a3b8, #64748b);
+        }
+
+        .control-btn.danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .info-section {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            border-left: 4px solid #16a34a;
+        }
+
+        .info-title {
+            font-weight: 700;
+            color: #064e3b;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .info-card:hover {
+            transform: translateY(-3px);
+            border-color: #16a34a;
+            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.2);
+        }
+
+        .info-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #16a34a;
+            margin-bottom: 5px;
+        }
+
+        .info-label {
+            color: #64748b;
+            font-size: 0.9em;
+        }
+
+        .dataset-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .dataset-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(22, 163, 74, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #064e3b;
+        }
+
+        .dataset-btn.active {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border-color: #16a34a;
+        }
+
+        .dataset-btn:hover:not(.active) {
+            background: rgba(220, 252, 231, 0.5);
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            border-radius: 30px;
+            color: #1e293b;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(22, 163, 74, 0.4);
+        }
+
+        .slide-number, .course-info {
+            position: fixed;
+            top: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .slide-number { right: 30px; }
+        .course-info { left: 30px; }
+
+        @keyframes slideInFromTop {
+            from { transform: translateY(-80px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromBottom {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-backdrop.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            color: #064e3b;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(22, 163, 74, 0.1);
+            color: #064e3b;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #334155;
+        }
+
+        .modal-code {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            overflow-x: auto;
+        }
+
+        .modal-example {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #16a34a;
+        }
+
+        .training-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 15px;
+            background: rgba(34, 197, 94, 0.9);
+            color: white;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.9; }
+            50% { opacity: 0.6; }
+        }
+
+        @media (max-width: 768px) {
+            .demo-grid { grid-template-columns: 1fr; }
+            .slide-title { font-size: 2.5em; }
+            .info-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="course-info">CS5720 - Week 1</div>
+    <div class="slide-number">Slide 9 of 20</div>
+    
+    <div class="slide-container">
+        <h1 class="slide-title">Interactive Perceptron Demo</h1>
+        
+        <div class="demo-container">
+            <div class="dataset-selector">
+                <button class="dataset-btn active" onclick="selectDataset('and')">AND Gate</button>
+                <button class="dataset-btn" onclick="selectDataset('or')">OR Gate</button>
+                <button class="dataset-btn" onclick="selectDataset('custom')">Custom Data</button>
+                <button class="dataset-btn" onclick="selectDataset('linear')">Linearly Separable</button>
+            </div>
+
+            <div class="demo-grid">
+                <div class="visualization-panel">
+                    <h3 style="margin-bottom: 20px; color: #064e3b;">Decision Boundary Visualization</h3>
+                    <div class="canvas-container">
+                        <canvas id="perceptronCanvas"></canvas>
+                        <div class="training-status" id="trainingStatus">Training...</div>
+                    </div>
+                </div>
+
+                <div class="control-panel">
+                    <h3 style="margin-bottom: 20px; color: #064e3b;">Perceptron Controls</h3>
+                    
+                    <div class="control-group">
+                        <label class="control-label">Learning Rate (α)</label>
+                        <div class="slider-container">
+                            <input type="range" class="slider" id="learningRateSlider" 
+                                   min="0.01" max="1" step="0.01" value="0.1">
+                            <span class="slider-value" id="learningRateValue">0.10</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Weight 1 (w₁)</label>
+                        <div class="slider-container">
+                            <input type="range" class="slider" id="weight1Slider" 
+                                   min="-5" max="5" step="0.1" value="0">
+                            <span class="slider-value" id="weight1Value">0.0</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Weight 2 (w₂)</label>
+                        <div class="slider-container">
+                            <input type="range" class="slider" id="weight2Slider" 
+                                   min="-5" max="5" step="0.1" value="0">
+                            <span class="slider-value" id="weight2Value">0.0</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Bias (b)</label>
+                        <div class="slider-container">
+                            <input type="range" class="slider" id="biasSlider" 
+                                   min="-5" max="5" step="0.1" value="0">
+                            <span class="slider-value" id="biasValue">0.0</span>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="control-btn" onclick="trainPerceptron()">Train</button>
+                        <button class="control-btn secondary" onclick="stepTraining()">Step</button>
+                        <button class="control-btn danger" onclick="resetPerceptron()">Reset</button>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3 class="info-title">Training Metrics</h3>
+                    <div class="info-grid">
+                        <div class="info-card" onclick="showMetricDetails('epoch')">
+                            <div class="info-value" id="epochCount">0</div>
+                            <div class="info-label">Epochs</div>
+                        </div>
+                        <div class="info-card" onclick="showMetricDetails('accuracy')">
+                            <div class="info-value" id="accuracyValue">0%</div>
+                            <div class="info-label">Accuracy</div>
+                        </div>
+                        <div class="info-card" onclick="showMetricDetails('error')">
+                            <div class="info-value" id="errorCount">0</div>
+                            <div class="info-label">Errors</div>
+                        </div>
+                        <div class="info-card" onclick="showMetricDetails('converged')">
+                            <div class="info-value" id="convergedStatus">No</div>
+                            <div class="info-label">Converged</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <a href="Week1_Slide8.html" class="nav-btn">← Previous</a>
+        <a href="Week1_Slide10.html" class="nav-btn">Next →</a>
+    </div>
+
+    <div style="position: fixed; bottom: 30px; left: 30px; color: #64748b; font-size: 0.9em;">
+        <strong>Prepared by Dr. Gorkem Kar</strong>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal-backdrop" id="modalBackdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Modal Title</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                Modal content goes here...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Perceptron implementation
+        class Perceptron {
+            constructor(learningRate = 0.1) {
+                this.w1 = 0;
+                this.w2 = 0;
+                this.bias = 0;
+                this.learningRate = learningRate;
+                this.epochs = 0;
+                this.trainingData = [];
+                this.isTraining = false;
+            }
+
+            predict(x1, x2) {
+                const sum = this.w1 * x1 + this.w2 * x2 + this.bias;
+                return sum > 0 ? 1 : 0;
+            }
+
+            train(data, maxEpochs = 100) {
+                this.trainingData = data;
+                let hasError = true;
+                this.epochs = 0;
+
+                while (hasError && this.epochs < maxEpochs) {
+                    hasError = false;
+                    this.epochs++;
+
+                    for (let point of data) {
+                        const prediction = this.predict(point.x1, point.x2);
+                        const error = point.label - prediction;
+
+                        if (error !== 0) {
+                            hasError = true;
+                            // Update weights and bias
+                            this.w1 += this.learningRate * error * point.x1;
+                            this.w2 += this.learningRate * error * point.x2;
+                            this.bias += this.learningRate * error;
+                        }
+                    }
+                }
+
+                return !hasError;
+            }
+
+            trainStep() {
+                if (!this.trainingData.length) return false;
+
+                let hasError = false;
+                for (let point of this.trainingData) {
+                    const prediction = this.predict(point.x1, point.x2);
+                    const error = point.label - prediction;
+
+                    if (error !== 0) {
+                        hasError = true;
+                        this.w1 += this.learningRate * error * point.x1;
+                        this.w2 += this.learningRate * error * point.x2;
+                        this.bias += this.learningRate * error;
+                    }
+                }
+                this.epochs++;
+                return !hasError;
+            }
+
+            getAccuracy(data) {
+                let correct = 0;
+                for (let point of data) {
+                    if (this.predict(point.x1, point.x2) === point.label) {
+                        correct++;
+                    }
+                }
+                return (correct / data.length) * 100;
+            }
+
+            getErrors(data) {
+                let errors = 0;
+                for (let point of data) {
+                    if (this.predict(point.x1, point.x2) !== point.label) {
+                        errors++;
+                    }
+                }
+                return errors;
+            }
+        }
+
+        // Global variables
+        let perceptron = new Perceptron(0.1);
+        let canvas, ctx;
+        let currentDataset = 'and';
+        let animationId = null;
+        let customData = [];
+
+        // Datasets
+        const datasets = {
+            and: [
+                {x1: 0, x2: 0, label: 0},
+                {x1: 0, x2: 1, label: 0},
+                {x1: 1, x2: 0, label: 0},
+                {x1: 1, x2: 1, label: 1}
+            ],
+            or: [
+                {x1: 0, x2: 0, label: 0},
+                {x1: 0, x2: 1, label: 1},
+                {x1: 1, x2: 0, label: 1},
+                {x1: 1, x2: 1, label: 1}
+            ],
+            linear: [
+                {x1: 0.2, x2: 0.3, label: 0},
+                {x1: 0.3, x2: 0.4, label: 0},
+                {x1: 0.4, x2: 0.6, label: 0},
+                {x1: 0.6, x2: 0.8, label: 1},
+                {x1: 0.7, x2: 0.7, label: 1},
+                {x1: 0.8, x2: 0.9, label: 1}
+            ],
+            custom: []
+        };
+
+        // Initialize
+        window.onload = function() {
+            canvas = document.getElementById('perceptronCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            const container = canvas.parentElement;
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
+
+            // Set up event listeners
+            setupSliders();
+            setupCanvasClick();
+
+            // Initial draw
+            drawVisualization();
+        };
+
+        // Setup slider listeners
+        function setupSliders() {
+            const sliders = [
+                {id: 'learningRateSlider', valueId: 'learningRateValue', property: 'learningRate', scale: 100},
+                {id: 'weight1Slider', valueId: 'weight1Value', property: 'w1', scale: 1},
+                {id: 'weight2Slider', valueId: 'weight2Value', property: 'w2', scale: 1},
+                {id: 'biasSlider', valueId: 'biasValue', property: 'bias', scale: 1}
+            ];
+
+            sliders.forEach(slider => {
+                const element = document.getElementById(slider.id);
+                const valueElement = document.getElementById(slider.valueId);
+                
+                element.addEventListener('input', function() {
+                    const value = parseFloat(this.value);
+                    if (slider.property === 'learningRate') {
+                        perceptron.learningRate = value;
+                        valueElement.textContent = value.toFixed(2);
+                    } else {
+                        perceptron[slider.property] = value;
+                        valueElement.textContent = value.toFixed(1);
+                    }
+                    drawVisualization();
+                });
+            });
+        }
+
+        // Canvas click for custom data
+        function setupCanvasClick() {
+            canvas.addEventListener('click', function(e) {
+                if (currentDataset !== 'custom') return;
+
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / canvas.width;
+                const y = 1 - (e.clientY - rect.top) / canvas.height;
+
+                // Determine label based on position (simple rule)
+                const label = (x + y) > 1 ? 1 : 0;
+
+                customData.push({x1: x, x2: y, label: label});
+                datasets.custom = customData;
+                drawVisualization();
+            });
+        }
+
+        // Select dataset
+        function selectDataset(name) {
+            currentDataset = name;
+            if (name === 'custom') {
+                customData = [];
+                datasets.custom = customData;
+            }
+
+            // Update button states
+            document.querySelectorAll('.dataset-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            resetPerceptron();
+        }
+
+        // Draw visualization
+        function drawVisualization() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw grid
+            drawGrid();
+
+            // Draw decision boundary
+            if (perceptron.w1 !== 0 || perceptron.w2 !== 0) {
+                drawDecisionBoundary();
+            }
+
+            // Draw data points
+            const data = datasets[currentDataset];
+            data.forEach(point => {
+                drawDataPoint(point);
+            });
+
+            // Update metrics
+            updateMetrics();
+        }
+
+        // Draw grid
+        function drawGrid() {
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+
+            // Vertical lines
+            for (let i = 0; i <= 10; i++) {
+                const x = (canvas.width / 10) * i;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+
+            // Horizontal lines
+            for (let i = 0; i <= 10; i++) {
+                const y = (canvas.height / 10) * i;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+
+            // Draw axes
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 2;
+
+            // X-axis
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height);
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.stroke();
+
+            // Y-axis
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, canvas.height);
+            ctx.stroke();
+        }
+
+        // Draw decision boundary
+        function drawDecisionBoundary() {
+            ctx.strokeStyle = '#8b5cf6';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+
+            // Calculate boundary line: w1*x1 + w2*x2 + bias = 0
+            // x2 = -(w1*x1 + bias) / w2
+
+            if (Math.abs(perceptron.w2) > 0.001) {
+                // Calculate y for x=0 and x=1
+                const y1 = -(perceptron.w1 * 0 + perceptron.bias) / perceptron.w2;
+                const y2 = -(perceptron.w1 * 1 + perceptron.bias) / perceptron.w2;
+
+                ctx.moveTo(0, canvas.height - y1 * canvas.height);
+                ctx.lineTo(canvas.width, canvas.height - y2 * canvas.height);
+            } else if (Math.abs(perceptron.w1) > 0.001) {
+                // Vertical line
+                const x = -perceptron.bias / perceptron.w1;
+                ctx.moveTo(x * canvas.width, 0);
+                ctx.lineTo(x * canvas.width, canvas.height);
+            }
+
+            ctx.stroke();
+
+            // Draw shaded regions
+            ctx.globalAlpha = 0.1;
+            if (perceptron.w2 !== 0) {
+                // Determine which side is positive
+                const testY = 0.5;
+                const testX = 0.5;
+                const value = perceptron.w1 * testX + perceptron.w2 * testY + perceptron.bias;
+                
+                if (value > 0) {
+                    ctx.fillStyle = '#22c55e';
+                } else {
+                    ctx.fillStyle = '#ef4444';
+                }
+                
+                // Fill the appropriate region
+                ctx.beginPath();
+                const y1 = -(perceptron.w1 * 0 + perceptron.bias) / perceptron.w2;
+                const y2 = -(perceptron.w1 * 1 + perceptron.bias) / perceptron.w2;
+                
+                ctx.moveTo(0, canvas.height - y1 * canvas.height);
+                ctx.lineTo(canvas.width, canvas.height - y2 * canvas.height);
+                
+                if (value > 0) {
+                    ctx.lineTo(canvas.width, 0);
+                    ctx.lineTo(0, 0);
+                } else {
+                    ctx.lineTo(canvas.width, canvas.height);
+                    ctx.lineTo(0, canvas.height);
+                }
+                
+                ctx.closePath();
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+        }
+
+        // Draw data point
+        function drawDataPoint(point) {
+            const x = point.x1 * canvas.width;
+            const y = canvas.height - point.x2 * canvas.height;
+            const radius = 12;
+
+            // Draw point
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            
+            if (point.label === 1) {
+                ctx.fillStyle = '#22c55e';
+            } else {
+                ctx.fillStyle = '#ef4444';
+            }
+            ctx.fill();
+
+            // Draw border
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Check if correctly classified
+            const prediction = perceptron.predict(point.x1, point.x2);
+            if (prediction !== point.label) {
+                // Draw X for misclassified
+                ctx.strokeStyle = '#1e293b';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(x - 8, y - 8);
+                ctx.lineTo(x + 8, y + 8);
+                ctx.moveTo(x - 8, y + 8);
+                ctx.lineTo(x + 8, y - 8);
+                ctx.stroke();
+            }
+        }
+
+        // Training functions
+        function trainPerceptron() {
+            if (perceptron.isTraining) return;
+
+            const data = datasets[currentDataset];
+            if (data.length === 0) {
+                showModal('No Data', 'Please add some data points by clicking on the canvas (in Custom Data mode) or select a different dataset.');
+                return;
+            }
+
+            perceptron.isTraining = true;
+            document.getElementById('trainingStatus').style.display = 'block';
+
+            // Animate training
+            let epoch = 0;
+            const maxEpochs = 100;
+
+            function trainStep() {
+                const converged = perceptron.trainStep();
+                drawVisualization();
+                epoch++;
+
+                if (!converged && epoch < maxEpochs) {
+                    animationId = setTimeout(trainStep, 100);
+                } else {
+                    perceptron.isTraining = false;
+                    document.getElementById('trainingStatus').style.display = 'none';
+                    
+                    if (converged) {
+                        showModal('Training Complete', `
+                            <p>The perceptron has successfully converged!</p>
+                            <div class="modal-example">
+                                <strong>Final Results:</strong><br>
+                                • Epochs: ${perceptron.epochs}<br>
+                                • Accuracy: 100%<br>
+                                • Weights: w₁=${perceptron.w1.toFixed(2)}, w₂=${perceptron.w2.toFixed(2)}<br>
+                                • Bias: ${perceptron.bias.toFixed(2)}
+                            </div>
+                            <p>The decision boundary equation is:</p>
+                            <div class="modal-code">
+${perceptron.w1.toFixed(2)}·x₁ + ${perceptron.w2.toFixed(2)}·x₂ + ${perceptron.bias.toFixed(2)} = 0
+                            </div>
+                        `);
+                    } else {
+                        showModal('Training Stopped', `
+                            <p>Maximum epochs (${maxEpochs}) reached without convergence.</p>
+                            <p>This might indicate that the data is not linearly separable.</p>
+                            <div class="modal-example">
+                                <strong>Tips:</strong><br>
+                                • Try adjusting the learning rate<br>
+                                • Ensure data is linearly separable<br>
+                                • Consider using a multi-layer network for non-linear patterns
+                            </div>
+                        `);
+                    }
+                }
+            }
+
+            trainStep();
+        }
+
+        function stepTraining() {
+            const data = datasets[currentDataset];
+            if (data.length === 0) return;
+
+            perceptron.trainingData = data;
+            const converged = perceptron.trainStep();
+            drawVisualization();
+
+            if (converged) {
+                showModal('Converged!', 'The perceptron has found the optimal solution.');
+            }
+        }
+
+        function resetPerceptron() {
+            if (animationId) {
+                clearTimeout(animationId);
+                animationId = null;
+            }
+
+            perceptron = new Perceptron(parseFloat(document.getElementById('learningRateSlider').value));
+            perceptron.epochs = 0;
+            perceptron.isTraining = false;
+            
+            document.getElementById('trainingStatus').style.display = 'none';
+            
+            // Reset sliders
+            document.getElementById('weight1Slider').value = 0;
+            document.getElementById('weight2Slider').value = 0;
+            document.getElementById('biasSlider').value = 0;
+            document.getElementById('weight1Value').textContent = '0.0';
+            document.getElementById('weight2Value').textContent = '0.0';
+            document.getElementById('biasValue').textContent = '0.0';
+
+            drawVisualization();
+        }
+
+        // Update metrics display
+        function updateMetrics() {
+            const data = datasets[currentDataset];
+            const accuracy = data.length > 0 ? perceptron.getAccuracy(data) : 0;
+            const errors = data.length > 0 ? perceptron.getErrors(data) : 0;
+            const converged = data.length > 0 && errors === 0;
+
+            document.getElementById('epochCount').textContent = perceptron.epochs;
+            document.getElementById('accuracyValue').textContent = accuracy.toFixed(0) + '%';
+            document.getElementById('errorCount').textContent = errors;
+            document.getElementById('convergedStatus').textContent = converged ? 'Yes' : 'No';
+        }
+
+        // Show metric details
+        function showMetricDetails(metric) {
+            const details = {
+                epoch: {
+                    title: 'Training Epochs',
+                    content: `
+                        <p>An <strong>epoch</strong> is one complete pass through all training data.</p>
+                        <div class="modal-example">
+                            <strong>Current Status:</strong><br>
+                            • Epochs completed: ${perceptron.epochs}<br>
+                            • Learning rate: ${perceptron.learningRate}<br>
+                            • Dataset size: ${datasets[currentDataset].length} points
+                        </div>
+                        <p>The perceptron updates its weights after examining each training example. More epochs usually lead to better learning, but too many can cause overfitting.</p>
+                        <div class="modal-code">
+for epoch in range(max_epochs):
+    for point in training_data:
+        prediction = perceptron.predict(point)
+        error = label - prediction
+        if error != 0:
+            weights += learning_rate * error * inputs
+                        </div>
+                    `
+                },
+                accuracy: {
+                    title: 'Model Accuracy',
+                    content: `
+                        <p><strong>Accuracy</strong> measures the percentage of correct predictions.</p>
+                        <div class="modal-example">
+                            <strong>Current Performance:</strong><br>
+                            • Accuracy: ${perceptron.getAccuracy(datasets[currentDataset]).toFixed(1)}%<br>
+                            • Correct predictions: ${datasets[currentDataset].length - perceptron.getErrors(datasets[currentDataset])}<br>
+                            • Total samples: ${datasets[currentDataset].length}
+                        </div>
+                        <p>For linearly separable data, a perceptron can achieve 100% accuracy. If accuracy plateaus below 100%, the data might not be linearly separable.</p>
+                        <div class="modal-code">
+accuracy = correct_predictions / total_predictions * 100
+                        </div>
+                    `
+                },
+                error: {
+                    title: 'Classification Errors',
+                    content: `
+                        <p><strong>Errors</strong> indicate misclassified data points.</p>
+                        <div class="modal-example">
+                            <strong>Error Analysis:</strong><br>
+                            • Current errors: ${perceptron.getErrors(datasets[currentDataset])}<br>
+                            • Error rate: ${(perceptron.getErrors(datasets[currentDataset]) / datasets[currentDataset].length * 100).toFixed(1)}%<br>
+                            • Status: ${perceptron.getErrors(datasets[currentDataset]) === 0 ? 'Perfect classification!' : 'Still learning...'}
+                        </div>
+                        <p>Misclassified points appear with an X mark in the visualization. The perceptron adjusts weights to minimize these errors.</p>
+                        <p><strong>Common causes of persistent errors:</strong></p>
+                        <ul>
+                            <li>Non-linearly separable data (like XOR)</li>
+                            <li>Learning rate too high or too low</li>
+                            <li>Insufficient training epochs</li>
+                        </ul>
+                    `
+                },
+                converged: {
+                    title: 'Convergence Status',
+                    content: `
+                        <p><strong>Convergence</strong> means the perceptron has found optimal weights.</p>
+                        <div class="modal-example">
+                            <strong>Convergence Criteria:</strong><br>
+                            • All points correctly classified<br>
+                            • No weight updates needed<br>
+                            • Current status: ${perceptron.getErrors(datasets[currentDataset]) === 0 ? 'Converged ✓' : 'Not converged ✗'}
+                        </div>
+                        <p><strong>Perceptron Convergence Theorem:</strong></p>
+                        <p>If the data is linearly separable, the perceptron algorithm will converge to a solution in a finite number of steps.</p>
+                        <div class="modal-code">
+converged = all(predict(x) == label for x, label in data)
+                        </div>
+                        <p>If the perceptron doesn't converge after many epochs, try:</p>
+                        <ul>
+                            <li>Checking if data is linearly separable</li>
+                            <li>Adjusting the learning rate</li>
+                            <li>Using a multi-layer network</li>
+                        </ul>
+                    `
+                }
+            };
+
+            const detail = details[metric];
+            showModal(detail.title, detail.content);
+        }
+
+        // Modal functions
+        function showModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('modalBackdrop').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modalBackdrop').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modalBackdrop').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('modalBackdrop').classList.contains('show')) {
+                closeModal();
+            }
+            
+            // Navigation
+            if (e.key === 'ArrowLeft') {
+                window.location.href = 'Week1_Slide8.html';
+            } else if (e.key === 'ArrowRight' || e.key === ' ') {
+                window.location.href = 'Week1_Slide10.html';
+            }
+        });
+
+        // Window resize
+        window.addEventListener('resize', function() {
+            const container = canvas.parentElement;
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
+            drawVisualization();
+        });
+    </script>
+</body>
+</html>

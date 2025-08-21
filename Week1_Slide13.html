@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS5720 - Activation Functions Introduction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .slide-container {
+            flex: 1;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .slide-title {
+            font-size: 3.5em;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #16a34a;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: slideInFromTop 1.2s ease-out;
+            font-weight: 700;
+        }
+
+        .content-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .concept-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromLeft 1s ease-out 0.3s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .importance-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromRight 1s ease-out 0.3s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #064e3b;
+            margin-bottom: 25px;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #16a34a, #22c55e);
+            border-radius: 2px;
+        }
+
+        .interactive-graph {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromBottom 1s ease-out 0.6s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .graph-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 400px;
+            margin: 30px auto;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-radius: 15px;
+            border: 2px solid rgba(22, 163, 74, 0.2);
+        }
+
+        .function-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .function-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(22, 163, 74, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #064e3b;
+        }
+
+        .function-btn.active {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border-color: #16a34a;
+        }
+
+        .function-btn:hover:not(.active) {
+            background: rgba(220, 252, 231, 0.5);
+        }
+
+        .comparison-section {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromBottom 1s ease-out 0.9s both;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            margin-top: 40px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .comparison-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .comparison-card:hover {
+            transform: translateY(-5px);
+            border-color: #3b82f6;
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.2);
+        }
+
+        .neuron-demo {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #16a34a;
+        }
+
+        .demo-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .input-slider {
+            flex: 1;
+            height: 8px;
+            background: rgba(22, 163, 74, 0.2);
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .input-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3);
+        }
+
+        .value-display {
+            min-width: 100px;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            border-radius: 30px;
+            color: #1e293b;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(22, 163, 74, 0.4);
+        }
+
+        .slide-number, .course-info {
+            position: fixed;
+            top: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .slide-number { right: 30px; }
+        .course-info { left: 30px; }
+
+        @keyframes slideInFromTop {
+            from { transform: translateY(-80px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromLeft {
+            from { transform: translateX(-60px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromRight {
+            from { transform: translateX(60px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromBottom {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-backdrop.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            color: #064e3b;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(22, 163, 74, 0.1);
+            color: #064e3b;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #334155;
+        }
+
+        .modal-code {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            overflow-x: auto;
+        }
+
+        .modal-example {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #16a34a;
+        }
+
+        @media (max-width: 768px) {
+            .content-layout { grid-template-columns: 1fr; }
+            .slide-title { font-size: 2.5em; }
+            .comparison-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="course-info">CS5720 - Week 1</div>
+    <div class="slide-number">Slide 13 of 20</div>
+    
+    <div class="slide-container">
+        <h1 class="slide-title">Activation Functions Introduction</h1>
+        
+        <div class="content-layout">
+            <div class="concept-section">
+                <h2 class="section-title">What are Activation Functions?</h2>
+                
+                <div style="font-size: 1.1em; line-height: 1.7; color: #334155; margin-bottom: 20px;">
+                    Activation functions introduce <strong>non-linearity</strong> into neural networks, transforming the weighted sum of inputs into an output signal. Without them, even deep networks would only compute linear transformations!
+                </div>
+
+                <div class="neuron-demo">
+                    <strong style="color: #064e3b; font-size: 1.2em;">Neuron with Activation:</strong>
+                    <div style="text-align: center; margin: 15px 0; font-family: monospace;">
+                        Input → [Σ(w·x) + b] → f(z) → Output
+                    </div>
+                    <p style="margin-top: 10px;">Where f(z) is the activation function</p>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <strong style="color: #064e3b;">Key Properties:</strong>
+                    <ul style="margin-top: 10px; margin-left: 20px; line-height: 1.8;">
+                        <li>Non-linear transformation</li>
+                        <li>Differentiable (for backpropagation)</li>
+                        <li>Computationally efficient</li>
+                        <li>Suitable gradient properties</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="importance-section">
+                <h2 class="section-title">Why We Need Them</h2>
+                
+                <div style="background: linear-gradient(135deg, #fee2e2, #fecaca); padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #ef4444;">
+                    <strong style="color: #991b1b;">Without Activation Functions:</strong>
+                    <p style="margin-top: 10px;">f(W₂(W₁x)) = W₂W₁x = Wx</p>
+                    <p>Multiple layers collapse to a single linear transformation!</p>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); padding: 20px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #16a34a;">
+                    <strong style="color: #166534;">With Activation Functions:</strong>
+                    <p style="margin-top: 10px;">f₂(W₂·f₁(W₁x))</p>
+                    <p>Can learn complex, non-linear patterns!</p>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <strong style="color: #064e3b;">Benefits:</strong>
+                    <ul style="margin-top: 10px; margin-left: 20px; line-height: 1.8;">
+                        <li>Enable learning of complex patterns</li>
+                        <li>Create non-linear decision boundaries</li>
+                        <li>Allow deep networks to be meaningful</li>
+                        <li>Model real-world relationships</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="interactive-graph">
+            <h2 class="section-title" style="text-align: center;">Interactive Activation Functions</h2>
+            
+            <div class="function-selector">
+                <button class="function-btn active" onclick="selectFunction('linear')">Linear</button>
+                <button class="function-btn" onclick="selectFunction('sigmoid')">Sigmoid</button>
+                <button class="function-btn" onclick="selectFunction('tanh')">Tanh</button>
+                <button class="function-btn" onclick="selectFunction('relu')">ReLU</button>
+                <button class="function-btn" onclick="selectFunction('leaky')">Leaky ReLU</button>
+            </div>
+
+            <div class="graph-container" id="graphContainer">
+                <canvas id="functionCanvas" width="800" height="400"></canvas>
+            </div>
+
+            <div class="demo-controls">
+                <label style="font-weight: 600; color: #064e3b;">Input Value (z):</label>
+                <input type="range" class="input-slider" id="inputSlider" 
+                       min="-5" max="5" step="0.1" value="0">
+                <div class="value-display">
+                    <div>z = <span id="inputValue">0.0</span></div>
+                    <div>f(z) = <span id="outputValue">0.0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison-section">
+            <h2 class="section-title" style="text-align: center; color: #1e40af;">Quick Comparison</h2>
+            
+            <div class="comparison-grid">
+                <div class="comparison-card" onclick="showComparisonDetails('linear')">
+                    <h3 style="color: #1e40af; margin-bottom: 15px;">Linear</h3>
+                    <div style="font-size: 1.3em; margin: 15px 0;">f(z) = z</div>
+                    <p style="color: #64748b;">No activation</p>
+                    <p style="color: #ef4444; font-size: 0.9em; margin-top: 10px;">❌ No non-linearity</p>
+                </div>
+
+                <div class="comparison-card" onclick="showComparisonDetails('sigmoid')">
+                    <h3 style="color: #1e40af; margin-bottom: 15px;">Sigmoid</h3>
+                    <div style="font-size: 1.3em; margin: 15px 0;">f(z) = 1/(1+e⁻ᶻ)</div>
+                    <p style="color: #64748b;">Range: (0, 1)</p>
+                    <p style="color: #22c55e; font-size: 0.9em; margin-top: 10px;">✓ Probability output</p>
+                </div>
+
+                <div class="comparison-card" onclick="showComparisonDetails('tanh')">
+                    <h3 style="color: #1e40af; margin-bottom: 15px;">Tanh</h3>
+                    <div style="font-size: 1.3em; margin: 15px 0;">f(z) = tanh(z)</div>
+                    <p style="color: #64748b;">Range: (-1, 1)</p>
+                    <p style="color: #22c55e; font-size: 0.9em; margin-top: 10px;">✓ Zero-centered</p>
+                </div>
+
+                <div class="comparison-card" onclick="showComparisonDetails('relu')">
+                    <h3 style="color: #1e40af; margin-bottom: 15px;">ReLU</h3>
+                    <div style="font-size: 1.3em; margin: 15px 0;">f(z) = max(0, z)</div>
+                    <p style="color: #64748b;">Range: [0, ∞)</p>
+                    <p style="color: #22c55e; font-size: 0.9em; margin-top: 10px;">✓ Most popular</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <a href="Week1_Slide12.html" class="nav-btn">← Previous</a>
+        <a href="Week1_Slide14.html" class="nav-btn">Next →</a>
+    </div>
+
+    <div style="position: fixed; bottom: 30px; left: 30px; color: #64748b; font-size: 0.9em;">
+        <strong>Prepared by Dr. Gorkem Kar</strong>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal-backdrop" id="modalBackdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Modal Title</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                Modal content goes here...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentFunction = 'linear';
+        let canvas, ctx;
+        let inputSlider, inputValueSpan, outputValueSpan;
+
+        // Activation functions
+        const activationFunctions = {
+            linear: {
+                func: (z) => z,
+                derivative: (z) => 1,
+                name: 'Linear',
+                formula: 'f(z) = z'
+            },
+            sigmoid: {
+                func: (z) => 1 / (1 + Math.exp(-z)),
+                derivative: (z) => {
+                    const s = 1 / (1 + Math.exp(-z));
+                    return s * (1 - s);
+                },
+                name: 'Sigmoid',
+                formula: 'f(z) = 1/(1 + e^(-z))'
+            },
+            tanh: {
+                func: (z) => Math.tanh(z),
+                derivative: (z) => 1 - Math.tanh(z) ** 2,
+                name: 'Tanh',
+                formula: 'f(z) = tanh(z)'
+            },
+            relu: {
+                func: (z) => Math.max(0, z),
+                derivative: (z) => z > 0 ? 1 : 0,
+                name: 'ReLU',
+                formula: 'f(z) = max(0, z)'
+            },
+            leaky: {
+                func: (z) => z > 0 ? z : 0.01 * z,
+                derivative: (z) => z > 0 ? 1 : 0.01,
+                name: 'Leaky ReLU',
+                formula: 'f(z) = max(0.01z, z)'
+            }
+        };
+
+        // Initialize
+        window.onload = function() {
+            canvas = document.getElementById('functionCanvas');
+            ctx = canvas.getContext('2d');
+            inputSlider = document.getElementById('inputSlider');
+            inputValueSpan = document.getElementById('inputValue');
+            outputValueSpan = document.getElementById('outputValue');
+
+            inputSlider.addEventListener('input', updateDisplay);
+            
+            drawGraph();
+            updateDisplay();
+        };
+
+        // Select activation function
+        function selectFunction(funcName) {
+            currentFunction = funcName;
+            
+            // Update button states
+            document.querySelectorAll('.function-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            drawGraph();
+            updateDisplay();
+        }
+
+        // Draw graph
+        function drawGraph() {
+            const width = canvas.width;
+            const height = canvas.height;
+            const padding = 40;
+            const graphWidth = width - 2 * padding;
+            const graphHeight = height - 2 * padding;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // Background
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Draw axes
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 2;
+            
+            // X-axis
+            ctx.beginPath();
+            ctx.moveTo(padding, height / 2);
+            ctx.lineTo(width - padding, height / 2);
+            ctx.stroke();
+            
+            // Y-axis
+            ctx.beginPath();
+            ctx.moveTo(width / 2, padding);
+            ctx.lineTo(width / 2, height - padding);
+            ctx.stroke();
+            
+            // Axis labels
+            ctx.fillStyle = '#334155';
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('z', width - padding + 20, height / 2 - 5);
+            ctx.fillText('f(z)', width / 2 + 5, padding - 10);
+            
+            // Grid lines
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+            for (let i = -5; i <= 5; i++) {
+                if (i !== 0) {
+                    const x = width / 2 + (i * graphWidth / 10);
+                    ctx.beginPath();
+                    ctx.moveTo(x, padding);
+                    ctx.lineTo(x, height - padding);
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#64748b';
+                    ctx.font = '12px sans-serif';
+                    ctx.fillText(i.toString(), x, height / 2 + 20);
+                }
+            }
+            
+            // Draw function
+            const func = activationFunctions[currentFunction].func;
+            ctx.strokeStyle = '#16a34a';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            let firstPoint = true;
+            for (let px = padding; px <= width - padding; px++) {
+                const x = ((px - width / 2) / graphWidth) * 10;
+                const y = func(x);
+                const py = height / 2 - (y * graphHeight / 10);
+                
+                if (firstPoint) {
+                    ctx.moveTo(px, py);
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+            
+            // Draw derivative (dashed)
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            
+            const derivative = activationFunctions[currentFunction].derivative;
+            firstPoint = true;
+            for (let px = padding; px <= width - padding; px++) {
+                const x = ((px - width / 2) / graphWidth) * 10;
+                const y = derivative(x);
+                const py = height / 2 - (y * graphHeight / 10);
+                
+                if (firstPoint) {
+                    ctx.moveTo(px, py);
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Legend
+            ctx.fillStyle = '#16a34a';
+            ctx.fillRect(padding, padding, 20, 3);
+            ctx.fillStyle = '#334155';
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Function', padding + 25, padding + 5);
+            
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillRect(padding, padding + 20, 20, 3);
+            ctx.fillStyle = '#334155';
+            ctx.fillText('Derivative', padding + 25, padding + 25);
+            
+            // Current point
+            const inputValue = parseFloat(inputSlider.value);
+            const outputValue = func(inputValue);
+            const px = width / 2 + (inputValue * graphWidth / 10);
+            const py = height / 2 - (outputValue * graphHeight / 10);
+            
+            ctx.fillStyle = '#ef4444';
+            ctx.beginPath();
+            ctx.arc(px, py, 8, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Formula
+            ctx.fillStyle = '#064e3b';
+            ctx.font = '16px sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(activationFunctions[currentFunction].formula, width - padding, height - padding);
+        }
+
+        // Update display
+        function updateDisplay() {
+            const inputValue = parseFloat(inputSlider.value);
+            const func = activationFunctions[currentFunction].func;
+            const outputValue = func(inputValue);
+            
+            inputValueSpan.textContent = inputValue.toFixed(1);
+            outputValueSpan.textContent = outputValue.toFixed(3);
+            
+            drawGraph();
+        }
+
+        // Show comparison details
+        function showComparisonDetails(funcType) {
+            const details = {
+                linear: {
+                    title: 'Linear Activation (Identity)',
+                    content: `
+                        <p><strong>The Simplest "Activation"</strong></p>
+                        <p>Linear activation is essentially no activation at all - it passes the input through unchanged.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Mathematical Definition:</strong><br>
+                            f(z) = z<br>
+                            f'(z) = 1
+                        </div>
+                        
+                        <p><strong>Properties:</strong></p>
+                        <ul>
+                            <li><strong>Range:</strong> (-∞, ∞)</li>
+                            <li><strong>Linear:</strong> No non-linearity introduced</li>
+                            <li><strong>Derivative:</strong> Constant (1)</li>
+                            <li><strong>Monotonic:</strong> Always increasing</li>
+                        </ul>
+                        
+                        <p><strong>When to Use:</strong></p>
+                        <ul>
+                            <li>Output layer for regression problems</li>
+                            <li>When you need unbounded output</li>
+                            <li>Linear regression baseline</li>
+                        </ul>
+                        
+                        <p><strong>Limitations:</strong></p>
+                        <div class="modal-code">
+# Problem with linear activation in hidden layers
+# Two linear layers collapse to one:
+h = W1 @ x + b1  # First layer
+y = W2 @ h + b2  # Second layer
+
+# Substituting:
+y = W2 @ (W1 @ x + b1) + b2
+y = (W2 @ W1) @ x + (W2 @ b1 + b2)
+y = W_combined @ x + b_combined
+
+# Result: Just a single linear transformation!
+                        </div>
+                        
+                        <p><strong>Key Insight:</strong></p>
+                        <p>Networks with only linear activations can only learn linear functions, regardless of depth. This is why we need non-linear activations for hidden layers!</p>
+                    `
+                },
+                sigmoid: {
+                    title: 'Sigmoid Activation',
+                    content: `
+                        <p><strong>The Classic S-Curve</strong></p>
+                        <p>Sigmoid squashes any input to a value between 0 and 1, making it perfect for probability outputs.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Mathematical Definition:</strong><br>
+                            f(z) = 1 / (1 + e⁻ᶻ)<br>
+                            f'(z) = f(z) × (1 - f(z))
+                        </div>
+                        
+                        <p><strong>Properties:</strong></p>
+                        <ul>
+                            <li><strong>Range:</strong> (0, 1)</li>
+                            <li><strong>Smooth:</strong> Differentiable everywhere</li>
+                            <li><strong>Probabilistic:</strong> Output interpretable as probability</li>
+                            <li><strong>Centered at:</strong> f(0) = 0.5</li>
+                        </ul>
+                        
+                        <p><strong>Advantages:</strong></p>
+                        <ul>
+                            <li>Clear probabilistic interpretation</li>
+                            <li>Smooth gradient</li>
+                            <li>Historically important</li>
+                            <li>Works well for binary classification output</li>
+                        </ul>
+                        
+                        <p><strong>Disadvantages:</strong></p>
+                        <ul>
+                            <li><strong>Vanishing Gradient:</strong> Saturates for large |z|</li>
+                            <li><strong>Not Zero-Centered:</strong> Always positive output</li>
+                            <li><strong>Computationally Expensive:</strong> Exponential calculation</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Vanishing gradient problem
+z = 10
+sigmoid(10) ≈ 0.99995
+sigmoid'(10) ≈ 0.00005  # Very small!
+
+# During backpropagation:
+gradient = error * 0.00005  # Gradient almost disappears
+# Learning becomes very slow or stops
+                        </div>
+                        
+                        <p><strong>When to Use:</strong></p>
+                        <ul>
+                            <li>Binary classification output layer</li>
+                            <li>Gates in LSTM/GRU</li>
+                            <li>When you need probability interpretation</li>
+                        </ul>
+                    `
+                },
+                tanh: {
+                    title: 'Tanh Activation',
+                    content: `
+                        <p><strong>The Zero-Centered S-Curve</strong></p>
+                        <p>Tanh is like sigmoid but centered at zero, outputting values between -1 and 1.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Mathematical Definition:</strong><br>
+                            f(z) = (eᶻ - e⁻ᶻ) / (eᶻ + e⁻ᶻ)<br>
+                            f'(z) = 1 - f(z)²
+                        </div>
+                        
+                        <p><strong>Properties:</strong></p>
+                        <ul>
+                            <li><strong>Range:</strong> (-1, 1)</li>
+                            <li><strong>Zero-Centered:</strong> f(0) = 0</li>
+                            <li><strong>Symmetric:</strong> f(-z) = -f(z)</li>
+                            <li><strong>Smooth:</strong> Differentiable everywhere</li>
+                        </ul>
+                        
+                        <p><strong>Relationship to Sigmoid:</strong></p>
+                        <div class="modal-code">
+# Tanh is a scaled and shifted sigmoid
+tanh(z) = 2 × sigmoid(2z) - 1
+
+# This means:
+# - Tanh has similar properties to sigmoid
+# - But with zero-centered output
+# - Stronger gradients than sigmoid
+                        </div>
+                        
+                        <p><strong>Advantages over Sigmoid:</strong></p>
+                        <ul>
+                            <li>Zero-centered (easier optimization)</li>
+                            <li>Stronger gradients</li>
+                            <li>Negative outputs possible</li>
+                            <li>Often converges faster</li>
+                        </ul>
+                        
+                        <p><strong>Disadvantages:</strong></p>
+                        <ul>
+                            <li>Still has vanishing gradient problem</li>
+                            <li>Computationally expensive</li>
+                            <li>Saturates at both ends</li>
+                        </ul>
+                        
+                        <p><strong>When to Use:</strong></p>
+                        <ul>
+                            <li>Hidden layers (before ReLU became popular)</li>
+                            <li>RNN/LSTM hidden states</li>
+                            <li>When outputs should be bounded [-1, 1]</li>
+                            <li>Natural language processing tasks</li>
+                        </ul>
+                    `
+                },
+                relu: {
+                    title: 'ReLU Activation',
+                    content: `
+                        <p><strong>The Modern Standard</strong></p>
+                        <p>Rectified Linear Unit (ReLU) is simple, fast, and effective - the most popular activation for hidden layers.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Mathematical Definition:</strong><br>
+                            f(z) = max(0, z)<br>
+                            f'(z) = { 1 if z > 0, 0 if z ≤ 0 }
+                        </div>
+                        
+                        <p><strong>Properties:</strong></p>
+                        <ul>
+                            <li><strong>Range:</strong> [0, ∞)</li>
+                            <li><strong>Sparse:</strong> Outputs exact zeros</li>
+                            <li><strong>Linear for positive:</strong> No saturation for z > 0</li>
+                            <li><strong>Non-differentiable at 0:</strong> But works in practice</li>
+                        </ul>
+                        
+                        <p><strong>Why ReLU Works So Well:</strong></p>
+                        <ul>
+                            <li><strong>No Vanishing Gradient:</strong> For positive inputs</li>
+                            <li><strong>Computationally Efficient:</strong> Just a max operation</li>
+                            <li><strong>Sparse Representations:</strong> Many neurons output 0</li>
+                            <li><strong>Biological Plausibility:</strong> Similar to neuron firing</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# ReLU implementation
+def relu(z):
+    return np.maximum(0, z)
+
+# Why it's fast:
+# - No exponentials
+# - Simple comparison
+# - Vectorized easily
+
+# Gradient computation
+def relu_gradient(z):
+    return (z > 0).astype(float)
+                        </div>
+                        
+                        <p><strong>The "Dying ReLU" Problem:</strong></p>
+                        <ul>
+                            <li>If neuron outputs negative, gradient is 0</li>
+                            <li>Neuron stops learning (permanently "dies")</li>
+                            <li>Can happen with large learning rates</li>
+                            <li>Solution: Use variants like Leaky ReLU</li>
+                        </ul>
+                        
+                        <p><strong>When to Use:</strong></p>
+                        <ul>
+                            <li>Default choice for hidden layers</li>
+                            <li>Deep networks (CNNs, etc.)</li>
+                            <li>When training speed matters</li>
+                            <li>Computer vision tasks</li>
+                        </ul>
+                        
+                        <p><strong>Variants:</strong></p>
+                        <ul>
+                            <li><strong>Leaky ReLU:</strong> Small slope for negatives</li>
+                            <li><strong>PReLU:</strong> Learnable negative slope</li>
+                            <li><strong>ELU:</strong> Smooth for negatives</li>
+                            <li><strong>SELU:</strong> Self-normalizing properties</li>
+                        </ul>
+                    `
+                }
+            };
+            
+            const detail = details[funcType];
+            showModal(detail.title, detail.content);
+        }
+
+        // Modal functions
+        function showModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('modalBackdrop').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modalBackdrop').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modalBackdrop').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('modalBackdrop').classList.contains('show')) {
+                closeModal();
+            }
+            
+            // Navigation
+            if (e.key === 'ArrowLeft') {
+                window.location.href = 'Week1_Slide12.html';
+            } else if (e.key === 'ArrowRight' || e.key === ' ') {
+                window.location.href = 'Week1_Slide14.html';
+            }
+        });
+    </script>
+</body>
+</html>

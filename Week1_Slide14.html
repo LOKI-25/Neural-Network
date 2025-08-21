@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS5720 - Common Activation Functions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .slide-container {
+            flex: 1;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .slide-title {
+            font-size: 3.5em;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #16a34a;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: slideInFromTop 1.2s ease-out;
+            font-weight: 700;
+        }
+
+        .functions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .function-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromBottom 1s ease-out;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .function-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.12);
+        }
+
+        .function-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .function-name {
+            font-size: 1.8em;
+            color: #064e3b;
+            font-weight: 600;
+        }
+
+        .function-formula {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+        }
+
+        .function-graph {
+            width: 100%;
+            height: 200px;
+            margin: 20px 0;
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+
+        .properties-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .property-tag {
+            padding: 5px 12px;
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            border: 1px solid #16a34a;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: #064e3b;
+            font-weight: 500;
+        }
+
+        .comparison-table {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromBottom 1s ease-out 0.6s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        tr:hover {
+            background: rgba(220, 252, 231, 0.3);
+        }
+
+        .best-practices {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromBottom 1s ease-out 0.9s both;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            margin-top: 40px;
+        }
+
+        .practice-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .practice-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .practice-card:hover {
+            transform: translateY(-3px);
+            border-color: #3b82f6;
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.2);
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: #064e3b;
+            margin-bottom: 25px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            border-radius: 30px;
+            color: #1e293b;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(22, 163, 74, 0.4);
+        }
+
+        .slide-number, .course-info {
+            position: fixed;
+            top: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .slide-number { right: 30px; }
+        .course-info { left: 30px; }
+
+        @keyframes slideInFromTop {
+            from { transform: translateY(-80px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromBottom {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-backdrop.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            color: #064e3b;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(22, 163, 74, 0.1);
+            color: #064e3b;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #334155;
+        }
+
+        .modal-code {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            overflow-x: auto;
+        }
+
+        .modal-example {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #16a34a;
+        }
+
+        @media (max-width: 768px) {
+            .functions-grid { grid-template-columns: 1fr; }
+            .slide-title { font-size: 2.5em; }
+            .practice-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="course-info">CS5720 - Week 1</div>
+    <div class="slide-number">Slide 14 of 20</div>
+    
+    <div class="slide-container">
+        <h1 class="slide-title">Common Activation Functions</h1>
+        
+        <div class="functions-grid">
+            <div class="function-card" onclick="showFunctionDetails('sigmoid')" style="animation-delay: 0.1s;">
+                <div class="function-header">
+                    <h3 class="function-name">Sigmoid</h3>
+                    <div class="function-formula">σ(z) = 1/(1+e⁻ᶻ)</div>
+                </div>
+                <canvas class="function-graph" id="sigmoidGraph"></canvas>
+                <div class="properties-list">
+                    <span class="property-tag">Range: (0, 1)</span>
+                    <span class="property-tag">Smooth</span>
+                    <span class="property-tag">Probabilistic</span>
+                    <span class="property-tag">Vanishing Gradient</span>
+                </div>
+            </div>
+
+            <div class="function-card" onclick="showFunctionDetails('relu')" style="animation-delay: 0.2s;">
+                <div class="function-header">
+                    <h3 class="function-name">ReLU</h3>
+                    <div class="function-formula">f(z) = max(0, z)</div>
+                </div>
+                <canvas class="function-graph" id="reluGraph"></canvas>
+                <div class="properties-list">
+                    <span class="property-tag">Range: [0, ∞)</span>
+                    <span class="property-tag">Fast</span>
+                    <span class="property-tag">Sparse</span>
+                    <span class="property-tag">Dead Neurons</span>
+                </div>
+            </div>
+
+            <div class="function-card" onclick="showFunctionDetails('tanh')" style="animation-delay: 0.3s;">
+                <div class="function-header">
+                    <h3 class="function-name">Tanh</h3>
+                    <div class="function-formula">tanh(z)</div>
+                </div>
+                <canvas class="function-graph" id="tanhGraph"></canvas>
+                <div class="properties-list">
+                    <span class="property-tag">Range: (-1, 1)</span>
+                    <span class="property-tag">Zero-centered</span>
+                    <span class="property-tag">Symmetric</span>
+                    <span class="property-tag">Vanishing Gradient</span>
+                </div>
+            </div>
+
+            <div class="function-card" onclick="showFunctionDetails('leaky')" style="animation-delay: 0.4s;">
+                <div class="function-header">
+                    <h3 class="function-name">Leaky ReLU</h3>
+                    <div class="function-formula">f(z) = max(0.01z, z)</div>
+                </div>
+                <canvas class="function-graph" id="leakyGraph"></canvas>
+                <div class="properties-list">
+                    <span class="property-tag">Range: (-∞, ∞)</span>
+                    <span class="property-tag">No Dead Neurons</span>
+                    <span class="property-tag">Fast</span>
+                    <span class="property-tag">Non-zero Gradient</span>
+                </div>
+            </div>
+
+            <div class="function-card" onclick="showFunctionDetails('elu')" style="animation-delay: 0.5s;">
+                <div class="function-header">
+                    <h3 class="function-name">ELU</h3>
+                    <div class="function-formula">f(z) = z if z>0 else α(eᶻ-1)</div>
+                </div>
+                <canvas class="function-graph" id="eluGraph"></canvas>
+                <div class="properties-list">
+                    <span class="property-tag">Smooth</span>
+                    <span class="property-tag">Negative Values</span>
+                    <span class="property-tag">Self-normalizing</span>
+                    <span class="property-tag">Robust</span>
+                </div>
+            </div>
+
+            <div class="function-card" onclick="showFunctionDetails('softmax')" style="animation-delay: 0.6s;">
+                <div class="function-header">
+                    <h3 class="function-name">Softmax</h3>
+                    <div class="function-formula">σ(z)ᵢ = eᶻⁱ/Σeᶻʲ</div>
+                </div>
+                <canvas class="function-graph" id="softmaxGraph"></canvas>
+                <div class="properties-list">
+                    <span class="property-tag">Multi-class</span>
+                    <span class="property-tag">Probability Dist.</span>
+                    <span class="property-tag">Sum to 1</span>
+                    <span class="property-tag">Output Layer</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison-table">
+            <h2 class="section-title">Quick Comparison Table</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Range</th>
+                            <th>Advantages</th>
+                            <th>Disadvantages</th>
+                            <th>Best Use Case</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr onclick="showFunctionDetails('sigmoid')">
+                            <td><strong>Sigmoid</strong></td>
+                            <td>(0, 1)</td>
+                            <td>Probability interpretation</td>
+                            <td>Vanishing gradient</td>
+                            <td>Binary classification output</td>
+                        </tr>
+                        <tr onclick="showFunctionDetails('relu')">
+                            <td><strong>ReLU</strong></td>
+                            <td>[0, ∞)</td>
+                            <td>Fast, no vanishing gradient</td>
+                            <td>Dead neurons</td>
+                            <td>Hidden layers (default)</td>
+                        </tr>
+                        <tr onclick="showFunctionDetails('tanh')">
+                            <td><strong>Tanh</strong></td>
+                            <td>(-1, 1)</td>
+                            <td>Zero-centered</td>
+                            <td>Vanishing gradient</td>
+                            <td>RNN/LSTM gates</td>
+                        </tr>
+                        <tr onclick="showFunctionDetails('leaky')">
+                            <td><strong>Leaky ReLU</strong></td>
+                            <td>(-∞, ∞)</td>
+                            <td>No dead neurons</td>
+                            <td>Not zero-centered</td>
+                            <td>Deep networks</td>
+                        </tr>
+                        <tr onclick="showFunctionDetails('softmax')">
+                            <td><strong>Softmax</strong></td>
+                            <td>(0, 1) per class</td>
+                            <td>Multi-class probability</td>
+                            <td>Computationally expensive</td>
+                            <td>Multi-class output</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="best-practices">
+            <h2 class="section-title" style="color: #1e40af;">Best Practices & Guidelines</h2>
+            
+            <div class="practice-grid">
+                <div class="practice-card" onclick="showPracticeDetails('hidden')">
+                    <h3 style="color: #1e40af; margin-bottom: 15px;">🏗️ Hidden Layers</h3>
+                    <p style="color: #475569;">Start with ReLU, experiment with variants if needed</p>
+                </div>
+
+                <div class="practice-card" onclick="showPracticeDetails('output')">
+                    <h3 style="color: #1e40af; margin-bottom: 15px;">🎯 Output Layer</h3>
+                    <p style="color: #475569;">Match activation to your task type</p>
+                </div>
+
+                <div class="practice-card" onclick="showPracticeDetails('initialization')">
+                    <h3 style="color: #1e40af; margin-bottom: 15px;">⚡ Initialization</h3>
+                    <p style="color: #475569;">Proper weight init for each activation</p>
+                </div>
+
+                <div class="practice-card" onclick="showPracticeDetails('debugging')">
+                    <h3 style="color: #1e40af; margin-bottom: 15px;">🔍 Debugging</h3>
+                    <p style="color: #475569;">Monitor activations during training</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <a href="Week1_Slide13.html" class="nav-btn">← Previous</a>
+        <a href="Week1_Slide15.html" class="nav-btn">Next →</a>
+    </div>
+
+    <div style="position: fixed; bottom: 30px; left: 30px; color: #64748b; font-size: 0.9em;">
+        <strong>Prepared by Dr. Gorkem Kar</strong>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal-backdrop" id="modalBackdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Modal Title</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                Modal content goes here...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Draw mini graphs for each activation function
+        window.onload = function() {
+            drawMiniGraph('sigmoidGraph', sigmoidFunction, '#3b82f6');
+            drawMiniGraph('reluGraph', reluFunction, '#16a34a');
+            drawMiniGraph('tanhGraph', tanhFunction, '#8b5cf6');
+            drawMiniGraph('leakyGraph', leakyReluFunction, '#f59e0b');
+            drawMiniGraph('eluGraph', eluFunction, '#ef4444');
+            drawSoftmaxVisualization('softmaxGraph');
+        };
+
+        // Activation functions
+        function sigmoidFunction(x) {
+            return 1 / (1 + Math.exp(-x));
+        }
+
+        function reluFunction(x) {
+            return Math.max(0, x);
+        }
+
+        function tanhFunction(x) {
+            return Math.tanh(x);
+        }
+
+        function leakyReluFunction(x) {
+            return x > 0 ? x : 0.01 * x;
+        }
+
+        function eluFunction(x, alpha = 1) {
+            return x > 0 ? x : alpha * (Math.exp(x) - 1);
+        }
+
+        // Draw mini graph
+        function drawMiniGraph(canvasId, func, color) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width = canvas.offsetWidth;
+            const height = canvas.height = canvas.offsetHeight;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw axes
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, height / 2);
+            ctx.lineTo(width, height / 2);
+            ctx.moveTo(width / 2, 0);
+            ctx.lineTo(width / 2, height);
+            ctx.stroke();
+            
+            // Draw function
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            const range = 6;
+            for (let px = 0; px <= width; px++) {
+                const x = (px / width - 0.5) * 2 * range;
+                const y = func(x);
+                const py = height / 2 - (y * height / (2 * range));
+                
+                if (px === 0) {
+                    ctx.moveTo(px, py);
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+        }
+
+        // Draw softmax visualization
+        function drawSoftmaxVisualization(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width = canvas.offsetWidth;
+            const height = canvas.height = canvas.offsetHeight;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw bars representing probabilities
+            const values = [0.7, 0.2, 0.08, 0.02];
+            const barWidth = width / (values.length * 2);
+            const maxHeight = height * 0.8;
+            
+            values.forEach((value, index) => {
+                const barHeight = value * maxHeight;
+                const x = (index * 2 + 0.5) * barWidth;
+                const y = height - barHeight - 10;
+                
+                // Draw bar
+                ctx.fillStyle = `rgba(22, 163, 74, ${0.3 + value * 0.7})`;
+                ctx.fillRect(x, y, barWidth, barHeight);
+                
+                // Draw label
+                ctx.fillStyle = '#064e3b';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText((value * 100).toFixed(0) + '%', x + barWidth / 2, y - 5);
+            });
+        }
+
+        // Show function details
+        function showFunctionDetails(funcType) {
+            const details = {
+                sigmoid: {
+                    title: 'Sigmoid Function - Detailed Analysis',
+                    content: `
+                        <p><strong>The Logistic Function</strong></p>
+                        <p>Sigmoid is one of the oldest and most studied activation functions, mapping any real value to the range (0, 1).</p>
+                        
+                        <div class="modal-example">
+                            <strong>Mathematical Properties:</strong><br>
+                            • Formula: σ(z) = 1 / (1 + e⁻ᶻ)<br>
+                            • Derivative: σ'(z) = σ(z) × (1 - σ(z))<br>
+                            • Range: (0, 1)<br>
+                            • σ(0) = 0.5, σ(-∞) → 0, σ(+∞) → 1
+                        </div>
+                        
+                        <p><strong>Advantages:</strong></p>
+                        <ul>
+                            <li><strong>Probability Interpretation:</strong> Output can be interpreted as probability</li>
+                            <li><strong>Smooth Gradient:</strong> Differentiable everywhere</li>
+                            <li><strong>Historical Importance:</strong> Well-studied and understood</li>
+                            <li><strong>Bounded Output:</strong> Prevents exploding activations</li>
+                        </ul>
+                        
+                        <p><strong>Disadvantages:</strong></p>
+                        <ul>
+                            <li><strong>Vanishing Gradient:</strong> Gradient becomes very small for large |z|</li>
+                            <li><strong>Not Zero-Centered:</strong> Output always positive</li>
+                            <li><strong>Computationally Expensive:</strong> Requires exponential computation</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+import numpy as np
+
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+def sigmoid_derivative(z):
+    s = sigmoid(z)
+    return s * (1 - s)
+
+# Vanishing gradient example
+z_large = 10
+print(f"sigmoid({z_large}) = {sigmoid(z_large):.6f}")
+print(f"sigmoid'({z_large}) = {sigmoid_derivative(z_large):.6f}")
+# Output: sigmoid'(10) = 0.000045 (very small!)
+                        </div>
+                        
+                        <p><strong>When to Use Sigmoid:</strong></p>
+                        <ul>
+                            <li>Binary classification output layer</li>
+                            <li>When you need probability between 0 and 1</li>
+                            <li>Gates in LSTM/GRU cells</li>
+                            <li>Attention mechanisms</li>
+                        </ul>
+                        
+                        <p><strong>Implementation Tips:</strong></p>
+                        <ul>
+                            <li>Use numerically stable version for large negative values</li>
+                            <li>Consider using BCE loss with sigmoid output</li>
+                            <li>Initialize weights carefully to avoid saturation</li>
+                        </ul>
+                    `
+                },
+                relu: {
+                    title: 'ReLU - The Modern Standard',
+                    content: `
+                        <p><strong>Rectified Linear Unit</strong></p>
+                        <p>ReLU revolutionized deep learning by solving the vanishing gradient problem and enabling training of very deep networks.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Mathematical Properties:</strong><br>
+                            • Formula: f(z) = max(0, z)<br>
+                            • Derivative: f'(z) = 1 if z > 0, else 0<br>
+                            • Range: [0, ∞)<br>
+                            • Non-differentiable at z = 0
+                        </div>
+                        
+                        <p><strong>Why ReLU Dominates:</strong></p>
+                        <ul>
+                            <li><strong>No Vanishing Gradient:</strong> Gradient is 1 for positive inputs</li>
+                            <li><strong>Computational Efficiency:</strong> Just a max operation</li>
+                            <li><strong>Sparse Activation:</strong> Many neurons output exactly 0</li>
+                            <li><strong>Biological Plausibility:</strong> Similar to neuron firing rates</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# ReLU implementation
+def relu(z):
+    return np.maximum(0, z)
+
+def relu_derivative(z):
+    return (z > 0).astype(float)
+
+# Sparse activation example
+layer_output = relu(np.random.randn(100) - 0.5)
+sparsity = np.mean(layer_output == 0)
+print(f"Sparsity: {sparsity:.2%} of neurons are inactive")
+# Typical: 50-70% sparsity
+                        </div>
+                        
+                        <p><strong>The Dying ReLU Problem:</strong></p>
+                        <ul>
+                            <li>Neurons can get stuck outputting 0</li>
+                            <li>Gradient becomes permanently 0</li>
+                            <li>Caused by large negative bias or bad initialization</li>
+                        </ul>
+                        
+                        <p><strong>Solutions to Dying ReLU:</strong></p>
+                        <ul>
+                            <li><strong>Leaky ReLU:</strong> Small negative slope</li>
+                            <li><strong>Parametric ReLU:</strong> Learnable negative slope</li>
+                            <li><strong>ELU/SELU:</strong> Smooth alternatives</li>
+                            <li><strong>Careful Initialization:</strong> He initialization</li>
+                        </ul>
+                        
+                        <p><strong>Best Practices:</strong></p>
+                        <ul>
+                            <li>Default choice for hidden layers</li>
+                            <li>Use He initialization (not Xavier)</li>
+                            <li>Monitor for dead neurons during training</li>
+                            <li>Consider batch normalization before ReLU</li>
+                        </ul>
+                    `
+                },
+                tanh: {
+                    title: 'Hyperbolic Tangent (Tanh)',
+                    content: `
+                        <p><strong>The Zero-Centered Alternative</strong></p>
+                        <p>Tanh is essentially a scaled and shifted sigmoid, providing zero-centered outputs which can help with training dynamics.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Mathematical Properties:</strong><br>
+                            • Formula: tanh(z) = (eᶻ - e⁻ᶻ) / (eᶻ + e⁻ᶻ)<br>
+                            • Derivative: tanh'(z) = 1 - tanh²(z)<br>
+                            • Range: (-1, 1)<br>
+                            • tanh(0) = 0, tanh(-∞) → -1, tanh(+∞) → 1
+                        </div>
+                        
+                        <p><strong>Relationship to Sigmoid:</strong></p>
+                        <div class="modal-code">
+# Tanh and sigmoid relationship
+def tanh_from_sigmoid(z):
+    return 2 * sigmoid(2 * z) - 1
+
+# Verification
+z = 1.5
+print(f"tanh({z}) = {np.tanh(z):.4f}")
+print(f"2*sigmoid(2*{z}) - 1 = {tanh_from_sigmoid(z):.4f}")
+# They're equal!
+
+# This means tanh has similar properties to sigmoid
+# but with the advantage of being zero-centered
+                        </div>
+                        
+                        <p><strong>Advantages over Sigmoid:</strong></p>
+                        <ul>
+                            <li><strong>Zero-Centered:</strong> Mean activation closer to 0</li>
+                            <li><strong>Stronger Gradients:</strong> Less severe vanishing gradient</li>
+                            <li><strong>Symmetric:</strong> Handles negative inputs naturally</li>
+                            <li><strong>Easier Optimization:</strong> Better gradient flow</li>
+                        </ul>
+                        
+                        <p><strong>Common Applications:</strong></p>
+                        <ul>
+                            <li>RNN/LSTM hidden states</li>
+                            <li>When bounded output needed</li>
+                            <li>Natural language processing</li>
+                            <li>Normalization layers</li>
+                        </ul>
+                        
+                        <p><strong>Gradient Comparison:</strong></p>
+                        <div class="modal-code">
+# Gradient comparison with sigmoid
+z = 2.0
+sigmoid_grad = sigmoid(z) * (1 - sigmoid(z))
+tanh_grad = 1 - np.tanh(z)**2
+
+print(f"Sigmoid gradient at {z}: {sigmoid_grad:.4f}")
+print(f"Tanh gradient at {z}: {tanh_grad:.4f}")
+# Tanh typically has stronger gradients
+                        </div>
+                    `
+                },
+                leaky: {
+                    title: 'Leaky ReLU and Variants',
+                    content: `
+                        <p><strong>Fixing the Dying ReLU Problem</strong></p>
+                        <p>Leaky ReLU allows a small gradient when the unit is not active, preventing neurons from dying completely.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Variants:</strong><br>
+                            • <strong>Leaky ReLU:</strong> f(z) = max(αz, z), α = 0.01<br>
+                            • <strong>Parametric ReLU:</strong> α is learnable<br>
+                            • <strong>Randomized ReLU:</strong> α sampled randomly<br>
+                            • <strong>ELU:</strong> Smooth negative part
+                        </div>
+                        
+                        <div class="modal-code">
+# Different ReLU variants
+def leaky_relu(z, alpha=0.01):
+    return np.where(z > 0, z, alpha * z)
+
+def parametric_relu(z, alpha):
+    # alpha is learned during training
+    return np.where(z > 0, z, alpha * z)
+
+def elu(z, alpha=1.0):
+    return np.where(z > 0, z, alpha * (np.exp(z) - 1))
+
+# Comparison
+z = -2
+print(f"ReLU({z}) = {relu(z)}")
+print(f"Leaky ReLU({z}) = {leaky_relu(z)}")
+print(f"ELU({z}) = {elu(z):.4f}")
+                        </div>
+                        
+                        <p><strong>Benefits of Leaky ReLU:</strong></p>
+                        <ul>
+                            <li>No dead neurons - always has gradient</li>
+                            <li>Nearly as fast as ReLU</li>
+                            <li>Often improves performance</li>
+                            <li>Simple to implement</li>
+                        </ul>
+                        
+                        <p><strong>Choosing α (slope):</strong></p>
+                        <ul>
+                            <li><strong>0.01:</strong> Original Leaky ReLU (most common)</li>
+                            <li><strong>0.2:</strong> Sometimes better for deep networks</li>
+                            <li><strong>Learnable:</strong> PReLU lets network decide</li>
+                            <li><strong>Random:</strong> RReLU for regularization</li>
+                        </ul>
+                        
+                        <p><strong>Advanced Variants:</strong></p>
+                        <ul>
+                            <li><strong>SELU:</strong> Self-normalizing properties</li>
+                            <li><strong>GELU:</strong> Smooth approximation used in transformers</li>
+                            <li><strong>Swish:</strong> f(x) = x · sigmoid(x)</li>
+                            <li><strong>Mish:</strong> f(x) = x · tanh(softplus(x))</li>
+                        </ul>
+                    `
+                },
+                elu: {
+                    title: 'Exponential Linear Unit (ELU)',
+                    content: `
+                        <p><strong>Smooth Alternative to ReLU</strong></p>
+                        <p>ELU provides smooth negative values, helping with the mean unit activations closer to zero.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Mathematical Definition:</strong><br>
+                            f(z) = { z if z > 0<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ α(eᶻ - 1) if z ≤ 0<br>
+                            <br>
+                            Typically α = 1.0
+                        </div>
+                        
+                        <p><strong>Key Advantages:</strong></p>
+                        <ul>
+                            <li><strong>Smooth:</strong> Continuous derivative unlike ReLU</li>
+                            <li><strong>Negative Values:</strong> Pushes mean activation to zero</li>
+                            <li><strong>Robust to Noise:</strong> Smooth curve handles noise better</li>
+                            <li><strong>Self-Normalizing:</strong> With proper initialization</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# ELU implementation
+def elu(z, alpha=1.0):
+    return np.where(z > 0, z, alpha * (np.exp(z) - 1))
+
+def elu_derivative(z, alpha=1.0):
+    return np.where(z > 0, 1, elu(z, alpha) + alpha)
+
+# Comparing mean activations
+np.random.seed(42)
+inputs = np.random.randn(1000)
+
+relu_outputs = relu(inputs)
+elu_outputs = elu(inputs)
+
+print(f"ReLU mean: {np.mean(relu_outputs):.3f}")
+print(f"ELU mean: {np.mean(elu_outputs):.3f}")
+# ELU mean closer to zero!
+                        </div>
+                        
+                        <p><strong>SELU - Self-Normalizing ELU:</strong></p>
+                        <ul>
+                            <li>Special case with α ≈ 1.6733, λ ≈ 1.0507</li>
+                            <li>Automatically maintains mean 0, variance 1</li>
+                            <li>Enables very deep networks without batch norm</li>
+                            <li>Requires specific initialization (LeCun normal)</li>
+                        </ul>
+                        
+                        <p><strong>When to Use ELU/SELU:</strong></p>
+                        <ul>
+                            <li>Very deep networks (100+ layers)</li>
+                            <li>When batch normalization is expensive</li>
+                            <li>Need smooth gradients</li>
+                            <li>Noise robustness important</li>
+                        </ul>
+                    `
+                },
+                softmax: {
+                    title: 'Softmax - Multi-class Output',
+                    content: `
+                        <p><strong>Probability Distribution Over Classes</strong></p>
+                        <p>Softmax converts a vector of real values into a probability distribution, perfect for multi-class classification.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Mathematical Definition:</strong><br>
+                            σ(z)ᵢ = exp(zᵢ) / Σⱼ exp(zⱼ)<br>
+                            <br>
+                            Where i is the class index and j sums over all classes
+                        </div>
+                        
+                        <p><strong>Key Properties:</strong></p>
+                        <ul>
+                            <li><strong>Outputs sum to 1:</strong> Σᵢ σ(z)ᵢ = 1</li>
+                            <li><strong>Range per output:</strong> (0, 1)</li>
+                            <li><strong>Preserves order:</strong> Larger inputs → larger probabilities</li>
+                            <li><strong>Differentiable:</strong> Smooth gradients</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+def softmax(z):
+    # Numerical stability: subtract max
+    z_shifted = z - np.max(z)
+    exp_z = np.exp(z_shifted)
+    return exp_z / np.sum(exp_z)
+
+# Example: 4-class classification
+logits = np.array([2.0, 1.0, 0.1, 0.0])
+probs = softmax(logits)
+
+print("Logits:", logits)
+print("Probabilities:", probs)
+print("Sum:", np.sum(probs))
+
+# Output:
+# Probabilities: [0.659, 0.242, 0.055, 0.044]
+# Sum: 1.0
+                        </div>
+                        
+                        <p><strong>Numerical Stability:</strong></p>
+                        <div class="modal-code">
+# Naive implementation can overflow
+logits_large = np.array([1000, 999, 998])
+# exp(1000) causes overflow!
+
+# Stable implementation
+def stable_softmax(z):
+    z_max = np.max(z)
+    z_shifted = z - z_max  # Now max is 0
+    exp_z = np.exp(z_shifted)
+    return exp_z / np.sum(exp_z)
+
+# This works correctly even for large values
+                        </div>
+                        
+                        <p><strong>Cross-Entropy Loss:</strong></p>
+                        <ul>
+                            <li>Natural pairing with softmax output</li>
+                            <li>Loss = -Σᵢ yᵢ log(ŷᵢ)</li>
+                            <li>Gradient simplifies to: ŷ - y</li>
+                            <li>Very efficient backpropagation</li>
+                        </ul>
+                        
+                        <p><strong>Temperature Scaling:</strong></p>
+                        <div class="modal-code">
+# Control confidence with temperature
+def softmax_temperature(z, T=1.0):
+    return softmax(z / T)
+
+# T > 1: More uniform (less confident)
+# T < 1: More peaked (more confident)
+# T → 0: Approaches argmax (one-hot)
+                        </div>
+                    `
+                }
+            };
+            
+            const detail = details[funcType];
+            showModal(detail.title, detail.content);
+        }
+
+        // Show practice details
+        function showPracticeDetails(practice) {
+            const practiceDetails = {
+                hidden: {
+                    title: 'Activation Functions for Hidden Layers',
+                    content: `
+                        <p><strong>Choosing Hidden Layer Activations</strong></p>
+                        <p>The choice of activation function in hidden layers significantly impacts training dynamics and model performance.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Default Recommendation:</strong><br>
+                            Start with ReLU, then experiment with variants if needed
+                        </div>
+                        
+                        <p><strong>Decision Tree:</strong></p>
+                        <ol>
+                            <li><strong>Standard Deep Network?</strong> → ReLU</li>
+                            <li><strong>Very Deep (100+ layers)?</strong> → SELU or Residual connections</li>
+                            <li><strong>Dying neurons problem?</strong> → Leaky ReLU or ELU</li>
+                            <li><strong>Transformer architecture?</strong> → GELU</li>
+                            <li><strong>Recurrent networks?</strong> → Tanh</li>
+                        </ol>
+                        
+                        <div class="modal-code">
+# Practical implementation
+import tensorflow as tf
+
+# Standard approach
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(32, activation='relu'),
+    tf.keras.layers.Dense(10, activation='softmax')
+])
+
+# Advanced approach with different activations
+model_advanced = tf.keras.Sequential([
+    tf.keras.layers.Dense(128, activation='elu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Dense(64, activation='leaky_relu'),
+    tf.keras.layers.Dropout(0.3),
+    tf.keras.layers.Dense(10, activation='softmax')
+])
+                        </div>
+                        
+                        <p><strong>Common Pitfalls:</strong></p>
+                        <ul>
+                            <li><strong>Using sigmoid/tanh everywhere:</strong> Causes vanishing gradients</li>
+                            <li><strong>No activation in hidden layers:</strong> Network becomes linear</li>
+                            <li><strong>Wrong initialization:</strong> Use He init for ReLU, Xavier for tanh/sigmoid</li>
+                            <li><strong>Ignoring dying neurons:</strong> Monitor activation statistics</li>
+                        </ul>
+                    `
+                },
+                output: {
+                    title: 'Output Layer Activation Selection',
+                    content: `
+                        <p><strong>Matching Activation to Task</strong></p>
+                        <p>The output layer activation must match your problem type for proper training and interpretation.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Task → Activation Mapping:</strong><br>
+                            • Binary Classification → Sigmoid<br>
+                            • Multi-class Classification → Softmax<br>
+                            • Regression → Linear (None)<br>
+                            • Multi-label Classification → Sigmoid (per output)
+                        </div>
+                        
+                        <p><strong>Binary Classification:</strong></p>
+                        <div class="modal-code">
+# Single output with sigmoid
+model.add(Dense(1, activation='sigmoid'))
+model.compile(loss='binary_crossentropy')
+
+# Interpretation
+# output > 0.5 → class 1
+# output ≤ 0.5 → class 0
+                        </div>
+                        
+                        <p><strong>Multi-class Classification:</strong></p>
+                        <div class="modal-code">
+# Softmax for n classes
+model.add(Dense(n_classes, activation='softmax'))
+model.compile(loss='categorical_crossentropy')
+
+# Or sparse categorical if labels are integers
+model.compile(loss='sparse_categorical_crossentropy')
+
+# Prediction: argmax(output)
+                        </div>
+                        
+                        <p><strong>Regression:</strong></p>
+                        <div class="modal-code">
+# No activation (linear)
+model.add(Dense(1, activation='linear'))
+# Or simply:
+model.add(Dense(1))  # linear is default
+
+model.compile(loss='mse')  # or 'mae'
+                        </div>
+                        
+                        <p><strong>Multi-label Classification:</strong></p>
+                        <div class="modal-code">
+# Multiple independent binary classifications
+model.add(Dense(n_labels, activation='sigmoid'))
+model.compile(loss='binary_crossentropy')
+
+# Each output independently thresholded at 0.5
+                        </div>
+                        
+                        <p><strong>Common Mistakes:</strong></p>
+                        <ul>
+                            <li>Using softmax for multi-label (use sigmoid)</li>
+                            <li>Using sigmoid for multi-class (use softmax)</li>
+                            <li>Using ReLU for classification output</li>
+                            <li>Forgetting linear activation for regression</li>
+                        </ul>
+                    `
+                },
+                initialization: {
+                    title: 'Weight Initialization Strategies',
+                    content: `
+                        <p><strong>Proper Initialization for Each Activation</strong></p>
+                        <p>Weight initialization is crucial for preventing vanishing/exploding gradients and ensuring proper training dynamics.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Activation → Initialization:</strong><br>
+                            • ReLU family → He initialization<br>
+                            • Tanh/Sigmoid → Xavier/Glorot initialization<br>
+                            • SELU → LeCun initialization
+                        </div>
+                        
+                        <p><strong>He Initialization (ReLU):</strong></p>
+                        <div class="modal-code">
+# He initialization for ReLU
+import numpy as np
+
+def he_init(shape):
+    fan_in = shape[0]
+    std = np.sqrt(2.0 / fan_in)
+    return np.random.normal(0, std, shape)
+
+# In Keras/TensorFlow
+Dense(128, activation='relu',
+      kernel_initializer='he_normal')  # or 'he_uniform'
+                        </div>
+                        
+                        <p><strong>Xavier/Glorot (Tanh/Sigmoid):</strong></p>
+                        <div class="modal-code">
+# Xavier initialization
+def xavier_init(shape):
+    fan_in, fan_out = shape
+    std = np.sqrt(2.0 / (fan_in + fan_out))
+    return np.random.normal(0, std, shape)
+
+# In Keras
+Dense(128, activation='tanh',
+      kernel_initializer='glorot_normal')  # default
+                        </div>
+                        
+                        <p><strong>Why It Matters:</strong></p>
+                        <ul>
+                            <li><strong>Too small:</strong> Gradients vanish, slow learning</li>
+                            <li><strong>Too large:</strong> Gradients explode, unstable training</li>
+                            <li><strong>Just right:</strong> Maintains variance through layers</li>
+                        </ul>
+                        
+                        <p><strong>SELU Special Case:</strong></p>
+                        <div class="modal-code">
+# SELU requires specific initialization
+Dense(128, activation='selu',
+      kernel_initializer='lecun_normal')
+
+# Also use AlphaDropout instead of regular Dropout
+# to maintain self-normalizing properties
+                        </div>
+                        
+                        <p><strong>Practical Tips:</strong></p>
+                        <ul>
+                            <li>Modern frameworks handle this automatically</li>
+                            <li>But explicit is better than implicit</li>
+                            <li>Monitor activation statistics early in training</li>
+                            <li>Adjust if seeing dead neurons or explosions</li>
+                        </ul>
+                    `
+                },
+                debugging: {
+                    title: 'Debugging Activation Issues',
+                    content: `
+                        <p><strong>Monitoring and Troubleshooting</strong></p>
+                        <p>Understanding how to debug activation-related issues is crucial for successful model training.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Key Metrics to Monitor:</strong><br>
+                            • Activation statistics (mean, std, % zeros)<br>
+                            • Gradient flow (magnitude per layer)<br>
+                            • Dead neuron percentage<br>
+                            • Activation distribution histograms
+                        </div>
+                        
+                        <p><strong>Detecting Dead Neurons:</strong></p>
+                        <div class="modal-code">
+# Monitor ReLU activations
+def check_dead_neurons(model, X_batch):
+    dead_neurons = []
+    
+    for layer in model.layers:
+        if hasattr(layer, 'activation'):
+            if layer.activation.__name__ == 'relu':
+                # Get layer output
+                layer_model = Model(inputs=model.input,
+                                   outputs=layer.output)
+                activations = layer_model.predict(X_batch)
+                
+                # Count always-zero neurons
+                always_zero = np.mean(activations == 0, axis=0)
+                dead = np.sum(always_zero == 1.0)
+                
+                print(f"{layer.name}: {dead}/{layer.units} dead neurons")
+                        </div>
+                        
+                        <p><strong>Gradient Monitoring:</strong></p>
+                        <div class="modal-code">
+# TensorBoard callback for gradient tracking
+tensorboard_callback = tf.keras.callbacks.TensorBoard(
+    log_dir='./logs',
+    histogram_freq=1,  # Log histograms
+    write_grads=True   # Log gradients
+)
+
+# Custom gradient tracking
+@tf.function
+def train_step(X, y):
+    with tf.GradientTape() as tape:
+        predictions = model(X)
+        loss = loss_fn(y, predictions)
+    
+    gradients = tape.gradient(loss, model.trainable_weights)
+    
+    # Check gradient magnitudes
+    for i, (grad, weight) in enumerate(zip(gradients, model.trainable_weights)):
+        if grad is not None:
+            grad_norm = tf.norm(grad)
+            print(f"Layer {i}: gradient norm = {grad_norm:.6f}")
+                        </div>
+                        
+                        <p><strong>Common Issues and Solutions:</strong></p>
+                        <ul>
+                            <li><strong>All ReLUs dead:</strong> Lower learning rate, better init</li>
+                            <li><strong>Exploding activations:</strong> Add batch norm, gradient clipping</li>
+                            <li><strong>Vanishing gradients:</strong> Switch from sigmoid to ReLU</li>
+                            <li><strong>Unstable training:</strong> Check for numerical issues in softmax</li>
+                        </ul>
+                        
+                        <p><strong>Visualization Tools:</strong></p>
+                        <ul>
+                            <li>TensorBoard histograms</li>
+                            <li>Weights & Biases activation tracking</li>
+                            <li>Custom matplotlib histograms</li>
+                            <li>Activation maximization</li>
+                        </ul>
+                    `
+                }
+            };
+            
+            const detail = practiceDetails[practice];
+            showModal(detail.title, detail.content);
+        }
+
+        // Modal functions
+        function showModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('modalBackdrop').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modalBackdrop').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modalBackdrop').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('modalBackdrop').classList.contains('show')) {
+                closeModal();
+            }
+            
+            // Navigation
+            if (e.key === 'ArrowLeft') {
+                window.location.href = 'Week1_Slide13.html';
+            } else if (e.key === 'ArrowRight' || e.key === ' ') {
+                window.location.href = 'Week1_Slide15.html';
+            }
+        });
+    </script>
+</body>
+</html>

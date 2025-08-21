@@ -1,0 +1,2312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS5720 - Biological vs Artificial Neurons</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .slide-container {
+            flex: 1;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .slide-title {
+            font-size: 3.5em;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #064e3b;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: slideInFromTop 1.2s ease-out;
+            font-weight: 700;
+        }
+
+        .comparison-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .biological-section {
+            background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromLeft 1s ease-out 0.3s both;
+            border: 2px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .artificial-section {
+            background: linear-gradient(135deg, #ffffff 0%, #dbeafe 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromRight 1s ease-out 0.3s both;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            font-weight: 600;
+            position: relative;
+            text-align: center;
+        }
+
+        .biological-title {
+            color: #92400e;
+        }
+
+        .artificial-title {
+            color: #1e40af;
+        }
+
+        .neuron-diagram {
+            width: 100%;
+            height: 250px;
+            margin: 20px 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bio-neuron {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .bio-neuron:hover {
+            transform: scale(1.05);
+        }
+
+        .cell-body {
+            width: 85px;
+            height: 85px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            position: absolute;
+            top: 57px;
+            left: 57px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.4);
+            border: 3px solid #d97706;
+        }
+
+        .cell-body::before {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            top: 15px;
+            left: 15px;
+        }
+
+        .nucleus {
+            width: 25px;
+            height: 25px;
+            background: rgba(139, 69, 19, 0.8);
+            border-radius: 50%;
+            margin-bottom: 5px;
+            border: 2px solid rgba(160, 82, 45, 0.9);
+        }
+
+        .soma-text {
+            font-size: 0.7em;
+            line-height: 1;
+        }
+
+        .dendrite {
+            position: absolute;
+            width: 3px;
+            background: linear-gradient(180deg, #fbbf24, #d97706);
+            transform-origin: bottom;
+            border-radius: 2px;
+            animation: dendriteGrow 2s ease-out forwards;
+        }
+
+        .dendrite::after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -2px;
+            width: 7px;
+            height: 7px;
+            background: #fbbf24;
+            border-radius: 50%;
+        }
+
+        .dendrite-1 {
+            height: 45px;
+            transform: rotate(-45deg);
+            top: 35px;
+            left: 35px;
+            animation-delay: 0.2s;
+        }
+
+        .dendrite-2 {
+            height: 40px;
+            transform: rotate(-20deg);
+            top: 25px;
+            left: 70px;
+            animation-delay: 0.4s;
+        }
+
+        .dendrite-3 {
+            height: 42px;
+            transform: rotate(20deg);
+            top: 25px;
+            left: 130px;
+            animation-delay: 0.6s;
+        }
+
+        .dendrite-4 {
+            height: 48px;
+            transform: rotate(45deg);
+            top: 35px;
+            left: 165px;
+            animation-delay: 0.8s;
+        }
+
+        .axon {
+            position: absolute;
+            width: 5px;
+            height: 70px;
+            background: linear-gradient(180deg, #f59e0b, #d97706);
+            left: 97px;
+            top: 125px;
+            border-radius: 3px;
+            animation: axonGrow 2s ease-out forwards;
+            animation-delay: 1s;
+        }
+
+        .axon::before {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: -3px;
+            width: 11px;
+            height: 8px;
+            background: #d97706;
+            border-radius: 0 0 50% 50%;
+        }
+
+        .synapse {
+            position: absolute;
+            bottom: -15px;
+            left: -5px;
+            width: 15px;
+            height: 8px;
+            background: #92400e;
+            border-radius: 8px;
+            animation: synapseFlash 2s ease-in-out infinite;
+            animation-delay: 2s;
+        }
+
+        .art-neuron {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .art-neuron:hover {
+            transform: scale(1.05);
+        }
+
+        .node {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-radius: 50%;
+            position: absolute;
+            top: 55px;
+            left: 55px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+            border: 3px solid #1d4ed8;
+        }
+
+        .node-equation {
+            font-size: 1.2em;
+            margin-bottom: 3px;
+        }
+
+        .node-function {
+            font-size: 0.7em;
+            opacity: 0.9;
+        }
+
+        .input-line {
+            position: absolute;
+            width: 65px;
+            height: 4px;
+            background: linear-gradient(90deg, #93c5fd, #3b82f6);
+            border-radius: 2px;
+            left: 0;
+            animation: dataFlow 2s ease-in-out infinite;
+        }
+
+        .input-line-1 {
+            top: 75px;
+            animation-delay: 0s;
+        }
+
+        .input-line-2 {
+            top: 100px;
+            animation-delay: 0.3s;
+        }
+
+        .input-line-3 {
+            top: 125px;
+            animation-delay: 0.6s;
+        }
+
+        .input-label {
+            position: absolute;
+            left: -25px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #1e40af;
+            font-size: 0.8em;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 6px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .weight-indicator {
+            position: absolute;
+            left: 35px;
+            background: rgba(59, 130, 246, 0.9);
+            color: white;
+            font-size: 0.7em;
+            font-weight: 600;
+            padding: 1px 4px;
+            border-radius: 4px;
+        }
+
+        .output-line {
+            position: absolute;
+            width: 65px;
+            height: 4px;
+            background: linear-gradient(90deg, #2563eb, #1d4ed8);
+            border-radius: 2px;
+            right: 0;
+            top: 95px;
+            animation: dataFlow 2s ease-in-out infinite;
+            animation-delay: 1s;
+        }
+
+        .output-line::after {
+            content: 'y';
+            position: absolute;
+            right: -20px;
+            top: -8px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #1e40af;
+            font-size: 0.8em;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 6px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .feature-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .bio-feature {
+            background: rgba(254, 243, 199, 0.5);
+            border-left-color: #fbbf24;
+        }
+
+        .art-feature {
+            background: rgba(219, 234, 254, 0.5);
+            border-left-color: #3b82f6;
+        }
+
+        .feature-item:hover {
+            transform: translateX(5px);
+        }
+
+        .comparison-table {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromBottom 1s ease-out 0.6s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            font-weight: 600;
+            color: #064e3b;
+        }
+
+        tr:hover {
+            background: rgba(220, 252, 231, 0.3);
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: neuronFloat 20s linear infinite;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            border-radius: 30px;
+            color: #1e293b;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(22, 163, 74, 0.4);
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .course-info {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        @keyframes slideInFromTop {
+            from { transform: translateY(-80px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromLeft {
+            from { transform: translateX(-60px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromRight {
+            from { transform: translateX(60px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromBottom {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes neuronFloat {
+            0% { transform: translateY(100vh) translateX(-30px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100px) translateX(100px) rotate(360deg); opacity: 0; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes dendriteGrow {
+            from { 
+                height: 0; 
+                opacity: 0; 
+            }
+            to { 
+                opacity: 1; 
+            }
+        }
+
+        @keyframes axonGrow {
+            from { 
+                height: 0; 
+                opacity: 0; 
+            }
+            to { 
+                height: 70px; 
+                opacity: 1; 
+            }
+        }
+
+        @keyframes synapseFlash {
+            0%, 100% { 
+                opacity: 0.6; 
+                transform: scale(1); 
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1.1); 
+            }
+        }
+
+        @keyframes dataFlow {
+            0%, 100% { 
+                opacity: 0.4; 
+                transform: scaleX(1); 
+            }
+            50% { 
+                opacity: 1; 
+                transform: scaleX(1.1); 
+            }
+        }
+
+        @media (max-width: 768px) {
+            .comparison-layout { grid-template-columns: 1fr; }
+            .slide-title { font-size: 2.5em; }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 25px;
+            max-width: 800px;
+            max-height: 85vh;
+            width: 90%;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+            position: relative;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            padding: 30px;
+            position: relative;
+            border-bottom: 2px solid rgba(22, 163, 74, 0.2);
+        }
+
+        .modal-title {
+            font-size: 2em;
+            color: #064e3b;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(22, 163, 74, 0.3);
+            font-size: 1.5em;
+            color: #064e3b;
+        }
+
+        .modal-close:hover {
+            background: #ef4444;
+            color: white;
+            transform: scale(1.1);
+            border-color: #dc2626;
+        }
+
+        .modal-body {
+            padding: 30px;
+            max-height: calc(85vh - 180px);
+            overflow-y: auto;
+            line-height: 1.8;
+        }
+
+        .modal-body h3 {
+            color: #16a34a;
+            font-size: 1.5em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .modal-body h3:first-child {
+            margin-top: 0;
+        }
+
+        .modal-body p {
+            color: #334155;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        .modal-body ul {
+            color: #475569;
+            font-size: 1.05em;
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+
+        .modal-body li {
+            margin-bottom: 10px;
+        }
+
+        .code-example {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .formula {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.2em;
+            color: #064e3b;
+            border: 2px solid rgba(22, 163, 74, 0.3);
+        }
+
+        .example-box {
+            background: rgba(22, 163, 74, 0.1);
+            border-left: 4px solid #16a34a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .example-box strong {
+            color: #064e3b;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .comparison-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .comparison-item {
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .bio-comparison {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%);
+            border-color: rgba(251, 191, 36, 0.3);
+        }
+
+        .art-comparison {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 50%);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-30px) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Scrollbar styling for modal */
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements" id="floatingElements"></div>
+    
+    <div class="course-info">CS5720 - Week 1</div>
+    <div class="slide-number">Slide 2 of 20</div>
+    
+    <div class="slide-container">
+        <h1 class="slide-title">Biological vs Artificial Neurons</h1>
+        
+        <div class="comparison-layout">
+            <div class="biological-section">
+                <h2 class="section-title biological-title">🧠 Biological Neuron</h2>
+                
+                <div class="neuron-diagram">
+                    <div class="bio-neuron" id="bioNeuron">
+                        <div class="dendrite dendrite-1"></div>
+                        <div class="dendrite dendrite-2"></div>
+                        <div class="dendrite dendrite-3"></div>
+                        <div class="dendrite dendrite-4"></div>
+                        <div class="cell-body">
+                            <div class="nucleus"></div>
+                            <div class="soma-text">Soma</div>
+                        </div>
+                        <div class="axon">
+                            <div class="synapse"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <ul class="feature-list">
+                    <li class="feature-item bio-feature">
+                        <strong>Dendrites:</strong> Receive signals from other neurons
+                    </li>
+                    <li class="feature-item bio-feature">
+                        <strong>Cell Body:</strong> Processes incoming signals
+                    </li>
+                    <li class="feature-item bio-feature">
+                        <strong>Axon:</strong> Transmits signals to other neurons
+                    </li>
+                    <li class="feature-item bio-feature">
+                        <strong>Synapses:</strong> Connection points between neurons
+                    </li>
+                </ul>
+            </div>
+
+            <div class="artificial-section">
+                <h2 class="section-title artificial-title">🤖 Artificial Neuron</h2>
+                
+                <div class="neuron-diagram">
+                    <div class="art-neuron" id="artNeuron">
+                        <div class="input-line input-line-1">
+                            <div class="input-label" style="top: -12px;">x₁</div>
+                            <div class="weight-indicator" style="top: -10px;">w₁</div>
+                        </div>
+                        <div class="input-line input-line-2">
+                            <div class="input-label" style="top: -12px;">x₂</div>
+                            <div class="weight-indicator" style="top: -10px;">w₂</div>
+                        </div>
+                        <div class="input-line input-line-3">
+                            <div class="input-label" style="top: -12px;">x₃</div>
+                            <div class="weight-indicator" style="top: -10px;">w₃</div>
+                        </div>
+                        <div class="node">
+                            <div class="node-equation">Σ</div>
+                            <div class="node-function">f(x)</div>
+                        </div>
+                        <div class="output-line"></div>
+                    </div>
+                </div>
+                
+                <ul class="feature-list">
+                    <li class="feature-item art-feature">
+                        <strong>Inputs:</strong> Receive weighted signals (x₁, x₂, ...)
+                    </li>
+                    <li class="feature-item art-feature">
+                        <strong>Weights:</strong> Multiply inputs (w₁, w₂, ...)
+                    </li>
+                    <li class="feature-item art-feature">
+                        <strong>Summation:</strong> Add weighted inputs + bias
+                    </li>
+                    <li class="feature-item art-feature">
+                        <strong>Activation:</strong> Apply function f(x) to produce output
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="comparison-table">
+            <h2 class="section-title" style="color: #064e3b;">Key Comparisons</h2>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Biological Neuron</th>
+                            <th>Artificial Neuron</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Signal Type</strong></td>
+                            <td>Electrochemical impulses</td>
+                            <td>Numerical values</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Processing</strong></td>
+                            <td>Complex biochemical reactions</td>
+                            <td>Mathematical operations</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Speed</strong></td>
+                            <td>Milliseconds</td>
+                            <td>Nanoseconds</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Energy</strong></td>
+                            <td>~20 watts (entire brain)</td>
+                            <td>Varies (often much higher)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Plasticity</strong></td>
+                            <td>Continuous adaptation</td>
+                            <td>Adjusted through training</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Connections</strong></td>
+                            <td>~10,000 per neuron</td>
+                            <td>Typically dozens to hundreds</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <a href="Week1_Slide1.html" class="nav-btn">← Previous</a>
+        <a href="Week1_Slide3.html" class="nav-btn">Next →</a>
+    </div>
+
+    <div style="position: fixed; bottom: 30px; left: 30px; color: #64748b; font-size: 0.9em;">
+        <strong>Prepared by Dr. Gorkem Kar</strong>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal-overlay" id="infoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Modal Title</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal functions
+        function openModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('infoModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('infoModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('infoModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('infoModal').classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Create floating elements
+        function createFloatingElements() {
+            const container = document.getElementById('floatingElements');
+            for (let i = 0; i < 30; i++) {
+                const element = document.createElement('div');
+                element.className = 'floating-element';
+                element.style.left = Math.random() * 100 + '%';
+                element.style.animationDelay = Math.random() * 20 + 's';
+                element.style.animationDuration = (Math.random() * 10 + 15) + 's';
+                container.appendChild(element);
+            }
+        }
+
+        // Animate neurons on hover
+        document.getElementById('bioNeuron').addEventListener('mouseenter', function() {
+            this.style.animation = 'pulse 1s ease-in-out';
+        });
+
+        document.getElementById('bioNeuron').addEventListener('mouseleave', function() {
+            this.style.animation = '';
+        });
+
+        document.getElementById('artNeuron').addEventListener('mouseenter', function() {
+            this.style.animation = 'pulse 1s ease-in-out';
+        });
+
+        document.getElementById('artNeuron').addEventListener('mouseleave', function() {
+            this.style.animation = '';
+        });
+
+        // Click handlers for neuron diagrams
+        document.getElementById('bioNeuron').addEventListener('click', function() {
+            openModal('Biological Neuron Structure', `
+                <h3>The Biological Neuron: Nature's Computing Unit</h3>
+                <p>A biological neuron is a specialized cell designed to transmit information throughout the body. The human brain contains approximately 86 billion neurons, each forming thousands of connections.</p>
+                
+                <h3>Structural Components</h3>
+                
+                <h4>1. Dendrites (Input)</h4>
+                <ul>
+                    <li><strong>Function:</strong> Receive signals from other neurons</li>
+                    <li><strong>Structure:</strong> Tree-like branches extending from cell body</li>
+                    <li><strong>Receptors:</strong> Contain neurotransmitter receptors</li>
+                    <li><strong>Integration:</strong> Can have 1,000-10,000 dendritic branches</li>
+                </ul>
+                
+                <h4>2. Cell Body (Soma)</h4>
+                <ul>
+                    <li><strong>Function:</strong> Integrates incoming signals</li>
+                    <li><strong>Contains:</strong> Nucleus with DNA, mitochondria for energy</li>
+                    <li><strong>Decision:</strong> Determines whether to fire action potential</li>
+                    <li><strong>Threshold:</strong> Typically -55mV to trigger firing</li>
+                </ul>
+                
+                <h4>3. Axon Hillock</h4>
+                <ul>
+                    <li><strong>Function:</strong> Action potential initiation zone</li>
+                    <li><strong>High density:</strong> Voltage-gated sodium channels</li>
+                    <li><strong>Integration:</strong> Sums all inputs to decide firing</li>
+                </ul>
+                
+                <h4>4. Axon (Output)</h4>
+                <ul>
+                    <li><strong>Function:</strong> Transmits signals to other neurons</li>
+                    <li><strong>Length:</strong> Can be over 1 meter long (sciatic nerve)</li>
+                    <li><strong>Myelin:</strong> Insulation for faster transmission</li>
+                    <li><strong>Speed:</strong> 1-120 m/s depending on myelination</li>
+                </ul>
+                
+                <h4>5. Synaptic Terminals</h4>
+                <ul>
+                    <li><strong>Function:</strong> Release neurotransmitters</li>
+                    <li><strong>Vesicles:</strong> Contain chemical messengers</li>
+                    <li><strong>Gap:</strong> 20-40 nanometer synaptic cleft</li>
+                    <li><strong>Types:</strong> Excitatory or inhibitory</li>
+                </ul>
+                
+                <h3>Information Processing</h3>
+                <div class="formula">
+                    Membrane Potential = -70mV (rest) → -55mV (threshold) → +40mV (peak)
+                </div>
+                
+                <h3>Types of Neurons</h3>
+                <div class="example-box">
+                    <strong>Sensory Neurons</strong>
+                    <p>Carry information from sensory receptors to the brain</p>
+                    
+                    <strong>Motor Neurons</strong>
+                    <p>Transmit signals from brain to muscles and glands</p>
+                    
+                    <strong>Interneurons</strong>
+                    <p>Connect neurons within the brain and spinal cord (99% of all neurons)</p>
+                </div>
+                
+                <h3>Energy and Metabolism</h3>
+                <ul>
+                    <li>Uses 20% of body's oxygen despite being 2% of body weight</li>
+                    <li>Primarily powered by glucose metabolism</li>
+                    <li>Cannot store energy - requires constant blood supply</li>
+                    <li>10 seconds without oxygen causes unconsciousness</li>
+                </ul>
+            `);
+        });
+
+        document.getElementById('artNeuron').addEventListener('click', function() {
+            openModal('Artificial Neuron Model', `
+                <h3>The Artificial Neuron: Mathematical Abstraction</h3>
+                <p>An artificial neuron is a mathematical function that receives inputs, processes them, and produces an output. It's the fundamental building block of artificial neural networks.</p>
+                
+                <h3>Mathematical Model</h3>
+                <div class="formula">
+                    y = f(Σ(wᵢ × xᵢ) + b)
+                </div>
+                
+                <h3>Components Explained</h3>
+                
+                <h4>1. Inputs (xᵢ)</h4>
+                <ul>
+                    <li><strong>Definition:</strong> Feature values from previous layer or data</li>
+                    <li><strong>Range:</strong> Often normalized to [0,1] or [-1,1]</li>
+                    <li><strong>Number:</strong> Can range from 1 to millions</li>
+                    <li><strong>Type:</strong> Real numbers (floating point)</li>
+                </ul>
+                
+                <h4>2. Weights (wᵢ)</h4>
+                <ul>
+                    <li><strong>Purpose:</strong> Determine importance of each input</li>
+                    <li><strong>Initialization:</strong> Random small values</li>
+                    <li><strong>Learning:</strong> Adjusted during training</li>
+                    <li><strong>Interpretation:</strong> Positive = excitatory, Negative = inhibitory</li>
+                </ul>
+                
+                <h4>3. Bias (b)</h4>
+                <ul>
+                    <li><strong>Purpose:</strong> Shifts activation threshold</li>
+                    <li><strong>Analogy:</strong> Like y-intercept in linear equation</li>
+                    <li><strong>Effect:</strong> Allows neuron to fire even with zero inputs</li>
+                    <li><strong>Learning:</strong> Also adjusted during training</li>
+                </ul>
+                
+                <h4>4. Summation Function (Σ)</h4>
+                <div class="code-example">
+# Computing weighted sum
+weighted_sum = 0
+for i in range(len(inputs)):
+    weighted_sum += weights[i] * inputs[i]
+weighted_sum += bias
+
+# Vectorized computation (efficient)
+weighted_sum = np.dot(weights, inputs) + bias
+                </div>
+                
+                <h4>5. Activation Function (f)</h4>
+                <div class="example-box">
+                    <strong>Linear:</strong> f(x) = x
+                    <p>Use: Output layer for regression</p>
+                    
+                    <strong>Sigmoid:</strong> f(x) = 1/(1 + e⁻ˣ)
+                    <p>Use: Binary classification, gates in LSTM</p>
+                    
+                    <strong>ReLU:</strong> f(x) = max(0, x)
+                    <p>Use: Hidden layers (most common)</p>
+                    
+                    <strong>Tanh:</strong> f(x) = (eˣ - e⁻ˣ)/(eˣ + e⁻ˣ)
+                    <p>Use: Hidden layers, centered around 0</p>
+                </div>
+                
+                <h3>Example Computation</h3>
+                <div class="code-example">
+# Simple neuron with 3 inputs
+inputs = np.array([0.5, 0.8, -0.3])
+weights = np.array([0.2, -0.5, 0.7])
+bias = 0.1
+
+# Step 1: Weighted sum
+z = np.dot(inputs, weights) + bias
+# z = (0.5*0.2) + (0.8*-0.5) + (-0.3*0.7) + 0.1
+# z = 0.1 - 0.4 - 0.21 + 0.1 = -0.41
+
+# Step 2: Apply activation (ReLU)
+output = max(0, z)
+# output = max(0, -0.41) = 0
+
+# With sigmoid activation instead:
+output_sigmoid = 1 / (1 + np.exp(-z))
+# output_sigmoid = 1 / (1 + e^0.41) = 0.399
+                </div>
+                
+                <h3>Key Differences from Biology</h3>
+                <ul>
+                    <li><strong>Simplification:</strong> No temporal dynamics</li>
+                    <li><strong>Continuous:</strong> Not discrete spikes</li>
+                    <li><strong>Deterministic:</strong> Same input always gives same output</li>
+                    <li><strong>Differentiable:</strong> Enables backpropagation</li>
+                </ul>
+                
+                <h3>Modern Variants</h3>
+                <ul>
+                    <li><strong>Spiking neurons:</strong> More biologically realistic</li>
+                    <li><strong>Capsule neurons:</strong> Vector outputs</li>
+                    <li><strong>Attention neurons:</strong> Dynamic connectivity</li>
+                    <li><strong>Gated units:</strong> LSTM, GRU cells</li>
+                </ul>
+            `);
+        });
+        
+        // Add click handlers for feature items
+        document.querySelectorAll('.bio-feature').forEach(item => {
+            item.style.cursor = 'pointer';
+            item.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const feature = this.querySelector('strong').textContent.replace(':', '');
+                const bioFeatureDetails = {
+                    'Dendrites': {
+                        title: 'Dendrites: The Input Receivers',
+                        content: `
+                            <h3>Dendrites in Detail</h3>
+                            <p>Dendrites are the tree-like extensions of a neuron that receive signals from other neurons. They are the primary input zones of the neuron.</p>
+                            
+                            <h3>Structure and Organization</h3>
+                            <ul>
+                                <li><strong>Branching Pattern:</strong> Highly branched, resembling tree roots</li>
+                                <li><strong>Surface Area:</strong> Can comprise 90% of neuron's surface</li>
+                                <li><strong>Spines:</strong> Small protrusions (~1 μm) that form synapses</li>
+                                <li><strong>Number:</strong> A single neuron can have 1-100+ dendrites</li>
+                            </ul>
+                            
+                            <h3>Functional Properties</h3>
+                            <div class="example-box">
+                                <strong>Signal Integration</strong>
+                                <p>• Receive 1,000-10,000 synaptic inputs<br>
+                                • Both excitatory (depolarizing) and inhibitory (hyperpolarizing)<br>
+                                • Spatial summation: Signals from different locations<br>
+                                • Temporal summation: Signals arriving at different times</p>
+                            </div>
+                            
+                            <h3>Dendritic Computation</h3>
+                            <p>Recent research shows dendrites perform complex computations:</p>
+                            <ul>
+                                <li><strong>Logical operations:</strong> AND, OR, XOR gates</li>
+                                <li><strong>Signal amplification:</strong> Active dendritic spikes</li>
+                                <li><strong>Coincidence detection:</strong> Timing-sensitive responses</li>
+                                <li><strong>Compartmentalization:</strong> Independent processing zones</li>
+                            </ul>
+                            
+                            <h3>Plasticity and Learning</h3>
+                            <div class="formula">
+                                Dendritic plasticity = Structural changes + Functional changes
+                            </div>
+                            <ul>
+                                <li><strong>Spine growth:</strong> New connections form in minutes</li>
+                                <li><strong>Spine elimination:</strong> Unused connections pruned</li>
+                                <li><strong>Receptor trafficking:</strong> Strength modulation</li>
+                                <li><strong>Local protein synthesis:</strong> On-site manufacturing</li>
+                            </ul>
+                        `
+                    },
+                    'Cell Body': {
+                        title: 'Cell Body (Soma): The Processing Center',
+                        content: `
+                            <h3>The Neuron's Command Center</h3>
+                            <p>The cell body, or soma, is the neuron's metabolic center and decision-making hub. It integrates all incoming signals to determine whether the neuron should fire.</p>
+                            
+                            <h3>Cellular Components</h3>
+                            <div class="example-box">
+                                <strong>Nucleus</strong>
+                                <p>• Contains DNA with ~20,000 genes<br>
+                                • Regulates protein synthesis<br>
+                                • Responds to activity with gene expression changes<br>
+                                • Size: 5-10 μm diameter</p>
+                                
+                                <strong>Organelles</strong>
+                                <p>• Mitochondria: Energy production (ATP)<br>
+                                • Endoplasmic reticulum: Protein synthesis<br>
+                                • Golgi apparatus: Protein packaging<br>
+                                • Ribosomes: Translation machinery</p>
+                            </div>
+                            
+                            <h3>Integration Process</h3>
+                            <div class="formula">
+                                Membrane Potential = Σ(Excitatory inputs) - Σ(Inhibitory inputs)
+                            </div>
+                            
+                            <h3>Decision Making</h3>
+                            <ul>
+                                <li><strong>Resting potential:</strong> -70 mV</li>
+                                <li><strong>Threshold potential:</strong> -55 mV</li>
+                                <li><strong>Action potential:</strong> Fires if threshold reached</li>
+                                <li><strong>Graded potentials:</strong> Small changes that decay</li>
+                            </ul>
+                            
+                            <h3>Metabolic Functions</h3>
+                            <ul>
+                                <li><strong>Protein synthesis:</strong> 10,000+ different proteins</li>
+                                <li><strong>Energy consumption:</strong> 75% of energy for ion pumps</li>
+                                <li><strong>Neurotransmitter production:</strong> Chemical messengers</li>
+                                <li><strong>Waste removal:</strong> Cellular cleanup mechanisms</li>
+                            </ul>
+                            
+                            <h3>Size and Shape Variations</h3>
+                            <p>Cell body size varies dramatically:</p>
+                            <ul>
+                                <li><strong>Small interneurons:</strong> 4-5 μm diameter</li>
+                                <li><strong>Motor neurons:</strong> 100+ μm diameter</li>
+                                <li><strong>Pyramidal cells:</strong> Triangle-shaped</li>
+                                <li><strong>Purkinje cells:</strong> Elaborate dendritic trees</li>
+                            </ul>
+                        `
+                    },
+                    'Axon': {
+                        title: 'Axon: The Signal Highway',
+                        content: `
+                            <h3>The Neuron's Output Cable</h3>
+                            <p>The axon is a long projection that transmits electrical signals (action potentials) from the cell body to other neurons, muscles, or glands.</p>
+                            
+                            <h3>Structural Features</h3>
+                            <ul>
+                                <li><strong>Length:</strong> From 1 mm to over 1 meter</li>
+                                <li><strong>Diameter:</strong> 0.2-20 μm</li>
+                                <li><strong>Axon hillock:</strong> Initial segment where action potentials begin</li>
+                                <li><strong>Branches:</strong> Can split into 10,000+ terminals</li>
+                            </ul>
+                            
+                            <h3>Myelination</h3>
+                            <div class="example-box">
+                                <strong>Myelin Sheath</strong>
+                                <p>• Insulation made by glial cells<br>
+                                • Oligodendrocytes (CNS) or Schwann cells (PNS)<br>
+                                • Increases conduction speed 100x<br>
+                                • Nodes of Ranvier: Gaps for signal regeneration</p>
+                            </div>
+                            
+                            <h3>Signal Propagation</h3>
+                            <div class="formula">
+                                Conduction Velocity = Fiber diameter × Myelination factor<br>
+                                Unmyelinated: 0.5-2 m/s<br>
+                                Myelinated: up to 120 m/s
+                            </div>
+                            
+                            <h3>Action Potential Properties</h3>
+                            <ul>
+                                <li><strong>All-or-none:</strong> Full amplitude or nothing</li>
+                                <li><strong>Non-decremental:</strong> Maintains strength over distance</li>
+                                <li><strong>Unidirectional:</strong> Travels away from cell body</li>
+                                <li><strong>Refractory period:</strong> Prevents backward propagation</li>
+                            </ul>
+                            
+                            <h3>Axonal Transport</h3>
+                            <p>Materials move along the axon via molecular motors:</p>
+                            <ul>
+                                <li><strong>Fast transport:</strong> 200-400 mm/day (vesicles, organelles)</li>
+                                <li><strong>Slow transport:</strong> 0.1-10 mm/day (proteins, cytoskeleton)</li>
+                                <li><strong>Retrograde:</strong> From terminals back to cell body</li>
+                                <li><strong>Anterograde:</strong> From cell body to terminals</li>
+                            </ul>
+                            
+                            <h3>Clinical Relevance</h3>
+                            <ul>
+                                <li><strong>Multiple sclerosis:</strong> Myelin destruction</li>
+                                <li><strong>Peripheral neuropathy:</strong> Axon damage</li>
+                                <li><strong>Spinal cord injury:</strong> Axon regeneration challenges</li>
+                            </ul>
+                        `
+                    },
+                    'Synapses': {
+                        title: 'Synapses: The Communication Junctions',
+                        content: `
+                            <h3>Where Neurons Connect</h3>
+                            <p>Synapses are specialized junctions where neurons communicate with each other or with other cells. Each neuron forms thousands of synaptic connections.</p>
+                            
+                            <h3>Types of Synapses</h3>
+                            <div class="example-box">
+                                <strong>Chemical Synapses (99%)</strong>
+                                <p>• Use neurotransmitters as messengers<br>
+                                • 20-40 nm synaptic cleft<br>
+                                • Unidirectional communication<br>
+                                • Can be modulated (strengthened/weakened)</p>
+                                
+                                <strong>Electrical Synapses (1%)</strong>
+                                <p>• Direct electrical coupling via gap junctions<br>
+                                • 3.5 nm gap<br>
+                                • Bidirectional, very fast<br>
+                                • Found in cardiac muscle, some brain regions</p>
+                            </div>
+                            
+                            <h3>Synaptic Transmission Steps</h3>
+                            <ol>
+                                <li><strong>Action potential arrives</strong> at presynaptic terminal</li>
+                                <li><strong>Calcium channels open</strong> due to depolarization</li>
+                                <li><strong>Vesicles fuse</strong> with membrane (exocytosis)</li>
+                                <li><strong>Neurotransmitters released</strong> into synaptic cleft</li>
+                                <li><strong>Binding to receptors</strong> on postsynaptic cell</li>
+                                <li><strong>Ion channels open/close</strong> changing membrane potential</li>
+                                <li><strong>Signal termination</strong> via reuptake or degradation</li>
+                            </ol>
+                            
+                            <h3>Neurotransmitters</h3>
+                            <ul>
+                                <li><strong>Glutamate:</strong> Primary excitatory (80% of synapses)</li>
+                                <li><strong>GABA:</strong> Primary inhibitory (20% of synapses)</li>
+                                <li><strong>Dopamine:</strong> Reward, motivation, movement</li>
+                                <li><strong>Serotonin:</strong> Mood, sleep, appetite</li>
+                                <li><strong>Acetylcholine:</strong> Muscle control, attention</li>
+                            </ul>
+                            
+                            <h3>Synaptic Plasticity</h3>
+                            <div class="formula">
+                                Synaptic Strength = f(Activity, Timing, Neuromodulators)
+                            </div>
+                            
+                            <ul>
+                                <li><strong>LTP:</strong> Long-term potentiation (strengthening)</li>
+                                <li><strong>LTD:</strong> Long-term depression (weakening)</li>
+                                <li><strong>Homeostatic:</strong> Maintains overall stability</li>
+                                <li><strong>Structural:</strong> New synapses form, old ones eliminated</li>
+                            </ul>
+                            
+                            <h3>Synaptic Integration</h3>
+                            <ul>
+                                <li><strong>Spatial summation:</strong> Multiple synapses active together</li>
+                                <li><strong>Temporal summation:</strong> Rapid sequential activation</li>
+                                <li><strong>Shunting inhibition:</strong> Strategic placement of inhibitory synapses</li>
+                            </ul>
+                        `
+                    }
+                };
+                
+                const detail = bioFeatureDetails[feature];
+                if (detail) {
+                    openModal(detail.title, detail.content);
+                }
+            });
+        });
+        
+        document.querySelectorAll('.art-feature').forEach(item => {
+            item.style.cursor = 'pointer';
+            item.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const feature = this.querySelector('strong').textContent.replace(':', '');
+                const artFeatureDetails = {
+                    'Inputs': {
+                        title: 'Inputs: Data Entry Points',
+                        content: `
+                            <h3>Understanding Neural Network Inputs</h3>
+                            <p>Inputs are the starting point of information flow in an artificial neural network. They represent the features or data that the network will process.</p>
+                            
+                            <h3>Input Representation</h3>
+                            <div class="formula">
+                                Input Vector: X = [x₁, x₂, x₃, ..., xₙ]
+                            </div>
+                            
+                            <h3>Common Input Types</h3>
+                            <div class="example-box">
+                                <strong>Numerical Features</strong>
+                                <p>• Age: 25 → 0.25 (normalized to [0,1])<br>
+                                • Temperature: 72°F → 0.72<br>
+                                • Price: $150 → 0.15 (scaled)<br>
+                                • Distance: 5.2 km → 5.2 (raw value)</p>
+                                
+                                <strong>Categorical Features</strong>
+                                <p>• Color: Red → [1, 0, 0] (one-hot)<br>
+                                • Day: Monday → [1, 0, 0, 0, 0, 0, 0]<br>
+                                • Grade: B → 0.75 (ordinal encoding)</p>
+                            </div>
+                            
+                            <h3>Input Preprocessing</h3>
+                            <div class="code-example">
+# Common preprocessing techniques
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+
+# Normalization (0 to 1)
+scaler = MinMaxScaler()
+normalized_data = scaler.fit_transform(raw_data)
+
+# Standardization (mean=0, std=1)
+scaler = StandardScaler()
+standardized_data = scaler.fit_transform(raw_data)
+
+# One-hot encoding for categories
+import pandas as pd
+one_hot = pd.get_dummies(categorical_data)
+                            </div>
+                            
+                            <h3>Input Dimensions by Task</h3>
+                            <ul>
+                                <li><strong>Tabular data:</strong> 10-1000 features typically</li>
+                                <li><strong>Images:</strong> Width × Height × Channels (e.g., 224×224×3)</li>
+                                <li><strong>Text:</strong> Vocabulary size or embedding dimension</li>
+                                <li><strong>Audio:</strong> Frequency bins × Time steps</li>
+                                <li><strong>Time series:</strong> Features × Sequence length</li>
+                            </ul>
+                            
+                            <h3>Input Layer Design</h3>
+                            <div class="code-example">
+# PyTorch examples
+import torch.nn as nn
+
+# Simple tabular data
+input_layer = nn.Linear(in_features=10, out_features=64)
+
+# Image data (CNN)
+input_layer = nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3)
+
+# Sequential data (RNN)
+input_layer = nn.LSTM(input_size=100, hidden_size=256)
+
+# Modern transformer
+input_layer = nn.Embedding(vocab_size=10000, embedding_dim=512)
+                            </div>
+                            
+                            <h3>Input Quality Matters</h3>
+                            <ul>
+                                <li><strong>Garbage in, garbage out:</strong> Quality affects everything</li>
+                                <li><strong>Missing values:</strong> Need imputation strategies</li>
+                                <li><strong>Outliers:</strong> Can dominate learning</li>
+                                <li><strong>Scale differences:</strong> Normalization crucial</li>
+                                <li><strong>Correlation:</strong> Redundant features waste capacity</li>
+                            </ul>
+                        `
+                    },
+                    'Weights': {
+                        title: 'Weights: The Network\'s Knowledge',
+                        content: `
+                            <h3>Weights: The Learnable Parameters</h3>
+                            <p>Weights are the core parameters that a neural network learns during training. They determine how strongly each input influences the neuron's output.</p>
+                            
+                            <h3>Weight Interpretation</h3>
+                            <div class="formula">
+                                Output contribution = Input × Weight<br>
+                                Positive weight → Excitatory connection<br>
+                                Negative weight → Inhibitory connection<br>
+                                Zero weight → No influence
+                            </div>
+                            
+                            <h3>Weight Initialization</h3>
+                            <div class="code-example">
+# Common initialization strategies
+import torch.nn as nn
+import torch.nn.init as init
+
+# Xavier/Glorot initialization (good for tanh, sigmoid)
+init.xavier_uniform_(layer.weight)
+init.xavier_normal_(layer.weight)
+
+# He initialization (good for ReLU)
+init.kaiming_uniform_(layer.weight, nonlinearity='relu')
+init.kaiming_normal_(layer.weight, nonlinearity='relu')
+
+# Simple uniform initialization
+init.uniform_(layer.weight, a=-0.1, b=0.1)
+
+# Zero initialization (only for biases!)
+init.zeros_(layer.bias)
+                            </div>
+                            
+                            <h3>Why Initialization Matters</h3>
+                            <div class="example-box">
+                                <strong>Too Small Weights</strong>
+                                <p>• Signals vanish in deep networks<br>
+                                • Gradients become too small<br>
+                                • Learning stops (vanishing gradient)</p>
+                                
+                                <strong>Too Large Weights</strong>
+                                <p>• Signals explode exponentially<br>
+                                • Gradients become too large<br>
+                                • Training unstable (exploding gradient)</p>
+                                
+                                <strong>Just Right (Xavier/He)</strong>
+                                <p>• Variance preserved through layers<br>
+                                • Stable gradient flow<br>
+                                • Efficient learning</p>
+                            </div>
+                            
+                            <h3>Weight Updates During Training</h3>
+                            <div class="formula">
+                                w_new = w_old - learning_rate × gradient<br><br>
+                                gradient = ∂Loss/∂w
+                            </div>
+                            
+                            <h3>Weight Visualization Example</h3>
+                            <div class="code-example">
+# Visualizing what weights learn
+import matplotlib.pyplot as plt
+
+# First layer weights in CNN (edge detectors)
+weights = model.conv1.weight.data.numpy()
+fig, axes = plt.subplots(4, 8, figsize=(10, 5))
+for i, ax in enumerate(axes.flat):
+    if i < weights.shape[0]:
+        ax.imshow(weights[i, 0], cmap='gray')
+        ax.axis('off')
+        
+# Weights often learn:
+# - Edge detectors (horizontal, vertical, diagonal)
+# - Color detectors (red, green, blue channels)
+# - Texture patterns (grids, dots, gradients)
+                            </div>
+                            
+                            <h3>Weight Regularization</h3>
+                            <ul>
+                                <li><strong>L2 Regularization:</strong> Penalizes large weights → w² penalty</li>
+                                <li><strong>L1 Regularization:</strong> Encourages sparsity → |w| penalty</li>
+                                <li><strong>Dropout:</strong> Randomly zeros weights during training</li>
+                                <li><strong>Weight decay:</strong> Shrinks weights each step</li>
+                            </ul>
+                            
+                            <h3>Weight Sharing</h3>
+                            <p>Some architectures reuse weights:</p>
+                            <ul>
+                                <li><strong>CNNs:</strong> Same filter weights across image</li>
+                                <li><strong>RNNs:</strong> Same weights across time steps</li>
+                                <li><strong>Siamese networks:</strong> Identical branches</li>
+                            </ul>
+                        `
+                    },
+                    'Summation': {
+                        title: 'Weighted Summation: The Core Computation',
+                        content: `
+                            <h3>The Heart of Neural Computation</h3>
+                            <p>The summation function combines all weighted inputs and bias into a single value, which then gets passed through the activation function.</p>
+                            
+                            <h3>Mathematical Formula</h3>
+                            <div class="formula">
+                                z = Σ(wᵢ × xᵢ) + b<br><br>
+                                Or in vector notation:<br>
+                                z = w^T·x + b = w₁x₁ + w₂x₂ + ... + wₙxₙ + b
+                            </div>
+                            
+                            <h3>Step-by-Step Example</h3>
+                            <div class="code-example">
+# Manual computation
+inputs = [0.5, 0.8, -0.3]
+weights = [0.7, -0.4, 0.9]
+bias = 0.2
+
+# Method 1: Loop
+weighted_sum = 0
+for i in range(len(inputs)):
+    weighted_sum += inputs[i] * weights[i]
+weighted_sum += bias
+
+# Method 2: List comprehension
+weighted_sum = sum(i*w for i,w in zip(inputs, weights)) + bias
+
+# Method 3: NumPy (vectorized - fastest!)
+import numpy as np
+weighted_sum = np.dot(inputs, weights) + bias
+
+# Result: (0.5×0.7) + (0.8×-0.4) + (-0.3×0.9) + 0.2
+#        = 0.35 - 0.32 - 0.27 + 0.2 = -0.04
+                            </div>
+                            
+                            <h3>Why Linear Combination?</h3>
+                            <ul>
+                                <li><strong>Simplicity:</strong> Easy to compute and differentiate</li>
+                                <li><strong>Linearity:</strong> Preserves proportional relationships</li>
+                                <li><strong>Composability:</strong> Complex functions from simple parts</li>
+                                <li><strong>Biological inspiration:</strong> Similar to dendritic integration</li>
+                            </ul>
+                            
+                            <h3>Computational Efficiency</h3>
+                            <div class="example-box">
+                                <strong>Matrix Multiplication</strong>
+                                <p>For a layer with multiple neurons:</p>
+                                <div class="code-example">
+# Batch processing with matrix operations
+# Input: [batch_size, input_features]
+# Weights: [input_features, output_features]
+# Output: [batch_size, output_features]
+
+X = np.random.randn(32, 784)  # 32 samples, 784 features
+W = np.random.randn(784, 128)  # 784 inputs, 128 neurons
+b = np.random.randn(128)       # 128 biases
+
+# All neurons, all samples at once!
+Z = np.dot(X, W) + b          # Shape: [32, 128]
+                                </div>
+                            </div>
+                            
+                            <h3>The Role of Bias</h3>
+                            <div class="formula">
+                                Without bias: z = Σ(wᵢxᵢ) → Line through origin<br>
+                                With bias: z = Σ(wᵢxᵢ) + b → Line with y-intercept
+                            </div>
+                            
+                            <ul>
+                                <li><strong>Flexibility:</strong> Shifts the activation threshold</li>
+                                <li><strong>Necessity:</strong> Some patterns need offset from origin</li>
+                                <li><strong>Learning:</strong> Bias is learned just like weights</li>
+                            </ul>
+                            
+                            <h3>Summation in Different Architectures</h3>
+                            <ul>
+                                <li><strong>Fully Connected:</strong> Sum over all previous layer neurons</li>
+                                <li><strong>Convolutional:</strong> Sum over local receptive field</li>
+                                <li><strong>Attention:</strong> Weighted sum with dynamic weights</li>
+                                <li><strong>Graph Networks:</strong> Sum over neighboring nodes</li>
+                            </ul>
+                        `
+                    },
+                    'Activation': {
+                        title: 'Activation Functions: Adding Non-linearity',
+                        content: `
+                            <h3>Why Activation Functions?</h3>
+                            <p>Activation functions introduce non-linearity into neural networks, enabling them to learn complex patterns. Without them, even deep networks would only compute linear transformations.</p>
+                            
+                            <h3>Common Activation Functions</h3>
+                            
+                            <div class="example-box">
+                                <strong>ReLU (Rectified Linear Unit)</strong>
+                                <div class="formula">f(x) = max(0, x)</div>
+                                <div class="code-example">
+def relu(x):
+    return np.maximum(0, x)
+    
+# Properties:
+# ✓ Simple and fast
+# ✓ No vanishing gradient for x > 0  
+# ✗ Dead neurons for x < 0
+# ✗ Not zero-centered
+                                </div>
+                            </div>
+                            
+                            <div class="example-box">
+                                <strong>Sigmoid</strong>
+                                <div class="formula">f(x) = 1 / (1 + e⁻ˣ)</div>
+                                <div class="code-example">
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+    
+# Properties:
+# ✓ Smooth gradient
+# ✓ Output in (0, 1) - good for probability
+# ✗ Vanishing gradient for large |x|
+# ✗ Not zero-centered
+# ✗ Computationally expensive
+                                </div>
+                            </div>
+                            
+                            <div class="example-box">
+                                <strong>Tanh (Hyperbolic Tangent)</strong>
+                                <div class="formula">f(x) = (eˣ - e⁻ˣ) / (eˣ + e⁻ˣ)</div>
+                                <div class="code-example">
+def tanh(x):
+    return np.tanh(x)
+    
+# Properties:
+# ✓ Zero-centered output (-1, 1)
+# ✓ Smooth gradient
+# ✗ Still has vanishing gradient
+# ✗ Computationally expensive
+                                </div>
+                            </div>
+                            
+                            <h3>Modern Activation Functions</h3>
+                            
+                            <div class="example-box">
+                                <strong>Leaky ReLU</strong>
+                                <div class="formula">f(x) = max(0.01x, x)</div>
+                                <p>Solves dying ReLU problem with small negative slope</p>
+                                
+                                <strong>ELU (Exponential Linear Unit)</strong>
+                                <div class="formula">f(x) = x if x > 0, else α(eˣ - 1)</div>
+                                <p>Smooth, zero-centered, handles negative inputs</p>
+                                
+                                <strong>Swish</strong>
+                                <div class="formula">f(x) = x · sigmoid(x)</div>
+                                <p>Discovered by neural architecture search, smooth everywhere</p>
+                            </div>
+                            
+                            <h3>Choosing Activation Functions</h3>
+                            <div class="code-example">
+# Typical choices by layer type
+model = nn.Sequential(
+    # Hidden layers: ReLU family
+    nn.Linear(784, 256),
+    nn.ReLU(),  # or LeakyReLU, ELU, GELU
+    
+    nn.Linear(256, 128),
+    nn.ReLU(),
+    
+    # Output layer: Task-dependent
+    nn.Linear(128, 10),
+    # Regression: None (linear)
+    # Binary classification: nn.Sigmoid()
+    # Multi-class: nn.Softmax(dim=1)
+)
+                            </div>
+                            
+                            <h3>Activation Function Properties</h3>
+                            <ul>
+                                <li><strong>Non-linearity:</strong> Enables complex function approximation</li>
+                                <li><strong>Differentiability:</strong> Required for backpropagation</li>
+                                <li><strong>Monotonicity:</strong> Helps with convergence</li>
+                                <li><strong>Range:</strong> Affects gradient flow and stability</li>
+                                <li><strong>Computational efficiency:</strong> Speed matters at scale</li>
+                            </ul>
+                            
+                            <h3>The Power of Non-linearity</h3>
+                            <div class="formula">
+                                Linear layers only: f(f(f(x))) = Ax + b (still linear!)<br>
+                                With activations: Can approximate any continuous function
+                            </div>
+                        `
+                    }
+                };
+                
+                const detail = artFeatureDetails[feature];
+                if (detail) {
+                    openModal(detail.title, detail.content);
+                }
+            });
+        });
+
+        // Interactive table rows with detailed modals
+        const tableDetails = {
+            'Signal Type': {
+                title: 'Signal Type Comparison',
+                content: `
+                    <h3>How Neurons Communicate</h3>
+                    
+                    <div class="comparison-box">
+                        <div class="comparison-item bio-comparison">
+                            <h4>🧠 Biological: Electrochemical Impulses</h4>
+                            <p>Biological neurons communicate through action potentials - electrical signals that travel down the axon at speeds of 1-120 m/s.</p>
+                            <ul>
+                                <li><strong>Ions:</strong> Na⁺, K⁺, Ca²⁺, Cl⁻ flow through channels</li>
+                                <li><strong>Voltage:</strong> -70mV (resting) to +40mV (action potential)</li>
+                                <li><strong>All-or-nothing:</strong> Signal fires completely or not at all</li>
+                                <li><strong>Refractory period:</strong> ~1-2ms recovery time</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="comparison-item art-comparison">
+                            <h4>🤖 Artificial: Numerical Values</h4>
+                            <p>Artificial neurons process decimal numbers, typically normalized between 0-1 or -1 to 1 for computational efficiency.</p>
+                            <ul>
+                                <li><strong>Format:</strong> Floating-point numbers (32/64-bit)</li>
+                                <li><strong>Range:</strong> Can be any real number</li>
+                                <li><strong>Continuous:</strong> Smooth gradients, not binary</li>
+                                <li><strong>Instant:</strong> No refractory period needed</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h3>Signal Propagation Example</h3>
+                    <div class="code-example">
+# Biological neuron simulation
+if membrane_potential > threshold:
+    fire_action_potential()
+    release_neurotransmitters()
+    enter_refractory_period()
+
+# Artificial neuron computation
+output = activation_function(sum(inputs * weights) + bias)
+# Example: output = relu(0.5*0.3 + 0.8*0.7 + 0.2*0.1 + 0.1) = 0.83
+                    </div>
+                    
+                    <h3>Key Implications</h3>
+                    <ul>
+                        <li><strong>Speed:</strong> Electronic signals are ~1 million times faster than biological</li>
+                        <li><strong>Energy:</strong> Biological neurons are incredibly energy-efficient</li>
+                        <li><strong>Noise:</strong> Biological systems handle noise better through redundancy</li>
+                        <li><strong>Precision:</strong> Artificial neurons can compute with arbitrary precision</li>
+                    </ul>
+                `
+            },
+            'Processing': {
+                title: 'Processing Mechanisms',
+                content: `
+                    <h3>How Neurons Process Information</h3>
+                    
+                    <div class="comparison-box">
+                        <div class="comparison-item bio-comparison">
+                            <h4>🧠 Biological: Complex Biochemical Reactions</h4>
+                            <p>A symphony of molecular interactions governs biological neuron behavior:</p>
+                            <ul>
+                                <li><strong>Neurotransmitters:</strong> 100+ types (dopamine, serotonin, GABA)</li>
+                                <li><strong>Receptors:</strong> Ionotropic and metabotropic</li>
+                                <li><strong>Ion channels:</strong> Voltage-gated, ligand-gated</li>
+                                <li><strong>Second messengers:</strong> cAMP, Ca²⁺ cascades</li>
+                                <li><strong>Gene expression:</strong> Long-term changes</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="comparison-item art-comparison">
+                            <h4>🤖 Artificial: Mathematical Operations</h4>
+                            <p>Simple, deterministic calculations that can be parallelized:</p>
+                            <ul>
+                                <li><strong>Multiplication:</strong> Input × weight</li>
+                                <li><strong>Addition:</strong> Sum all products + bias</li>
+                                <li><strong>Activation:</strong> Non-linear transformation</li>
+                                <li><strong>Derivatives:</strong> For learning via backprop</li>
+                                <li><strong>Matrix ops:</strong> Efficient batch processing</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h3>Processing Pipeline Comparison</h3>
+                    
+                    <h4>Biological Processing Steps:</h4>
+                    <ol>
+                        <li>Neurotransmitter binding to receptors</li>
+                        <li>Ion channel opening/closing</li>
+                        <li>Membrane potential change</li>
+                        <li>Spatial/temporal summation</li>
+                        <li>Action potential generation (if threshold met)</li>
+                        <li>Calcium influx triggers vesicle release</li>
+                    </ol>
+                    
+                    <h4>Artificial Processing Steps:</h4>
+                    <div class="code-example">
+# Step-by-step artificial neuron computation
+# 1. Receive inputs
+inputs = np.array([0.5, 0.8, -0.3, 0.9])
+weights = np.array([0.2, -0.5, 0.7, 0.3])
+bias = 0.1
+
+# 2. Weighted sum
+weighted_sum = np.dot(inputs, weights) + bias
+# = (0.5*0.2) + (0.8*-0.5) + (-0.3*0.7) + (0.9*0.3) + 0.1
+# = 0.1 - 0.4 - 0.21 + 0.27 + 0.1 = -0.14
+
+# 3. Apply activation function
+output = activation_function(weighted_sum)
+# ReLU: max(0, -0.14) = 0
+# Sigmoid: 1/(1 + e^0.14) = 0.465
+                    </div>
+                    
+                    <h3>Complexity vs Efficiency Trade-offs</h3>
+                    <ul>
+                        <li><strong>Biological:</strong> Handles uncertainty, context, and ambiguity naturally</li>
+                        <li><strong>Artificial:</strong> Excels at precise, repetitive calculations</li>
+                        <li><strong>Biological:</strong> Self-repairing and adaptive</li>
+                        <li><strong>Artificial:</strong> Requires explicit training procedures</li>
+                    </ul>
+                `
+            },
+            'Speed': {
+                title: 'Processing Speed Comparison',
+                content: `
+                    <h3>The Speed of Thought vs Computation</h3>
+                    
+                    <div class="comparison-box">
+                        <div class="comparison-item bio-comparison">
+                            <h4>🧠 Biological: Milliseconds</h4>
+                            <p>Biological neurons operate on a timescale evolved for survival:</p>
+                            <ul>
+                                <li><strong>Action potential:</strong> ~1-2 ms duration</li>
+                                <li><strong>Synaptic delay:</strong> ~0.5-5 ms</li>
+                                <li><strong>Conduction velocity:</strong> 1-120 m/s</li>
+                                <li><strong>Refractory period:</strong> ~1-2 ms</li>
+                                <li><strong>Integration time:</strong> 10-100 ms</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="comparison-item art-comparison">
+                            <h4>🤖 Artificial: Nanoseconds</h4>
+                            <p>Electronic circuits operate near the speed of light:</p>
+                            <ul>
+                                <li><strong>Gate delay:</strong> ~1-10 ns</li>
+                                <li><strong>Memory access:</strong> ~10-100 ns</li>
+                                <li><strong>Float operation:</strong> ~1-10 ns</li>
+                                <li><strong>Signal speed:</strong> ~200,000 km/s in silicon</li>
+                                <li><strong>No recovery needed:</strong> Instant reset</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h3>Real-World Performance Examples</h3>
+                    
+                    <div class="example-box">
+                        <strong>Visual Processing Task: Recognizing a Face</strong>
+                        <p><strong>Human Brain:</strong> ~100-200 ms from photon to recognition<br>
+                        • Involves ~10-20 synaptic steps through visual cortex<br>
+                        • Processes entire scene context simultaneously</p>
+                        
+                        <p><strong>GPU Neural Network:</strong> ~10-50 ms for inference<br>
+                        • Requires 50-100 layer computations<br>
+                        • Can process 1000s of images per second in batches</p>
+                    </div>
+                    
+                    <h3>The Paradox: Slow but Powerful</h3>
+                    <p>Despite being ~1 million times slower, biological neurons achieve remarkable feats through:</p>
+                    
+                    <ul>
+                        <li><strong>Massive Parallelism:</strong> 86 billion neurons working together</li>
+                        <li><strong>Event-driven:</strong> Only active neurons consume energy</li>
+                        <li><strong>Analog computation:</strong> Infinite precision in principle</li>
+                        <li><strong>3D connectivity:</strong> Each neuron connects to ~10,000 others</li>
+                    </ul>
+                    
+                    <h3>Speed in Context</h3>
+                    <div class="formula">
+                        Biological Neural Network:<br>
+                        Low speed × Massive parallelism × Rich connectivity = Intelligence<br><br>
+                        
+                        Artificial Neural Network:<br>
+                        High speed × Limited parallelism × Simple connectivity = Computation
+                    </div>
+                    
+                    <h3>Future Directions</h3>
+                    <ul>
+                        <li><strong>Neuromorphic chips:</strong> Hardware mimicking biological timing</li>
+                        <li><strong>Spiking neural networks:</strong> Time-based computation</li>
+                        <li><strong>Quantum neural networks:</strong> Exploiting quantum parallelism</li>
+                    </ul>
+                `
+            },
+            'Energy': {
+                title: 'Energy Efficiency Comparison',
+                content: `
+                    <h3>The Energy Economics of Intelligence</h3>
+                    
+                    <div class="comparison-box">
+                        <div class="comparison-item bio-comparison">
+                            <h4>🧠 Biological: ~20 Watts</h4>
+                            <p>The human brain is remarkably energy-efficient:</p>
+                            <ul>
+                                <li><strong>Total consumption:</strong> 20W (12W for neurons)</li>
+                                <li><strong>Per neuron:</strong> ~10⁻⁹ watts</li>
+                                <li><strong>Efficiency:</strong> 10⁶ operations per joule</li>
+                                <li><strong>Fuel:</strong> Glucose and oxygen</li>
+                                <li><strong>Always on:</strong> No sleep mode for neurons</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="comparison-item art-comparison">
+                            <h4>🤖 Artificial: Varies (often much higher)</h4>
+                            <p>Modern AI systems consume significant power:</p>
+                            <ul>
+                                <li><strong>Smartphone AI:</strong> 1-5W</li>
+                                <li><strong>Desktop GPU:</strong> 200-400W</li>
+                                <li><strong>Data center:</strong> Megawatts</li>
+                                <li><strong>Per operation:</strong> ~10⁻¹² joules</li>
+                                <li><strong>Cooling needs:</strong> Often equals computation</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h3>Energy Usage Breakdown</h3>
+                    
+                    <h4>Where Biological Brains Spend Energy:</h4>
+                    <div class="example-box">
+                        <strong>Resting Potential Maintenance: 50%</strong>
+                        <p>• Na⁺/K⁺ pumps constantly working<br>
+                        • Maintaining -70mV potential<br>
+                        • 3 Na⁺ out, 2 K⁺ in per ATP</p>
+                        
+                        <strong>Action Potentials: 25%</strong>
+                        <p>• Restoring ion gradients<br>
+                        • Neurotransmitter recycling<br>
+                        • Calcium pumping</p>
+                        
+                        <strong>Synaptic Transmission: 25%</strong>
+                        <p>• Vesicle recycling<br>
+                        • Neurotransmitter synthesis<br>
+                        • Receptor trafficking</p>
+                    </div>
+                    
+                    <h4>Where Artificial Systems Spend Energy:</h4>
+                    <div class="code-example">
+# Energy cost breakdown for neural network inference
+# Example: ResNet-50 on ImageNet
+
+Total energy: 0.23 Joules per image
+├── Memory access: 45% (0.104 J)
+│   ├── DRAM reads: 60%
+│   └── Cache operations: 40%
+├── Computation: 35% (0.081 J)
+│   ├── Convolutions: 80%
+│   └── Fully connected: 20%
+└── Data movement: 20% (0.046 J)
+    ├── On-chip communication: 70%
+    └── Off-chip I/O: 30%
+                    </div>
+                    
+                    <h3>Efficiency Metrics Comparison</h3>
+                    
+                    <div class="formula">
+                        Biological Efficiency:<br>
+                        10¹⁶ synaptic operations/second ÷ 20W = 5×10¹⁴ ops/watt<br><br>
+                        
+                        Modern GPU (A100):<br>
+                        10¹⁴ operations/second ÷ 400W = 2.5×10¹¹ ops/watt<br><br>
+                        
+                        Gap: ~2000× more efficient!
+                    </div>
+                    
+                    <h3>Why Biology Wins on Efficiency</h3>
+                    <ul>
+                        <li><strong>Event-driven:</strong> Only active neurons consume power</li>
+                        <li><strong>Analog computation:</strong> No digital conversion overhead</li>
+                        <li><strong>3D architecture:</strong> Minimal wire length</li>
+                        <li><strong>In-memory computing:</strong> No von Neumann bottleneck</li>
+                        <li><strong>Optimized over evolution:</strong> 500 million years of R&D</li>
+                    </ul>
+                    
+                    <h3>Future Efficient AI Approaches</h3>
+                    <ul>
+                        <li><strong>Neuromorphic computing:</strong> Intel Loihi, IBM TrueNorth</li>
+                        <li><strong>Analog AI chips:</strong> In-memory computation</li>
+                        <li><strong>Sparsity exploitation:</strong> Only compute non-zeros</li>
+                        <li><strong>Quantization:</strong> Lower precision = less energy</li>
+                        <li><strong>Edge computing:</strong> Process data where created</li>
+                    </ul>
+                `
+            },
+            'Plasticity': {
+                title: 'Learning and Adaptation',
+                content: `
+                    <h3>How Neurons Learn and Adapt</h3>
+                    
+                    <div class="comparison-box">
+                        <div class="comparison-item bio-comparison">
+                            <h4>🧠 Biological: Continuous Adaptation</h4>
+                            <p>Biological brains never stop changing:</p>
+                            <ul>
+                                <li><strong>Synaptic plasticity:</strong> Strength changes in minutes</li>
+                                <li><strong>Structural plasticity:</strong> New connections form/prune</li>
+                                <li><strong>Neurogenesis:</strong> New neurons throughout life</li>
+                                <li><strong>Homeostatic:</strong> Self-regulating stability</li>
+                                <li><strong>Sleep consolidation:</strong> Offline learning</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="comparison-item art-comparison">
+                            <h4>🤖 Artificial: Adjusted Through Training</h4>
+                            <p>Learning happens in distinct phases:</p>
+                            <ul>
+                                <li><strong>Training phase:</strong> Weights updated via backprop</li>
+                                <li><strong>Validation:</strong> Hyperparameter tuning</li>
+                                <li><strong>Deployment:</strong> Weights typically frozen</li>
+                                <li><strong>Fine-tuning:</strong> Occasional updates</li>
+                                <li><strong>Transfer learning:</strong> Reuse learned features</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h3>Mechanisms of Plasticity</h3>
+                    
+                    <h4>Biological Learning Rules:</h4>
+                    <div class="example-box">
+                        <strong>Hebbian Learning: "Cells that fire together, wire together"</strong>
+                        <p>When neuron A repeatedly causes neuron B to fire, their connection strengthens.</p>
+                        
+                        <strong>Spike-Timing Dependent Plasticity (STDP)</strong>
+                        <p>• Pre before post: Strengthen (LTP)<br>
+                        • Post before pre: Weaken (LTD)<br>
+                        • Window: ~20ms</p>
+                        
+                        <strong>Homeostatic Plasticity</strong>
+                        <p>Neurons adjust their overall excitability to maintain stable firing rates.</p>
+                    </div>
+                    
+                    <h4>Artificial Learning Algorithms:</h4>
+                    <div class="code-example">
+# Gradient descent weight update
+for epoch in range(num_epochs):
+    for batch in data_loader:
+        # Forward pass
+        output = model(batch.input)
+        loss = criterion(output, batch.target)
+        
+        # Backward pass
+        loss.backward()  # Compute gradients
+        
+        # Update weights
+        for param in model.parameters():
+            param.data -= learning_rate * param.grad
+            
+        # Clear gradients
+        optimizer.zero_grad()
+
+# Advanced optimizers (Adam, RMSprop) adapt learning rates
+# per parameter based on gradient history
+                    </div>
+                    
+                    <h3>Time Scales of Learning</h3>
+                    
+                    <div class="formula">
+                        Biological Time Scales:<br>
+                        • Milliseconds: Short-term potentiation<br>
+                        • Minutes-hours: Long-term potentiation<br>
+                        • Days-weeks: Structural changes<br>
+                        • Months-years: Major rewiring<br><br>
+                        
+                        Artificial Time Scale:<br>
+                        • Minutes-days: Full training<br>
+                        • Seconds: Fine-tuning<br>
+                        • Frozen after deployment
+                    </div>
+                    
+                    <h3>Online vs Offline Learning</h3>
+                    
+                    <ul>
+                        <li><strong>Biological:</strong> Learns continuously from every experience</li>
+                        <li><strong>Artificial:</strong> Typically batch learning on datasets</li>
+                    </ul>
+                    
+                    <h3>Catastrophic Forgetting</h3>
+                    <p>A key difference in learning dynamics:</p>
+                    
+                    <ul>
+                        <li><strong>Biological:</strong> Can learn new skills without forgetting old ones</li>
+                        <li><strong>Artificial:</strong> Often forgets previous tasks when learning new ones</li>
+                    </ul>
+                    
+                    <h3>Future Directions</h3>
+                    <ul>
+                        <li><strong>Continual learning:</strong> AI that learns without forgetting</li>
+                        <li><strong>Meta-learning:</strong> Learning how to learn</li>
+                        <li><strong>Few-shot learning:</strong> Learning from minimal examples</li>
+                        <li><strong>Neuroplasticity-inspired algorithms:</strong> More biological realism</li>
+                    </ul>
+                `
+            },
+            'Connections': {
+                title: 'Neural Connectivity',
+                content: `
+                    <h3>The Architecture of Neural Networks</h3>
+                    
+                    <div class="comparison-box">
+                        <div class="comparison-item bio-comparison">
+                            <h4>🧠 Biological: ~10,000 Connections per Neuron</h4>
+                            <p>The human brain's connectivity is staggeringly complex:</p>
+                            <ul>
+                                <li><strong>Total synapses:</strong> ~100 trillion</li>
+                                <li><strong>Connection types:</strong> Excitatory (80%), Inhibitory (20%)</li>
+                                <li><strong>3D structure:</strong> Connections in all directions</li>
+                                <li><strong>Dynamic:</strong> Connections form and prune constantly</li>
+                                <li><strong>Local circuits:</strong> Most connections are nearby</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="comparison-item art-comparison">
+                            <h4>🤖 Artificial: Typically Dozens to Hundreds</h4>
+                            <p>Artificial networks have structured, limited connectivity:</p>
+                            <ul>
+                                <li><strong>Fully connected:</strong> Each neuron to all in next layer</li>
+                                <li><strong>Convolutional:</strong> Local receptive fields</li>
+                                <li><strong>Sparse:</strong> Selected connections only</li>
+                                <li><strong>Fixed:</strong> Architecture predetermined</li>
+                                <li><strong>2D constraints:</strong> Limited by chip design</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h3>Connectivity Patterns</h3>
+                    
+                    <h4>Biological Brain Circuits:</h4>
+                    <div class="example-box">
+                        <strong>Cortical Microcolumns</strong>
+                        <p>• ~100 neurons per column<br>
+                        • Vertical organization through 6 layers<br>
+                        • Lateral inhibition between columns<br>
+                        • Recurrent connections within column</p>
+                        
+                        <strong>Small-World Network</strong>
+                        <p>• High clustering coefficient<br>
+                        • Short average path length<br>
+                        • Hub neurons with many connections<br>
+                        • Efficient information transfer</p>
+                    </div>
+                    
+                    <h4>Artificial Network Architectures:</h4>
+                    <div class="code-example">
+# Different connectivity patterns in PyTorch
+
+# 1. Fully Connected (Dense)
+fc_layer = nn.Linear(in_features=784, out_features=128)
+# Connections: 784 × 128 = 100,352
+
+# 2. Convolutional (Local)
+conv_layer = nn.Conv2d(in_channels=3, out_channels=64, kernel_size=3)
+# Connections per output: 3 × 3 × 3 = 27
+
+# 3. Recurrent (Temporal)
+rnn_layer = nn.LSTM(input_size=100, hidden_size=256)
+# Connections: 100 × 256 + 256 × 256 (recurrent)
+
+# 4. Attention (All-to-all)
+attention = nn.MultiheadAttention(embed_dim=512, num_heads=8)
+# Dynamic connections based on input
+                    </div>
+                    
+                    <h3>Connection Strengths</h3>
+                    
+                    <div class="formula">
+                        Biological Synapses:<br>
+                        • Weight range: 0.1 - 10 (relative units)<br>
+                        • Distribution: Log-normal<br>
+                        • Changes: Continuous, activity-dependent<br><br>
+                        
+                        Artificial Weights:<br>
+                        • Weight range: Typically [-1, 1] after init<br>
+                        • Distribution: Normal or uniform<br>
+                        • Changes: Gradient-based updates
+                    </div>
+                    
+                    <h3>The Connectivity Challenge</h3>
+                    
+                    <p>Why can't we just copy biological connectivity?</p>
+                    <ul>
+                        <li><strong>Memory limitations:</strong> 10,000 connections × 86B neurons = impossible to store</li>
+                        <li><strong>Computational cost:</strong> O(n²) complexity for full connectivity</li>
+                        <li><strong>Training difficulty:</strong> More connections = harder optimization</li>
+                        <li><strong>Hardware constraints:</strong> 2D chips vs 3D brains</li>
+                    </ul>
+                    
+                    <h3>Innovative Connectivity Solutions</h3>
+                    
+                    <ul>
+                        <li><strong>Sparse networks:</strong> 90%+ connections can be pruned</li>
+                        <li><strong>Skip connections:</strong> ResNet-style shortcuts</li>
+                        <li><strong>Attention mechanisms:</strong> Dynamic connectivity</li>
+                        <li><strong>Graph neural networks:</strong> Arbitrary connectivity</li>
+                        <li><strong>Neuromorphic hardware:</strong> 3D crossbar arrays</li>
+                    </ul>
+                    
+                    <h3>Future: Bridging the Gap</h3>
+                    <div class="example-box">
+                        <strong>Brain-Inspired Architectures</strong>
+                        <p>• Hierarchical modular networks<br>
+                        • Local learning rules<br>
+                        • Dynamic rewiring during training<br>
+                        • Biologically plausible credit assignment</p>
+                    </div>
+                `
+            }
+        };
+
+        // Interactive table rows
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('click', function() {
+                const aspect = this.cells[0].textContent.trim();
+                const detail = tableDetails[aspect];
+                
+                if (detail) {
+                    openModal(detail.title, detail.content);
+                }
+            });
+        });
+
+        // Initialize
+        createFloatingElements();
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                window.location.href = 'Week1_Slide3.html';
+            } else if (e.key === 'ArrowLeft') {
+                window.location.href = 'Week1_Slide1.html';
+            }
+        });
+    </script>
+</body>
+</html>

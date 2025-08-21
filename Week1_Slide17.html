@@ -1,0 +1,2034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS5720 - Setting Up Your First Neural Network</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .slide-container {
+            flex: 1;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .slide-title {
+            font-size: 3.5em;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #16a34a;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: slideInFromTop 1.2s ease-out;
+            font-weight: 700;
+        }
+
+        .setup-workflow {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .step-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            border: 1px solid rgba(22, 163, 74, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: slideInFromLeft 1s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(22, 163, 74, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .step-card:hover::before {
+            left: 100%;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(22, 163, 74, 0.15);
+            border-color: #22c55e;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.3);
+        }
+
+        .step-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #064e3b;
+            flex: 1;
+        }
+
+        .step-status {
+            padding: 8px 16px;
+            background: rgba(22, 163, 74, 0.1);
+            color: #064e3b;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .step-description {
+            color: #475569;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .step-preview {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin-top: 15px;
+        }
+
+        .quick-start-section {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromRight 1s ease-out 0.3s both;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            margin-top: 30px;
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: #1e40af;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            border-radius: 2px;
+        }
+
+        .quick-demo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .demo-panel {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .demo-title {
+            font-size: 1.3em;
+            color: #1e40af;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .code-editor {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 15px 0;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .code-editor::before {
+            content: '●●●';
+            position: absolute;
+            top: 8px;
+            left: 15px;
+            color: #64748b;
+            font-size: 1.2em;
+        }
+
+        .code-content {
+            margin-top: 25px;
+        }
+
+        .run-button {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 15px 0;
+        }
+
+        .run-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.3);
+        }
+
+        .output-panel {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #16a34a;
+            margin-top: 15px;
+        }
+
+        .checklist {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .checklist-item {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checklist-item:hover {
+            border-color: #22c55e;
+            transform: translateY(-2px);
+        }
+
+        .checklist-item.completed {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border-color: #16a34a;
+        }
+
+        .checklist-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #16a34a;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .checkbox.checked {
+            background: #16a34a;
+            color: white;
+        }
+
+        .interactive-builder {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromBottom 1s ease-out 0.6s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+            margin-top: 30px;
+        }
+
+        .builder-controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-label {
+            font-weight: 600;
+            color: #064e3b;
+        }
+
+        .control-input {
+            padding: 8px 12px;
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            border-radius: 8px;
+            text-align: center;
+            width: 80px;
+        }
+
+        .network-visualization {
+            width: 100%;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            border-radius: 30px;
+            color: #1e293b;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(22, 163, 74, 0.4);
+        }
+
+        .slide-number, .course-info {
+            position: fixed;
+            top: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .slide-number { right: 30px; }
+        .course-info { left: 30px; }
+
+        @keyframes slideInFromTop {
+            from { transform: translateY(-80px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromLeft {
+            from { transform: translateX(-60px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromRight {
+            from { transform: translateX(60px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromBottom {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-backdrop.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            color: #064e3b;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(22, 163, 74, 0.1);
+            color: #064e3b;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #334155;
+        }
+
+        .modal-body h3 {
+            color: #16a34a;
+            font-size: 1.4em;
+            margin: 25px 0 15px 0;
+            font-weight: 600;
+        }
+
+        .modal-body h3:first-child {
+            margin-top: 0;
+        }
+
+        .modal-body p {
+            margin-bottom: 15px;
+        }
+
+        .modal-body ul, .modal-body ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+
+        .modal-body li {
+            margin-bottom: 8px;
+        }
+
+        .modal-code {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            overflow-x: auto;
+        }
+
+        .modal-example {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #16a34a;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fef3c7, #fcd34d);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #f59e0b;
+        }
+
+        @media (max-width: 768px) {
+            .quick-demo { grid-template-columns: 1fr; }
+            .slide-title { font-size: 2.5em; }
+            .builder-controls { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="course-info">CS5720 - Week 1</div>
+    <div class="slide-number">Slide 17 of 20</div>
+    
+    <div class="slide-container">
+        <h1 class="slide-title">Setting Up Your First Neural Network</h1>
+        
+        <div class="setup-workflow">
+            <div class="step-card" onclick="showStepDetails('environment')" style="animation-delay: 0.1s;">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Environment Setup</div>
+                    <div class="step-status">Essential</div>
+                </div>
+                <div class="step-description">
+                    Install Python, essential libraries, and development tools. Get your workspace ready for neural network development.
+                </div>
+                <div class="step-preview">pip install tensorflow numpy pandas matplotlib</div>
+            </div>
+
+            <div class="step-card" onclick="showStepDetails('data')" style="animation-delay: 0.2s;">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Data Preparation</div>
+                    <div class="step-status">Critical</div>
+                </div>
+                <div class="step-description">
+                    Load, explore, and preprocess your dataset. Split into training and testing sets for proper evaluation.
+                </div>
+                <div class="step-preview">X_train, X_test, y_train, y_test = train_test_split(...)</div>
+            </div>
+
+            <div class="step-card" onclick="showStepDetails('architecture')" style="animation-delay: 0.3s;">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Define Architecture</div>
+                    <div class="step-status">Design</div>
+                </div>
+                <div class="step-description">
+                    Choose number of layers, neurons, and activation functions. Start simple and iterate based on performance.
+                </div>
+                <div class="step-preview">model = Sequential([Dense(128, activation='relu'), ...])</div>
+            </div>
+
+            <div class="step-card" onclick="showStepDetails('compilation')" style="animation-delay: 0.4s;">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <div class="step-title">Compile Model</div>
+                    <div class="step-status">Configuration</div>
+                </div>
+                <div class="step-description">
+                    Select optimizer, loss function, and metrics. These choices significantly impact training performance.
+                </div>
+                <div class="step-preview">model.compile(optimizer='adam', loss='mse', metrics=['mae'])</div>
+            </div>
+
+            <div class="step-card" onclick="showStepDetails('training')" style="animation-delay: 0.5s;">
+                <div class="step-header">
+                    <div class="step-number">5</div>
+                    <div class="step-title">Train & Evaluate</div>
+                    <div class="step-status">Execute</div>
+                </div>
+                <div class="step-description">
+                    Fit the model to training data and monitor performance. Use validation data to tune hyperparameters.
+                </div>
+                <div class="step-preview">history = model.fit(X_train, y_train, validation_split=0.2)</div>
+            </div>
+        </div>
+
+        <div class="quick-start-section">
+            <h2 class="section-title">🚀 Quick Start Demo</h2>
+            
+            <div class="quick-demo">
+                <div class="demo-panel">
+                    <div class="demo-title">
+                        <span>💻</span> Live Code Editor
+                    </div>
+                    <div class="code-editor">
+                        <div class="code-content" id="codeContent">
+import tensorflow as tf
+from tensorflow import keras
+import numpy as np
+
+# Generate sample data
+X = np.random.random((1000, 10))
+y = np.random.random((1000, 1))
+
+# Build model
+model = keras.Sequential([
+    keras.layers.Dense(64, activation='relu'),
+    keras.layers.Dense(32, activation='relu'),
+    keras.layers.Dense(1, activation='linear')
+])
+
+# Compile
+model.compile(optimizer='adam',
+              loss='mse',
+              metrics=['mae'])
+
+# Train
+history = model.fit(X, y, 
+                    epochs=50, 
+                    validation_split=0.2,
+                    verbose=0)
+
+print(f"Final loss: {history.history['loss'][-1]:.4f}")
+                        </div>
+                    </div>
+                    <button class="run-button" onclick="runDemo()">▶ Run Code</button>
+                    <div class="output-panel" id="outputPanel" style="display: none;">
+                        <strong>Output:</strong><br>
+                        <span id="demoOutput"></span>
+                    </div>
+                </div>
+
+                <div class="demo-panel">
+                    <div class="demo-title">
+                        <span>📊</span> Training Progress
+                    </div>
+                    <canvas id="progressChart" width="300" height="200" style="border: 1px solid #ccc; border-radius: 8px; background: white;"></canvas>
+                    <div style="margin-top: 15px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9em; color: #64748b;">
+                            <span>Epoch: <span id="currentEpoch">0</span>/50</span>
+                            <span>Loss: <span id="currentLoss">--</span></span>
+                        </div>
+                        <div style="width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; margin-top: 8px;">
+                            <div id="progressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #16a34a, #22c55e); border-radius: 4px; transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checklist">
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checklist-header">
+                        <div class="checkbox" id="check1">✓</div>
+                        <strong>Install TensorFlow</strong>
+                    </div>
+                    <div>Get TensorFlow 2.x installed and verify GPU support if available</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checklist-header">
+                        <div class="checkbox" id="check2"></div>
+                        <strong>Load Sample Data</strong>
+                    </div>
+                    <div>Import a simple dataset like MNIST or create synthetic data</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checklist-header">
+                        <div class="checkbox" id="check3"></div>
+                        <strong>Build First Model</strong>
+                    </div>
+                    <div>Create a simple 2-3 layer neural network with ReLU activations</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checklist-header">
+                        <div class="checkbox" id="check4"></div>
+                        <strong>Train & Validate</strong>
+                    </div>
+                    <div>Fit the model and monitor training/validation loss curves</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checklist-header">
+                        <div class="checkbox" id="check5"></div>
+                        <strong>Make Predictions</strong>
+                    </div>
+                    <div>Use trained model to make predictions on new data</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checklist-header">
+                        <div class="checkbox" id="check6"></div>
+                        <strong>Visualize Results</strong>
+                    </div>
+                    <div>Plot training curves and analyze model performance</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="interactive-builder">
+            <h2 class="section-title" style="color: #064e3b;">🏗️ Interactive Network Builder</h2>
+            
+            <div class="builder-controls">
+                <div class="control-group">
+                    <div class="control-label">Input Size</div>
+                    <input type="number" class="control-input" id="inputSize" value="10" min="1" max="100" onchange="updateNetwork()">
+                </div>
+                <div class="control-group">
+                    <div class="control-label">Hidden Layers</div>
+                    <input type="number" class="control-input" id="hiddenLayers" value="2" min="1" max="5" onchange="updateNetwork()">
+                </div>
+                <div class="control-group">
+                    <div class="control-label">Neurons per Layer</div>
+                    <input type="number" class="control-input" id="neuronsPerLayer" value="64" min="8" max="512" onchange="updateNetwork()">
+                </div>
+                <div class="control-group">
+                    <div class="control-label">Output Size</div>
+                    <input type="number" class="control-input" id="outputSize" value="1" min="1" max="10" onchange="updateNetwork()">
+                </div>
+            </div>
+
+            <div class="network-visualization" id="networkViz">
+                <!-- Network visualization will be rendered here -->
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="run-button" onclick="generateCode()">📄 Generate Code</button>
+                <button class="run-button" onclick="showArchitectureDetails()" style="background: linear-gradient(135deg, #3b82f6, #60a5fa);">📋 Architecture Details</button>
+            </div>
+
+            <div id="generatedCode" style="display: none;">
+                <h3 style="color: #064e3b; margin: 20px 0 10px 0;">Generated TensorFlow Code:</h3>
+                <div class="code-editor">
+                    <div class="code-content" id="generatedCodeContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <a href="Week1_Slide16.html" class="nav-btn">← Previous</a>
+        <a href="Week1_Slide18.html" class="nav-btn">Next →</a>
+    </div>
+
+    <div style="position: fixed; bottom: 30px; left: 30px; color: #64748b; font-size: 0.9em;">
+        <strong>Prepared by Dr. Gorkem Kar</strong>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal-backdrop" id="modalBackdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Modal Title</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                Modal content goes here...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isTraining = false;
+        
+        // Step details
+        const stepDetails = {
+            environment: {
+                title: 'Environment Setup - Getting Started',
+                content: `
+                    <h3>Python Installation</h3>
+                    <p>Neural networks require Python 3.7+ with scientific computing libraries. Here's the complete setup process:</p>
+                    
+                    <div class="modal-example">
+                        <strong>Recommended Python Distribution:</strong><br>
+                        • Anaconda (includes most packages)<br>
+                        • Miniconda (minimal installation)<br>
+                        • Standard Python + pip (manual installation)
+                    </div>
+                    
+                    <h3>Essential Libraries</h3>
+                    
+                    <div class="modal-code">
+# Core libraries for neural networks
+pip install tensorflow>=2.8.0     # Main deep learning framework
+pip install numpy>=1.19.0         # Numerical computing
+pip install pandas>=1.3.0         # Data manipulation
+pip install matplotlib>=3.3.0     # Plotting and visualization
+pip install scikit-learn>=1.0.0   # Machine learning utilities
+pip install jupyter               # Interactive notebooks
+
+# Optional but recommended
+pip install seaborn              # Statistical visualization
+pip install plotly              # Interactive plots
+pip install tensorboard         # Training visualization
+                    </div>
+                    
+                    <h3>GPU Support (Optional)</h3>
+                    <p>For faster training, especially with large models:</p>
+                    
+                    <div class="modal-code">
+# Check if GPU is available
+import tensorflow as tf
+print("GPU Available:", tf.config.list_physical_devices('GPU'))
+
+# For NVIDIA GPUs (most common)
+# Install CUDA and cuDNN from NVIDIA
+# TensorFlow will automatically use GPU if available
+                    </div>
+                    
+                    <h3>Development Environment</h3>
+                    
+                    <div class="modal-example">
+                        <strong>Recommended IDEs:</strong><br>
+                        • Jupyter Notebook/Lab (interactive development)<br>
+                        • VS Code with Python extension<br>
+                        • PyCharm Professional<br>
+                        • Google Colab (no installation needed)
+                    </div>
+                    
+                    <h3>Verification Steps</h3>
+                    
+                    <div class="modal-code">
+# Test your installation
+import tensorflow as tf
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+print("TensorFlow version:", tf.__version__)
+print("Numpy version:", np.__version__)
+print("GPU available:", tf.config.list_physical_devices('GPU'))
+
+# Simple test
+x = tf.constant([[1.0, 2.0]])
+y = tf.constant([[3.0], [4.0]])
+result = tf.matmul(x, y)
+print("Test computation:", result.numpy())
+                    </div>
+                    
+                    <h3>Common Issues & Solutions</h3>
+                    
+                    <div class="warning-box">
+                        <strong>ImportError: No module named 'tensorflow'</strong><br>
+                        Solution: Ensure you're using the correct Python environment and TensorFlow is installed
+                    </div>
+                    
+                    <div class="warning-box">
+                        <strong>GPU not detected</strong><br>
+                        Solution: Install CUDA 11.2+ and cuDNN 8.1+, restart Python after installation
+                    </div>
+                    
+                    <h3>Google Colab Alternative</h3>
+                    <p>If installation is problematic, use Google Colab:</p>
+                    <ul>
+                        <li>Go to colab.research.google.com</li>
+                        <li>Free GPU access for learning</li>
+                        <li>All libraries pre-installed</li>
+                        <li>No local setup required</li>
+                    </ul>
+                `
+            },
+            data: {
+                title: 'Data Preparation - Foundation of Success',
+                content: `
+                    <h3>Data: The Foundation of Neural Networks</h3>
+                    <p>Quality data preparation is crucial for neural network success. Here's how to properly prepare your data:</p>
+                    
+                    <h3>1. Data Loading</h3>
+                    
+                    <div class="modal-code">
+import pandas as pd
+import numpy as np
+from sklearn.datasets import load_boston, load_iris
+from sklearn.model_selection import train_test_split
+
+# Option 1: Load built-in datasets
+data = load_iris()
+X, y = data.data, data.target
+
+# Option 2: Load from CSV
+df = pd.read_csv('your_data.csv')
+X = df.drop('target_column', axis=1)
+y = df['target_column']
+
+# Option 3: Create synthetic data for testing
+from sklearn.datasets import make_classification
+X, y = make_classification(n_samples=1000, n_features=10, 
+                          n_classes=2, random_state=42)
+                    </div>
+                    
+                    <h3>2. Data Exploration</h3>
+                    
+                    <div class="modal-code">
+# Basic exploration
+print("Dataset shape:", X.shape)
+print("Target shape:", y.shape)
+print("Features:", X.columns if hasattr(X, 'columns') else 'No column names')
+print("Missing values:", pd.DataFrame(X).isnull().sum())
+
+# Statistical summary
+print(pd.DataFrame(X).describe())
+
+# Visualize data distribution
+import matplotlib.pyplot as plt
+plt.figure(figsize=(12, 4))
+plt.subplot(1, 2, 1)
+plt.hist(y, bins=20)
+plt.title('Target Distribution')
+
+plt.subplot(1, 2, 2)
+pd.DataFrame(X).hist(bins=20, figsize=(10, 8))
+plt.tight_layout()
+plt.show()
+                    </div>
+                    
+                    <h3>3. Data Preprocessing</h3>
+                    
+                    <h4>Scaling/Normalization</h4>
+                    <div class="modal-example">
+                        <strong>Why scale?</strong> Neural networks work best when features are on similar scales. Large values can dominate the learning process.
+                    </div>
+                    
+                    <div class="modal-code">
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+
+# StandardScaler: mean=0, std=1
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# MinMaxScaler: range [0,1]
+scaler = MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Manual normalization
+X_normalized = (X - X.mean()) / X.std()
+                    </div>
+                    
+                    <h4>Handling Categorical Data</h4>
+                    <div class="modal-code">
+# One-hot encoding for categorical features
+from sklearn.preprocessing import OneHotEncoder
+encoder = OneHotEncoder(sparse=False)
+categorical_encoded = encoder.fit_transform(categorical_data)
+
+# Label encoding for target (if categorical)
+from sklearn.preprocessing import LabelEncoder
+label_encoder = LabelEncoder()
+y_encoded = label_encoder.fit_transform(y)
+                    </div>
+                    
+                    <h3>4. Train-Test Split</h3>
+                    
+                    <div class="modal-code">
+# Basic split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# With validation set
+X_train, X_temp, y_train, y_temp = train_test_split(
+    X, y, test_size=0.4, random_state=42
+)
+X_val, X_test, y_val, y_test = train_test_split(
+    X_temp, y_temp, test_size=0.5, random_state=42
+)
+
+# Result: 60% train, 20% validation, 20% test
+print(f"Train: {X_train.shape}, Val: {X_val.shape}, Test: {X_test.shape}")
+                    </div>
+                    
+                    <h3>5. Data Quality Checks</h3>
+                    
+                    <div class="modal-code">
+# Check for common issues
+def data_quality_check(X, y):
+    print("=== Data Quality Report ===")
+    
+    # Missing values
+    missing = pd.DataFrame(X).isnull().sum()
+    if missing.sum() > 0:
+        print(f"⚠️  Missing values found: {missing.sum()}")
+    else:
+        print("✅ No missing values")
+    
+    # Infinite values
+    inf_count = np.isinf(X).sum() if hasattr(X, 'sum') else 0
+    if inf_count > 0:
+        print(f"⚠️  Infinite values: {inf_count}")
+    else:
+        print("✅ No infinite values")
+    
+    # Data types
+    print(f"✅ Data types: {X.dtype if hasattr(X, 'dtype') else 'Mixed'}")
+    
+    # Class balance (for classification)
+    if len(np.unique(y)) < 20:  # Likely classification
+        unique, counts = np.unique(y, return_counts=True)
+        print(f"📊 Class distribution: {dict(zip(unique, counts))}")
+    
+    return True
+
+data_quality_check(X_train, y_train)
+                    </div>
+                    
+                    <h3>Best Practices</h3>
+                    <ul>
+                        <li><strong>Always scale features</strong> for neural networks</li>
+                        <li><strong>Keep test set separate</strong> until final evaluation</li>
+                        <li><strong>Use stratified sampling</strong> for imbalanced datasets</li>
+                        <li><strong>Validate preprocessing</strong> on a small sample first</li>
+                        <li><strong>Save preprocessing objects</strong> for deployment</li>
+                    </ul>
+                    
+                    <div class="modal-example">
+                        <strong>Complete Data Prep Pipeline:</strong><br>
+                        Load → Explore → Clean → Scale → Split → Validate
+                    </div>
+                `
+            },
+            architecture: {
+                title: 'Network Architecture - Design Decisions',
+                content: `
+                    <h3>Designing Your Neural Network Architecture</h3>
+                    <p>Architecture design is both art and science. Here are key decisions and guidelines:</p>
+                    
+                    <h3>1. Number of Layers</h3>
+                    
+                    <div class="modal-example">
+                        <strong>Rule of Thumb:</strong><br>
+                        • 1-2 layers: Simple problems (linear separability)<br>
+                        • 3-5 layers: Most real-world problems<br>
+                        • 6+ layers: Complex problems (images, language)
+                    </div>
+                    
+                    <div class="modal-code">
+# Simple architecture (2 hidden layers)
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(128, activation='relu', input_shape=(10,)),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')  # Binary classification
+])
+
+# Deeper architecture (4 hidden layers)
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(256, activation='relu', input_shape=(100,)),
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(32, activation='relu'),
+    tf.keras.layers.Dense(10, activation='softmax')  # 10-class classification
+])
+                    </div>
+                    
+                    <h3>2. Number of Neurons per Layer</h3>
+                    
+                    <h4>Common Patterns:</h4>
+                    <ul>
+                        <li><strong>Decreasing:</strong> 512 → 256 → 128 → 64 (funnel shape)</li>
+                        <li><strong>Constant:</strong> 128 → 128 → 128 (rectangular)</li>
+                        <li><strong>Increasing then decreasing:</strong> 64 → 128 → 64 (diamond)</li>
+                    </ul>
+                    
+                    <div class="modal-code">
+# Funnel architecture (most common)
+def create_funnel_model(input_dim, num_classes):
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(256, activation='relu', input_shape=(input_dim,)),
+        tf.keras.layers.Dropout(0.3),
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dropout(0.3),
+        tf.keras.layers.Dense(64, activation='relu'),
+        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.Dense(num_classes, activation='softmax')
+    ])
+    return model
+
+# Usage
+model = create_funnel_model(input_dim=100, num_classes=5)
+                    </div>
+                    
+                    <h3>3. Activation Functions</h3>
+                    
+                    <div class="modal-example">
+                        <strong>Activation Function Selection:</strong><br>
+                        • Hidden layers: ReLU (default choice)<br>
+                        • Binary output: Sigmoid<br>
+                        • Multi-class output: Softmax<br>
+                        • Regression output: Linear (no activation)
+                    </div>
+                    
+                    <h3>4. Regularization Techniques</h3>
+                    
+                    <h4>Dropout</h4>
+                    <div class="modal-code">
+# Add dropout to prevent overfitting
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dropout(0.3),  # Drop 30% of neurons randomly
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dropout(0.2),  # Drop 20% of neurons
+    tf.keras.layers.Dense(10, activation='softmax')
+])
+                    </div>
+                    
+                    <h4>Batch Normalization</h4>
+                    <div class="modal-code">
+# Add batch normalization for training stability
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Dense(10, activation='softmax')
+])
+                    </div>
+                    
+                    <h3>5. Architecture Guidelines by Problem Type</h3>
+                    
+                    <h4>Tabular Data Classification</h4>
+                    <div class="modal-code">
+# Good starting point for tabular data
+def create_tabular_classifier(input_dim, num_classes):
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(256, activation='relu', input_shape=(input_dim,)),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Dropout(0.3),
+        
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Dropout(0.3),
+        
+        tf.keras.layers.Dense(64, activation='relu'),
+        tf.keras.layers.Dropout(0.2),
+        
+        tf.keras.layers.Dense(num_classes, activation='softmax')
+    ])
+    return model
+                    </div>
+                    
+                    <h4>Regression Problems</h4>
+                    <div class="modal-code">
+# Architecture for regression
+def create_regression_model(input_dim):
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(128, activation='relu', input_shape=(input_dim,)),
+        tf.keras.layers.Dropout(0.2),
+        
+        tf.keras.layers.Dense(64, activation='relu'),
+        tf.keras.layers.Dropout(0.2),
+        
+        tf.keras.layers.Dense(32, activation='relu'),
+        
+        tf.keras.layers.Dense(1, activation='linear')  # No activation for regression
+    ])
+    return model
+                    </div>
+                    
+                    <h3>6. Model Complexity Guidelines</h3>
+                    
+                    <div class="warning-box">
+                        <strong>Start Simple!</strong><br>
+                        Begin with a simple architecture and gradually increase complexity only if needed.
+                    </div>
+                    
+                    <div class="modal-code">
+# Progressive complexity approach
+
+# Step 1: Baseline (simple)
+model_simple = tf.keras.Sequential([
+    tf.keras.layers.Dense(32, activation='relu'),
+    tf.keras.layers.Dense(num_classes, activation='softmax')
+])
+
+# Step 2: Add depth if underfitting
+model_deeper = tf.keras.Sequential([
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(32, activation='relu'),
+    tf.keras.layers.Dense(num_classes, activation='softmax')
+])
+
+# Step 3: Add regularization if overfitting
+model_regularized = tf.keras.Sequential([
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dropout(0.3),
+    tf.keras.layers.Dense(32, activation='relu'),
+    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Dense(num_classes, activation='softmax')
+])
+                    </div>
+                    
+                    <h3>7. Architecture Debugging</h3>
+                    
+                    <div class="modal-code">
+# Analyze your model architecture
+model.summary()
+
+# Count parameters
+total_params = model.count_params()
+print(f"Total parameters: {total_params:,}")
+
+# Visualize architecture
+tf.keras.utils.plot_model(model, show_shapes=True, show_layer_names=True)
+
+# Check layer outputs
+for i, layer in enumerate(model.layers):
+    print(f"Layer {i}: {layer.name} - Output shape: {layer.output_shape}")
+                    </div>
+                    
+                    <h3>Common Architecture Patterns</h3>
+                    <ul>
+                        <li><strong>Wide and Shallow:</strong> Few layers, many neurons (good for simple problems)</li>
+                        <li><strong>Narrow and Deep:</strong> Many layers, fewer neurons (good for complex patterns)</li>
+                        <li><strong>Bottleneck:</strong> Wide → Narrow → Wide (dimensionality reduction)</li>
+                        <li><strong>Residual:</strong> Skip connections for very deep networks</li>
+                    </ul>
+                `
+            },
+            compilation: {
+                title: 'Model Compilation - Optimization Setup',
+                content: `
+                    <h3>Model Compilation: Preparing for Training</h3>
+                    <p>Compilation configures the learning process by specifying the optimizer, loss function, and metrics.</p>
+                    
+                    <h3>1. Optimizers: How the Model Learns</h3>
+                    
+                    <div class="modal-example">
+                        <strong>Optimizer Choice Guide:</strong><br>
+                        • Adam: Best default choice (adaptive learning)<br>
+                        • SGD: Simple, works well with momentum<br>
+                        • RMSprop: Good for RNNs<br>
+                        • AdaGrad: For sparse data
+                    </div>
+                    
+                    <div class="modal-code">
+# Adam (most popular) - adaptive learning rates
+model.compile(
+    optimizer='adam',  # Default: lr=0.001
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Adam with custom learning rate
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# SGD with momentum
+model.compile(
+    optimizer=tf.keras.optimizers.SGD(learning_rate=0.01, momentum=0.9),
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+                    </div>
+                    
+                    <h3>2. Loss Functions: What to Minimize</h3>
+                    
+                    <h4>Classification Loss Functions</h4>
+                    <div class="modal-code">
+# Binary classification (2 classes)
+model.compile(
+    optimizer='adam',
+    loss='binary_crossentropy',  # Use with sigmoid output
+    metrics=['accuracy']
+)
+
+# Multi-class classification (one-hot encoded labels)
+model.compile(
+    optimizer='adam',
+    loss='categorical_crossentropy',  # Use with softmax output
+    metrics=['accuracy']
+)
+
+# Multi-class classification (integer labels)
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',  # Use with softmax output
+    metrics=['accuracy']
+)
+                    </div>
+                    
+                    <h4>Regression Loss Functions</h4>
+                    <div class="modal-code">
+# Regression problems
+model.compile(
+    optimizer='adam',
+    loss='mse',  # Mean Squared Error (most common)
+    metrics=['mae']  # Mean Absolute Error as metric
+)
+
+# Alternative regression losses
+loss_options = [
+    'mse',           # Mean Squared Error
+    'mae',           # Mean Absolute Error (robust to outliers)
+    'huber',         # Huber loss (robust)
+    'log_cosh'       # Smooth approximation of MAE
+]
+                    </div>
+                    
+                    <h3>3. Metrics: Monitoring Performance</h3>
+                    
+                    <div class="modal-code">
+# Classification metrics
+model.compile(
+    optimizer='adam',
+    loss='categorical_crossentropy',
+    metrics=[
+        'accuracy',                    # Overall accuracy
+        'top_k_categorical_accuracy',  # Top-k accuracy
+        tf.keras.metrics.Precision(),  # Precision
+        tf.keras.metrics.Recall(),     # Recall
+        tf.keras.metrics.F1Score()     # F1 score
+    ]
+)
+
+# Regression metrics
+model.compile(
+    optimizer='adam',
+    loss='mse',
+    metrics=[
+        'mae',                           # Mean Absolute Error
+        'mse',                           # Mean Squared Error
+        tf.keras.metrics.RootMeanSquaredError(),  # RMSE
+        tf.keras.metrics.MeanAbsolutePercentageError()  # MAPE
+    ]
+)
+                    </div>
+                    
+                    <h3>4. Learning Rate Strategies</h3>
+                    
+                    <div class="modal-code">
+# Fixed learning rate
+optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+
+# Learning rate scheduling
+def scheduler(epoch, lr):
+    if epoch < 10:
+        return lr
+    else:
+        return lr * 0.9  # Reduce by 10% after epoch 10
+
+lr_callback = tf.keras.callbacks.LearningRateScheduler(scheduler)
+
+# Exponential decay
+initial_lr = 0.001
+lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+    initial_lr,
+    decay_steps=100,
+    decay_rate=0.96,
+    staircase=True
+)
+optimizer = tf.keras.optimizers.Adam(learning_rate=lr_schedule)
+                    </div>
+                    
+                    <h3>5. Advanced Compilation Options</h3>
+                    
+                    <div class="modal-code">
+# Custom loss function
+def custom_loss(y_true, y_pred):
+    mse = tf.keras.losses.mse(y_true, y_pred)
+    mae = tf.keras.losses.mae(y_true, y_pred)
+    return mse + 0.1 * mae  # Combined loss
+
+# Custom metric
+def custom_accuracy(y_true, y_pred):
+    return tf.keras.metrics.categorical_accuracy(y_true, y_pred)
+
+model.compile(
+    optimizer='adam',
+    loss=custom_loss,
+    metrics=[custom_accuracy]
+)
+                    </div>
+                    
+                    <h3>6. Problem-Specific Compilation Examples</h3>
+                    
+                    <h4>Image Classification</h4>
+                    <div class="modal-code">
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
+    loss='categorical_crossentropy',
+    metrics=['accuracy', 'top_5_categorical_accuracy']
+)
+                    </div>
+                    
+                    <h4>Binary Classification</h4>
+                    <div class="modal-code">
+model.compile(
+    optimizer='adam',
+    loss='binary_crossentropy',
+    metrics=['accuracy', 'precision', 'recall']
+)
+                    </div>
+                    
+                    <h4>Time Series Forecasting</h4>
+                    <div class="modal-code">
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+    loss='huber',  # Robust to outliers
+    metrics=['mae', 'mse']
+)
+                    </div>
+                    
+                    <h3>7. Compilation Best Practices</h3>
+                    
+                    <div class="modal-example">
+                        <strong>Quick Start Recommendations:</strong><br>
+                        • Optimizer: Start with Adam<br>
+                        • Learning Rate: 0.001 (Adam default) or 0.01 (SGD)<br>
+                        • Loss: Match your problem type<br>
+                        • Metrics: Include domain-relevant metrics
+                    </div>
+                    
+                    <div class="warning-box">
+                        <strong>Common Mistakes:</strong><br>
+                        • Using categorical_crossentropy with integer labels<br>
+                        • Using sigmoid with categorical_crossentropy<br>
+                        • Learning rate too high (exploding) or too low (slow)
+                    </div>
+                    
+                    <h3>8. Debugging Compilation</h3>
+                    
+                    <div class="modal-code">
+# Check compilation settings
+print("Optimizer:", model.optimizer.__class__.__name__)
+print("Loss function:", model.loss)
+print("Metrics:", [m.name for m in model.metrics])
+
+# Verify shapes match loss function
+print("Output shape:", model.output_shape)
+print("Expected for categorical_crossentropy: (batch_size, num_classes)")
+print("Expected for binary_crossentropy: (batch_size, 1)")
+                    </div>
+                `
+            },
+            training: {
+                title: 'Training & Evaluation - Learning Process',
+                content: `
+                    <h3>Training Your Neural Network</h3>
+                    <p>Training is where your model learns from data. Here's how to train effectively and monitor progress:</p>
+                    
+                    <h3>1. Basic Training</h3>
+                    
+                    <div class="modal-code">
+# Simple training
+history = model.fit(
+    X_train, y_train,
+    epochs=50,                    # Number of complete passes through data
+    batch_size=32,               # Number of samples per gradient update
+    validation_split=0.2,        # Use 20% of training data for validation
+    verbose=1                    # Show progress bar
+)
+
+# Training with separate validation data
+history = model.fit(
+    X_train, y_train,
+    epochs=50,
+    batch_size=32,
+    validation_data=(X_val, y_val),
+    verbose=1
+)
+                    </div>
+                    
+                    <h3>2. Training Callbacks</h3>
+                    
+                    <div class="modal-code">
+# Essential callbacks for better training
+callbacks = [
+    # Stop training when validation loss stops improving
+    tf.keras.callbacks.EarlyStopping(
+        monitor='val_loss',
+        patience=10,              # Wait 10 epochs before stopping
+        restore_best_weights=True # Restore weights from best epoch
+    ),
+    
+    # Save best model during training
+    tf.keras.callbacks.ModelCheckpoint(
+        'best_model.h5',
+        monitor='val_loss',
+        save_best_only=True,
+        save_weights_only=False
+    ),
+    
+    # Reduce learning rate when stuck
+    tf.keras.callbacks.ReduceLROnPlateau(
+        monitor='val_loss',
+        factor=0.5,               # Multiply LR by 0.5
+        patience=5,               # Wait 5 epochs
+        min_lr=1e-7              # Don't go below this LR
+    )
+]
+
+# Train with callbacks
+history = model.fit(
+    X_train, y_train,
+    epochs=100,
+    validation_data=(X_val, y_val),
+    callbacks=callbacks
+)
+                    </div>
+                    
+                    <h3>3. Monitoring Training Progress</h3>
+                    
+                    <div class="modal-code">
+# Plot training history
+import matplotlib.pyplot as plt
+
+def plot_training_history(history):
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+    
+    # Plot loss
+    ax1.plot(history.history['loss'], label='Training Loss')
+    ax1.plot(history.history['val_loss'], label='Validation Loss')
+    ax1.set_title('Model Loss')
+    ax1.set_xlabel('Epoch')
+    ax1.set_ylabel('Loss')
+    ax1.legend()
+    
+    # Plot accuracy (if available)
+    if 'accuracy' in history.history:
+        ax2.plot(history.history['accuracy'], label='Training Accuracy')
+        ax2.plot(history.history['val_accuracy'], label='Validation Accuracy')
+        ax2.set_title('Model Accuracy')
+        ax2.set_xlabel('Epoch')
+        ax2.set_ylabel('Accuracy')
+        ax2.legend()
+    
+    plt.tight_layout()
+    plt.show()
+
+# Use the function
+plot_training_history(history)
+                    </div>
+                    
+                    <h3>4. Batch Size Considerations</h3>
+                    
+                    <div class="modal-example">
+                        <strong>Batch Size Trade-offs:</strong><br>
+                        • Small batches (8-32): More updates, noisier gradients, better generalization<br>
+                        • Large batches (128-512): Fewer updates, stabler gradients, faster training<br>
+                        • Very large batches (1024+): May hurt generalization, requires careful tuning
+                    </div>
+                    
+                    <div class="modal-code">
+# Experiment with different batch sizes
+batch_sizes = [16, 32, 64, 128]
+results = {}
+
+for batch_size in batch_sizes:
+    print(f"Training with batch size: {batch_size}")
+    
+    # Create fresh model for fair comparison
+    model_copy = tf.keras.models.clone_model(model)
+    model_copy.compile(optimizer='adam', loss='mse', metrics=['mae'])
+    
+    # Train
+    history = model_copy.fit(
+        X_train, y_train,
+        batch_size=batch_size,
+        epochs=20,
+        validation_data=(X_val, y_val),
+        verbose=0
+    )
+    
+    # Store final validation loss
+    results[batch_size] = min(history.history['val_loss'])
+
+print("Batch size comparison:", results)
+                    </div>
+                    
+                    <h3>5. Handling Common Training Issues</h3>
+                    
+                    <h4>Overfitting (High Training, Low Validation Performance)</h4>
+                    <div class="modal-code">
+# Solutions for overfitting:
+
+# 1. Add dropout
+model.add(tf.keras.layers.Dropout(0.3))
+
+# 2. Reduce model complexity
+# Use fewer layers or fewer neurons per layer
+
+# 3. Early stopping
+early_stop = tf.keras.callbacks.EarlyStopping(
+    monitor='val_loss', patience=10, restore_best_weights=True
+)
+
+# 4. L2 regularization
+tf.keras.layers.Dense(64, activation='relu', 
+                     kernel_regularizer=tf.keras.regularizers.l2(0.001))
+
+# 5. Data augmentation (for images)
+datagen = tf.keras.preprocessing.image.ImageDataGenerator(
+    rotation_range=20, width_shift_range=0.2, height_shift_range=0.2
+)
+                    </div>
+                    
+                    <h4>Underfitting (Poor Performance on Both Training and Validation)</h4>
+                    <div class="modal-code">
+# Solutions for underfitting:
+
+# 1. Increase model complexity
+# Add more layers or more neurons
+
+# 2. Train longer
+# Increase number of epochs
+
+# 3. Reduce regularization
+# Lower dropout rate or remove L2 regularization
+
+# 4. Check data quality
+# Ensure data is properly preprocessed and scaled
+
+# 5. Adjust learning rate
+optimizer = tf.keras.optimizers.Adam(learning_rate=0.01)  # Higher LR
+                    </div>
+                    
+                    <h3>6. Model Evaluation</h3>
+                    
+                    <div class="modal-code">
+# Evaluate on test set (do this only once!)
+test_loss, test_accuracy = model.evaluate(X_test, y_test, verbose=0)
+print(f"Test Loss: {test_loss:.4f}")
+print(f"Test Accuracy: {test_accuracy:.4f}")
+
+# Make predictions
+predictions = model.predict(X_test)
+
+# For classification: convert probabilities to classes
+if len(predictions.shape) > 1 and predictions.shape[1] > 1:
+    predicted_classes = np.argmax(predictions, axis=1)
+    true_classes = np.argmax(y_test, axis=1) if len(y_test.shape) > 1 else y_test
+    
+    # Classification report
+    from sklearn.metrics import classification_report, confusion_matrix
+    print("Classification Report:")
+    print(classification_report(true_classes, predicted_classes))
+    
+    # Confusion matrix
+    cm = confusion_matrix(true_classes, predicted_classes)
+    print("Confusion Matrix:")
+    print(cm)
+                    </div>
+                    
+                    <h3>7. Advanced Training Techniques</h3>
+                    
+                    <h4>Learning Rate Scheduling</h4>
+                    <div class="modal-code">
+# Cyclical learning rates
+def cyclical_lr(epoch):
+    base_lr = 0.0001
+    max_lr = 0.01
+    step_size = 10
+    cycle = np.floor(1 + epoch / (2 * step_size))
+    x = np.abs(epoch / step_size - 2 * cycle + 1)
+    return base_lr + (max_lr - base_lr) * np.maximum(0, (1 - x))
+
+lr_scheduler = tf.keras.callbacks.LearningRateScheduler(cyclical_lr)
+                    </div>
+                    
+                    <h4>Custom Training Loop</h4>
+                    <div class="modal-code">
+# For advanced users: custom training loop
+@tf.function
+def train_step(x, y):
+    with tf.GradientTape() as tape:
+        predictions = model(x, training=True)
+        loss = loss_fn(y, predictions)
+    
+    gradients = tape.gradient(loss, model.trainable_variables)
+    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+    
+    train_accuracy(y, predictions)
+    return loss
+
+# Training loop
+for epoch in range(epochs):
+    for step, (x_batch, y_batch) in enumerate(train_dataset):
+        loss = train_step(x_batch, y_batch)
+        
+        if step % 100 == 0:
+            print(f"Epoch {epoch}, Step {step}, Loss: {loss:.4f}")
+                    </div>
+                    
+                    <h3>8. Training Best Practices</h3>
+                    
+                    <ul>
+                        <li><strong>Start simple:</strong> Begin with basic architecture and add complexity gradually</li>
+                        <li><strong>Monitor validation:</strong> Always use validation data to detect overfitting</li>
+                        <li><strong>Save checkpoints:</strong> Use ModelCheckpoint to save best model</li>
+                        <li><strong>Use early stopping:</strong> Prevent overfitting and save time</li>
+                        <li><strong>Visualize progress:</strong> Plot training curves to understand behavior</li>
+                        <li><strong>Test only once:</strong> Use test set only for final evaluation</li>
+                    </ul>
+                    
+                    <div class="warning-box">
+                        <strong>Common Training Mistakes:</strong><br>
+                        • Using test data for hyperparameter tuning<br>
+                        • Not using validation data<br>
+                        • Training for too long without early stopping<br>
+                        • Ignoring training curves
+                    </div>
+                `
+            }
+        };
+
+        // Show step details
+        function showStepDetails(step) {
+            const details = stepDetails[step];
+            showModal(details.title, details.content);
+        }
+
+        // Demo functions
+        function runDemo() {
+            if (isTraining) return;
+            
+            isTraining = true;
+            const outputPanel = document.getElementById('outputPanel');
+            const demoOutput = document.getElementById('demoOutput');
+            
+            outputPanel.style.display = 'block';
+            demoOutput.innerHTML = 'Starting training...';
+            
+            // Simulate training progress
+            let epoch = 0;
+            const maxEpochs = 50;
+            
+            const interval = setInterval(() => {
+                epoch++;
+                const progress = (epoch / maxEpochs) * 100;
+                const loss = (1.5 * Math.exp(-epoch / 10) + 0.1 + Math.random() * 0.05).toFixed(4);
+                
+                document.getElementById('currentEpoch').textContent = epoch;
+                document.getElementById('currentLoss').textContent = loss;
+                document.getElementById('progressBar').style.width = progress + '%';
+                
+                // Update training chart
+                updateTrainingChart(epoch, parseFloat(loss));
+                
+                if (epoch >= maxEpochs) {
+                    clearInterval(interval);
+                    demoOutput.innerHTML = `Training completed!<br>Final loss: ${loss}<br>Model ready for predictions.`;
+                    isTraining = false;
+                }
+            }, 100);
+        }
+
+        // Training chart
+        let chartData = [];
+        function updateTrainingChart(epoch, loss) {
+            const canvas = document.getElementById('progressChart');
+            const ctx = canvas.getContext('2d');
+            
+            chartData.push({epoch, loss});
+            if (chartData.length > 50) chartData.shift();
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw axes
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(40, 20);
+            ctx.lineTo(40, 180);
+            ctx.lineTo(280, 180);
+            ctx.stroke();
+            
+            // Draw loss curve
+            if (chartData.length > 1) {
+                ctx.strokeStyle = '#16a34a';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                
+                chartData.forEach((point, i) => {
+                    const x = 40 + (i / (chartData.length - 1)) * 240;
+                    const y = 180 - (point.loss / 2) * 160; // Scale loss to fit chart
+                    
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                ctx.stroke();
+            }
+            
+            // Labels
+            ctx.fillStyle = '#374151';
+            ctx.font = '12px sans-serif';
+            ctx.fillText('Loss', 10, 15);
+            ctx.fillText('Epoch', 250, 195);
+        }
+
+        // Checklist functionality
+        function toggleCheck(item) {
+            const checkbox = item.querySelector('.checkbox');
+            const isChecked = checkbox.classList.contains('checked');
+            
+            if (isChecked) {
+                checkbox.classList.remove('checked');
+                checkbox.textContent = '';
+                item.classList.remove('completed');
+            } else {
+                checkbox.classList.add('checked');
+                checkbox.textContent = '✓';
+                item.classList.add('completed');
+            }
+        }
+
+        // Network builder
+        function updateNetwork() {
+            const inputSize = document.getElementById('inputSize').value;
+            const hiddenLayers = document.getElementById('hiddenLayers').value;
+            const neuronsPerLayer = document.getElementById('neuronsPerLayer').value;
+            const outputSize = document.getElementById('outputSize').value;
+            
+            // Simple network visualization
+            const viz = document.getElementById('networkViz');
+            viz.innerHTML = `
+                <div style="display: flex; justify-content: space-around; align-items: center; height: 100%; padding: 20px;">
+                    <div style="text-align: center;">
+                        <div style="font-weight: bold; color: #064e3b;">Input</div>
+                        <div style="font-size: 2em; color: #3b82f6;">${inputSize}</div>
+                        <div style="font-size: 0.8em; color: #64748b;">neurons</div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="font-weight: bold; color: #064e3b;">Hidden</div>
+                        <div style="font-size: 2em; color: #f59e0b;">${hiddenLayers} × ${neuronsPerLayer}</div>
+                        <div style="font-size: 0.8em; color: #64748b;">layers × neurons</div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="font-weight: bold; color: #064e3b;">Output</div>
+                        <div style="font-size: 2em; color: #16a34a;">${outputSize}</div>
+                        <div style="font-size: 0.8em; color: #64748b;">neurons</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateCode() {
+            const inputSize = document.getElementById('inputSize').value;
+            const hiddenLayers = document.getElementById('hiddenLayers').value;
+            const neuronsPerLayer = document.getElementById('neuronsPerLayer').value;
+            const outputSize = document.getElementById('outputSize').value;
+            
+            let code = `import tensorflow as tf
+
+# Create Sequential model
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(${neuronsPerLayer}, activation='relu', input_shape=(${inputSize},)),
+`;
+            
+            for (let i = 1; i < hiddenLayers; i++) {
+                code += `    tf.keras.layers.Dense(${neuronsPerLayer}, activation='relu'),\n`;
+            }
+            
+            const outputActivation = outputSize == 1 ? 'sigmoid' : 'softmax';
+            code += `    tf.keras.layers.Dense(${outputSize}, activation='${outputActivation}')
+])
+
+# Compile model
+model.compile(
+    optimizer='adam',
+    loss='${outputSize == 1 ? 'binary_crossentropy' : 'categorical_crossentropy'}',
+    metrics=['accuracy']
+)
+
+# Model summary
+model.summary()`;
+
+            document.getElementById('generatedCodeContent').textContent = code;
+            document.getElementById('generatedCode').style.display = 'block';
+        }
+
+        function showArchitectureDetails() {
+            const inputSize = document.getElementById('inputSize').value;
+            const hiddenLayers = document.getElementById('hiddenLayers').value;
+            const neuronsPerLayer = document.getElementById('neuronsPerLayer').value;
+            const outputSize = document.getElementById('outputSize').value;
+            
+            const totalParams = calculateParameters(inputSize, hiddenLayers, neuronsPerLayer, outputSize);
+            
+            showModal('Architecture Analysis', `
+                <h3>Network Architecture Details</h3>
+                
+                <div class="modal-example">
+                    <strong>Architecture Summary:</strong><br>
+                    • Input Layer: ${inputSize} neurons<br>
+                    • Hidden Layers: ${hiddenLayers} layers × ${neuronsPerLayer} neurons<br>
+                    • Output Layer: ${outputSize} neurons<br>
+                    • Total Parameters: ${totalParams.toLocaleString()}
+                </div>
+                
+                <h3>Parameter Breakdown</h3>
+                <p>Understanding where parameters come from:</p>
+                
+                <div class="modal-code">
+Layer 1: ${inputSize} → ${neuronsPerLayer}
+  Weights: ${inputSize} × ${neuronsPerLayer} = ${(inputSize * neuronsPerLayer).toLocaleString()}
+  Biases: ${neuronsPerLayer}
+  
+${hiddenLayers > 1 ? `Hidden Layers: ${neuronsPerLayer} → ${neuronsPerLayer}
+  Weights: ${neuronsPerLayer} × ${neuronsPerLayer} × ${hiddenLayers - 1} = ${(neuronsPerLayer * neuronsPerLayer * (hiddenLayers - 1)).toLocaleString()}
+  Biases: ${neuronsPerLayer} × ${hiddenLayers - 1} = ${(neuronsPerLayer * (hiddenLayers - 1)).toLocaleString()}
+` : ''}
+Output Layer: ${neuronsPerLayer} → ${outputSize}
+  Weights: ${neuronsPerLayer} × ${outputSize} = ${(neuronsPerLayer * outputSize).toLocaleString()}
+  Biases: ${outputSize}
+
+Total Parameters: ${totalParams.toLocaleString()}
+                </div>
+                
+                <h3>Architecture Recommendations</h3>
+                
+                ${totalParams > 1000000 ? `
+                <div class="warning-box">
+                    <strong>Large Model Warning:</strong><br>
+                    Your model has over 1M parameters. Consider:
+                    <ul>
+                        <li>Reducing neurons per layer</li>
+                        <li>Using fewer hidden layers</li>
+                        <li>Adding regularization (dropout, L2)</li>
+                    </ul>
+                </div>
+                ` : ''}
+                
+                ${totalParams < 1000 ? `
+                <div class="warning-box">
+                    <strong>Small Model Warning:</strong><br>
+                    Your model might be too simple. Consider:
+                    <ul>
+                        <li>Adding more neurons per layer</li>
+                        <li>Adding more hidden layers</li>
+                        <li>Checking if data complexity matches model capacity</li>
+                    </ul>
+                </div>
+                ` : ''}
+                
+                <h3>Training Considerations</h3>
+                <ul>
+                    <li><strong>Memory:</strong> ~${Math.round(totalParams * 4 / 1024 / 1024)} MB for float32 weights</li>
+                    <li><strong>Training Time:</strong> ${totalParams > 100000 ? 'Moderate to Long' : 'Fast'}</li>
+                    <li><strong>Overfitting Risk:</strong> ${totalParams > 50000 ? 'High - Use regularization' : 'Low to Moderate'}</li>
+                </ul>
+            `);
+        }
+
+        function calculateParameters(inputSize, hiddenLayers, neuronsPerLayer, outputSize) {
+            // First hidden layer
+            let params = parseInt(inputSize) * parseInt(neuronsPerLayer) + parseInt(neuronsPerLayer);
+            
+            // Additional hidden layers
+            for (let i = 1; i < hiddenLayers; i++) {
+                params += parseInt(neuronsPerLayer) * parseInt(neuronsPerLayer) + parseInt(neuronsPerLayer);
+            }
+            
+            // Output layer
+            params += parseInt(neuronsPerLayer) * parseInt(outputSize) + parseInt(outputSize);
+            
+            return params;
+        }
+
+        // Modal functions
+        function showModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('modalBackdrop').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modalBackdrop').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modalBackdrop').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('modalBackdrop').classList.contains('show')) {
+                closeModal();
+            }
+            
+            // Navigation
+            if (e.key === 'ArrowLeft') {
+                window.location.href = 'Week1_Slide16.html';
+            } else if (e.key === 'ArrowRight' || e.key === ' ') {
+                window.location.href = 'Week1_Slide18.html';
+            }
+        });
+
+        // Initialize
+        window.onload = function() {
+            updateNetwork();
+            
+            // Set first checklist item as completed by default
+            const firstCheckbox = document.getElementById('check1');
+            firstCheckbox.classList.add('checked');
+            firstCheckbox.closest('.checklist-item').classList.add('completed');
+        };
+    </script>
+</body>
+</html>

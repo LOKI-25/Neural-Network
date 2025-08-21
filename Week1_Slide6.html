@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS5720 - The Perceptron - Simplest Neural Network</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .slide-container {
+            flex: 1;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .slide-title {
+            font-size: 3.5em;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #16a34a;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: slideInFromTop 1.2s ease-out;
+            font-weight: 700;
+        }
+
+        .content-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .concept-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromLeft 1s ease-out 0.3s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .visualization-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromRight 1s ease-out 0.3s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #064e3b;
+            margin-bottom: 25px;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #16a34a, #22c55e);
+            border-radius: 2px;
+        }
+
+        .definition-box {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 4px solid #16a34a;
+            margin-bottom: 25px;
+        }
+
+        .definition-text {
+            font-size: 1.2em;
+            line-height: 1.8;
+            color: #334155;
+            font-weight: 500;
+        }
+
+        .perceptron-visual {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border-radius: 15px;
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            overflow: hidden;
+        }
+
+        .perceptron-input {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .perceptron-input:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(59, 130, 246, 0.5);
+        }
+
+        .perceptron-neuron {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 4px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 15px 35px rgba(22, 163, 74, 0.4);
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .perceptron-neuron:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+            box-shadow: 0 20px 45px rgba(22, 163, 74, 0.6);
+        }
+
+        .perceptron-output {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .perceptron-output:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 12px 30px rgba(245, 158, 11, 0.5);
+        }
+
+        .connection-line {
+            animation: connectionFlow 2s ease-in-out infinite;
+        }
+
+        .weight-label {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            color: #064e3b;
+            font-size: 0.9em;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 10px;
+            border: 2px solid rgba(22, 163, 74, 0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            pointer-events: none;
+            animation: fadeInUp 1s ease-out forwards;
+        }
+
+        .formula-section {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            animation: slideInFromBottom 1s ease-out 0.6s both;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+            text-align: center;
+        }
+
+        .formula-title {
+            font-size: 2em;
+            color: #064e3b;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .perceptron-formula {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            margin: 20px 0;
+            font-size: 1.5em;
+            font-family: 'Courier New', monospace;
+            color: #064e3b;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .perceptron-formula::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, rgba(22, 163, 74, 0.1));
+            animation: formulaShimmer 3s ease-in-out infinite;
+        }
+
+        .formula-components {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .component-card {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #f59e0b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .component-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.2);
+        }
+
+        .component-title {
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .component-desc {
+            color: #5c2706;
+            line-height: 1.5;
+            font-size: 0.95em;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            border: 2px solid rgba(22, 163, 74, 0.2);
+            border-radius: 30px;
+            color: #1e293b;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(22, 163, 74, 0.4);
+        }
+
+        .slide-number, .course-info {
+            position: fixed;
+            top: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,253,244,0.9));
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .slide-number { right: 30px; }
+        .course-info { left: 30px; }
+
+        @keyframes slideInFromTop {
+            from { transform: translateY(-80px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromLeft {
+            from { transform: translateX(-60px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromRight {
+            from { transform: translateX(60px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromBottom {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes connectionFlow {
+            0%, 100% { opacity: 0.5; stroke-width: 4px; }
+            50% { opacity: 1; stroke-width: 5px; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes formulaShimmer {
+            0%, 100% { top: -100%; }
+            50% { top: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .content-layout { grid-template-columns: 1fr; }
+            .slide-title { font-size: 2.5em; }
+            .formula-components { grid-template-columns: 1fr; }
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-backdrop.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            color: #064e3b;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(22, 163, 74, 0.1);
+            color: #064e3b;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #334155;
+        }
+
+        .modal-body strong {
+            color: #064e3b;
+            font-weight: 600;
+        }
+
+        .modal-body em {
+            color: #16a34a;
+            font-style: normal;
+            font-weight: 500;
+        }
+
+        .modal-example {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #16a34a;
+        }
+
+        .modal-code {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            overflow-x: auto;
+        }
+
+        .modal-tip {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .modal-tip-title {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 20px;
+                padding: 30px 25px;
+            }
+            .modal-title {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="course-info">CS5720 - Week 1</div>
+    <div class="slide-number">Slide 6 of 20</div>
+    
+    <div class="slide-container">
+        <h1 class="slide-title">The Perceptron - Simplest Neural Network</h1>
+        
+        <div class="content-layout">
+            <div class="concept-section">
+                <h2 class="section-title">What is a Perceptron?</h2>
+                
+                <div class="definition-box">
+                    <div class="definition-text">
+                        A <strong>Perceptron</strong> is the simplest form of a neural network, consisting of a single artificial neuron that makes binary decisions based on weighted inputs.
+                    </div>
+                </div>
+                
+                <div style="font-size: 1.1em; line-height: 1.7; color: #334155; margin-bottom: 25px;">
+                    <strong>Key Characteristics:</strong>
+                    <br><br>
+                    • <em>Single Layer:</em> One neuron, multiple inputs
+                    <br>
+                    • <em>Binary Output:</em> Returns 0 or 1
+                    <br>
+                    • <em>Linear Classifier:</em> Draws a line to separate data
+                    <br>
+                    • <em>Supervised Learning:</em> Learns from examples
+                </div>
+
+                <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 20px; border-radius: 12px; border-left: 4px solid #f59e0b;">
+                    <div style="font-weight: 600; color: #92400e; margin-bottom: 8px;">🎯 Think of it like...</div>
+                    <div style="color: #5c2706;">
+                        A perceptron is like a bouncer at a club who makes yes/no decisions based on multiple criteria (age, dress code, ID) with different importance weights.
+                    </div>
+                </div>
+            </div>
+
+            <div class="visualization-section">
+                <h2 class="section-title">Perceptron Structure</h2>
+                
+                <div class="perceptron-visual" id="perceptronVisual">
+                    <!-- SVG for connections (drawn behind nodes) -->
+                    <svg style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none;">
+                        <!-- Define gradient for connections -->
+                        <defs>
+                            <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#86efac;stop-opacity:0.8" />
+                                <stop offset="100%" style="stop-color:#4ade80;stop-opacity:0.8" />
+                            </linearGradient>
+                        </defs>
+                        
+                        <!-- Connections from inputs to neuron -->
+                        <line x1="50" y1="110" x2="50%" y2="50%" stroke="url(#connectionGradient)" stroke-width="4" class="connection-line" />
+                        <line x1="50" y1="190" x2="50%" y2="50%" stroke="url(#connectionGradient)" stroke-width="4" class="connection-line" />
+                        <line x1="50" y1="270" x2="50%" y2="50%" stroke="url(#connectionGradient)" stroke-width="4" class="connection-line" />
+                        
+                        <!-- Connection from neuron to output -->
+                        <line x1="50%" y1="50%" x2="calc(100% - 50px)" y2="50%" stroke="url(#connectionGradient)" stroke-width="4" class="connection-line" />
+                    </svg>
+
+                    <!-- Inputs -->
+                    <div class="perceptron-input" style="left: 20px; top: 80px;" onclick="showInputDetails('x1')" id="input1">
+                        x₁
+                    </div>
+                    <div class="perceptron-input" style="left: 20px; top: 160px;" onclick="showInputDetails('x2')" id="input2">
+                        x₂
+                    </div>
+                    <div class="perceptron-input" style="left: 20px; top: 240px;" onclick="showInputDetails('bias')" id="inputBias">
+                        1
+                    </div>
+
+                    <!-- Weight labels -->
+                    <div class="weight-label" style="left: 25%; top: 95px;">w₁</div>
+                    <div class="weight-label" style="left: 25%; top: 175px;">w₂</div>
+                    <div class="weight-label" style="left: 25%; top: 255px;">b</div>
+
+                    <!-- Central neuron -->
+                    <div class="perceptron-neuron" onclick="showNeuronDetails()">
+                        <div style="font-size: 1.2em;">Σ</div>
+                        <div style="font-size: 0.8em;">f(∑)</div>
+                    </div>
+
+                    <!-- Output -->
+                    <div class="perceptron-output" onclick="showOutputDetails()">
+                        y
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; text-align: center; color: #475569;">
+                    <strong>Click on any component for detailed explanation!</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="formula-section">
+            <h2 class="formula-title">The Perceptron Formula</h2>
+            
+            <div class="perceptron-formula">
+                y = f(w₁x₁ + w₂x₂ + b)
+            </div>
+
+            <div class="formula-components">
+                <div class="component-card" onclick="showFormulaDetails('inputs')">
+                    <div class="component-title">Inputs (x₁, x₂)</div>
+                    <div class="component-desc">The data features or signals coming into the perceptron</div>
+                </div>
+
+                <div class="component-card" onclick="showFormulaDetails('weights')">
+                    <div class="component-title">Weights (w₁, w₂)</div>
+                    <div class="component-desc">Importance multipliers for each input - learned during training</div>
+                </div>
+
+                <div class="component-card" onclick="showFormulaDetails('bias')">
+                    <div class="component-title">Bias (b)</div>
+                    <div class="component-desc">Shifts the decision boundary - like an offset or threshold</div>
+                </div>
+
+                <div class="component-card" onclick="showFormulaDetails('activation')">
+                    <div class="component-title">Activation Function f()</div>
+                    <div class="component-desc">Converts the weighted sum into a binary decision (0 or 1)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <a href="Week1_Slide5.html" class="nav-btn">← Previous</a>
+        <a href="Week1_Slide7.html" class="nav-btn">Next →</a>
+    </div>
+
+    <div style="position: fixed; bottom: 30px; left: 30px; color: #64748b; font-size: 0.9em;">
+        <strong>Prepared by Dr. Gorkem Kar</strong>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal-backdrop" id="modalBackdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Modal Title</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                Modal content goes here...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal functionality
+        const modal = document.getElementById('modalBackdrop');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+
+        function showModal(title, content) {
+            modalTitle.textContent = title;
+            modalBody.innerHTML = content;
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('show')) {
+                closeModal();
+            }
+        });
+
+        // Input details
+        function showInputDetails(type) {
+            const inputDetails = {
+                'x1': {
+                    title: 'Input x₁ - First Feature',
+                    content: `
+                        <p><strong>What is an Input?</strong></p>
+                        <p>Inputs are the data values that the perceptron uses to make decisions. Each input represents a different feature or aspect of your data.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Real-World Examples:</strong><br>
+                            • Email Spam Detection: x₁ = number of exclamation marks<br>
+                            • Medical Diagnosis: x₁ = patient temperature<br>
+                            • Image Recognition: x₁ = pixel brightness value<br>
+                            • Credit Approval: x₁ = annual income
+                        </div>
+                        
+                        <p><strong>Input Characteristics:</strong></p>
+                        <ul>
+                            <li>Usually normalized to a standard range (0-1 or -1 to 1)</li>
+                            <li>Can be continuous (temperature) or discrete (count)</li>
+                            <li>Each input has its own weight determining importance</li>
+                            <li>Multiple inputs allow complex decision making</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Example: Email spam detection
+x1 = number_of_exclamation_marks / max_exclamations  # normalized
+x2 = number_of_capital_words / total_words          # normalized
+x3 = presence_of_money_keywords                     # binary (0 or 1)
+
+# Perceptron processes all inputs together
+inputs = [x1, x2, x3]
+                        </div>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">💡 Feature Engineering</div>
+                            <div style="color: #5c2706;">Choosing good inputs (features) is crucial for perceptron success. The quality of inputs often matters more than the complexity of the algorithm!</div>
+                        </div>
+                    `
+                },
+                'x2': {
+                    title: 'Input x₂ - Second Feature',
+                    content: `
+                        <p><strong>Multiple Inputs Enable Complex Decisions</strong></p>
+                        <p>Having multiple inputs allows the perceptron to consider several factors simultaneously, just like humans do when making decisions.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Two-Input Decision Examples:</strong><br>
+                            • Weather App: x₁ = temperature, x₂ = humidity → Rain prediction<br>
+                            • Stock Trading: x₁ = price change, x₂ = volume → Buy/sell decision<br>
+                            • Game AI: x₁ = player health, x₂ = enemy distance → Attack/defend<br>
+                            • Ad Targeting: x₁ = user age, x₂ = browsing history → Show ad?
+                        </div>
+                        
+                        <p><strong>Why Multiple Inputs Matter:</strong></p>
+                        <ul>
+                            <li><strong>Richer Information:</strong> More data points for better decisions</li>
+                            <li><strong>Pattern Recognition:</strong> Detect relationships between features</li>
+                            <li><strong>Improved Accuracy:</strong> Single inputs often insufficient</li>
+                            <li><strong>Real-World Modeling:</strong> Most decisions involve multiple factors</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Example: Student admission decision
+def student_admission(gpa, test_score):
+    x1 = gpa / 4.0           # Normalize GPA (0-1)
+    x2 = test_score / 1600   # Normalize SAT score (0-1)
+    
+    # Perceptron weights (learned from training data)
+    w1 = 0.7  # GPA importance
+    w2 = 0.3  # Test score importance
+    b = -0.5  # Bias (admission threshold)
+    
+    # Decision calculation
+    weighted_sum = w1*x1 + w2*x2 + b
+    decision = 1 if weighted_sum > 0 else 0
+    
+    return "Admitted" if decision else "Rejected"
+                        </code>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🎯 Input Correlation</div>
+                            <div style="color: #5c2706;">Be careful of highly correlated inputs (like height and weight). They can confuse the perceptron and reduce performance.</div>
+                        </div>
+                    `
+                },
+                'bias': {
+                    title: 'Bias Input - The Decision Threshold',
+                    content: `
+                        <p><strong>The Bias: Shifting the Decision Boundary</strong></p>
+                        <p>The bias is a special input that's always set to 1. It allows the perceptron to shift its decision boundary, making it more flexible.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Bias Analogy:</strong><br>
+                            Think of bias like the "strictness" of a teacher:<br>
+                            • Positive bias = Lenient teacher (easier to pass)<br>
+                            • Negative bias = Strict teacher (harder to pass)<br>
+                            • Zero bias = Neutral (decision boundary through origin)
+                        </div>
+                        
+                        <p><strong>How Bias Works:</strong></p>
+                        <ul>
+                            <li><strong>Always Active:</strong> Input value is always 1</li>
+                            <li><strong>Has Weight:</strong> The bias weight 'b' can be positive or negative</li>
+                            <li><strong>Shifts Boundary:</strong> Moves decision line up/down or left/right</li>
+                            <li><strong>Improves Flexibility:</strong> Allows fitting data that doesn't pass through origin</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Without bias - line must pass through origin
+y = w1*x1 + w2*x2
+# Decision boundary: w1*x1 + w2*x2 = 0
+
+# With bias - line can be anywhere
+y = w1*x1 + w2*x2 + b
+# Decision boundary: w1*x1 + w2*x2 + b = 0
+
+# Example values:
+# b > 0: Makes positive predictions more likely
+# b < 0: Makes negative predictions more likely
+# b = 0: Neutral, boundary passes through origin
+                        </code>
+                        
+                        <p><strong>Real-World Impact:</strong></p>
+                        <ul>
+                            <li>Email spam: Bias represents general spam likelihood</li>
+                            <li>Medical diagnosis: Bias accounts for disease prevalence</li>
+                            <li>Credit approval: Bias reflects bank's lending policy</li>
+                            <li>Image recognition: Bias handles lighting variations</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">⚖️ Bias vs Fairness</div>
+                            <div style="color: #5c2706;">In AI ethics, "bias" has a different meaning (unfair discrimination). The mathematical bias here is just a technical parameter for better model fit.</div>
+                        </div>
+                    `
+                }
+            };
+            
+            const detail = inputDetails[type];
+            showModal(detail.title, detail.content);
+        }
+
+        // Neuron details
+        function showNeuronDetails() {
+            showModal('The Perceptron Neuron - The Decision Maker', `
+                <p><strong>The Heart of the Perceptron</strong></p>
+                <p>The neuron is where all the magic happens. It takes the weighted inputs, sums them up, and makes a binary decision.</p>
+                
+                <div class="modal-example">
+                    <strong>Neuron Process (Step by Step):</strong><br>
+                    1. <em>Receive Inputs:</em> Gets x₁, x₂, and bias<br>
+                    2. <em>Apply Weights:</em> Multiplies each input by its weight<br>
+                    3. <em>Sum Everything:</em> Adds all weighted inputs together<br>
+                    4. <em>Apply Activation:</em> Converts sum to binary output
+                </div>
+                
+                <p><strong>Mathematical Operation:</strong></p>
+                <div class="modal-code">
+# Inside the perceptron neuron
+def perceptron_neuron(inputs, weights, bias):
+    # Step 1: Weighted sum
+    weighted_sum = 0
+    for i in range(len(inputs)):
+        weighted_sum += inputs[i] * weights[i]
+    
+    # Step 2: Add bias
+    weighted_sum += bias
+    
+    # Step 3: Apply step function (activation)
+    if weighted_sum > 0:
+        output = 1  # Positive class
+    else:
+        output = 0  # Negative class
+    
+    return output
+
+# Example usage
+inputs = [0.8, 0.6]  # Two features
+weights = [0.5, 0.3] # Learned weights
+bias = -0.2          # Learned bias
+
+result = perceptron_neuron(inputs, weights, bias)
+# Result: 1 (since 0.8*0.5 + 0.6*0.3 + (-0.2) = 0.22 > 0)
+                </code>
+                
+                <p><strong>Activation Function:</strong></p>
+                <ul>
+                    <li><strong>Step Function:</strong> Classic perceptron uses hard threshold</li>
+                    <li><strong>Threshold at 0:</strong> Positive sum → output 1, negative → output 0</li>
+                    <li><strong>Binary Decision:</strong> Clear yes/no, on/off, true/false</li>
+                    <li><strong>Non-differentiable:</strong> Creates challenges for learning</li>
+                </ul>
+                
+                <div class="modal-tip">
+                    <div class="modal-tip-title">🧠 Biological Inspiration</div>
+                    <div style="color: #5c2706;">Real neurons also sum inputs and "fire" when the sum exceeds a threshold. The perceptron mimics this basic neural behavior!</div>
+                </div>
+                
+                <p><strong>Geometric Interpretation:</strong></p>
+                <ul>
+                    <li>The perceptron defines a line (in 2D) or plane (in higher dimensions)</li>
+                    <li>Points on one side of the line are classified as 1</li>
+                    <li>Points on the other side are classified as 0</li>
+                    <li>The weights determine the line's slope and orientation</li>
+                    <li>The bias determines where the line crosses the axes</li>
+                </ul>
+            `);
+        }
+
+        // Output details
+        function showOutputDetails() {
+            showModal('Perceptron Output - The Final Decision', `
+                <p><strong>Binary Classification Output</strong></p>
+                <p>The perceptron output is always binary: either 0 or 1, representing two classes or decisions.</p>
+                
+                <div class="modal-example">
+                    <strong>Output Interpretations:</strong><br>
+                    • Spam Detection: 0 = Not Spam, 1 = Spam<br>
+                    • Medical Diagnosis: 0 = Healthy, 1 = Disease<br>
+                    • Credit Approval: 0 = Reject, 1 = Approve<br>
+                    • Image Recognition: 0 = Cat, 1 = Dog
+                </div>
+                
+                <p><strong>How Output is Generated:</strong></p>
+                <div class="modal-code">
+# Perceptron output calculation
+def perceptron_output(weighted_sum):
+    if weighted_sum > 0:
+        return 1    # Positive class
+    else:
+        return 0    # Negative class
+
+# Alternative implementations:
+# Using step function
+import numpy as np
+output = np.where(weighted_sum > 0, 1, 0)
+
+# Using sign function (modified)
+output = (np.sign(weighted_sum) + 1) // 2  # Maps {-1,1} to {0,1}
+                </code>
+                
+                <p><strong>Decision Boundary:</strong></p>
+                <ul>
+                    <li><strong>Linear Separator:</strong> Perceptron creates a straight line boundary</li>
+                    <li><strong>Two Regions:</strong> Divides input space into two areas</li>
+                    <li><strong>Deterministic:</strong> Same input always gives same output</li>
+                    <li><strong>Hard Classification:</strong> No uncertainty or probability</li>
+                </ul>
+                
+                <p><strong>Limitations of Binary Output:</strong></p>
+                <ul>
+                    <li>No confidence measure (is it 51% sure or 99% sure?)</li>
+                    <li>No probability estimates</li>
+                    <li>Hard to handle uncertainty</li>
+                    <li>Cannot solve non-linearly separable problems</li>
+                </ul>
+                
+                <div class="modal-tip">
+                    <div class="modal-tip-title">🔄 Modern Improvements</div>
+                    <div style="color: #5c2706;">Modern neural networks use smooth activation functions (like sigmoid) that provide probability outputs instead of hard binary decisions.</div>
+                </div>
+                
+                <p><strong>Applications Best Suited for Binary Output:</strong></p>
+                <ul>
+                    <li>Clear-cut decisions where uncertainty isn't needed</li>
+                    <li>Real-time systems requiring fast decisions</li>
+                    <li>Simple classification tasks</li>
+                    <li>When interpretability is more important than precision</li>
+                </ul>
+            `);
+        }
+
+        // Formula component details
+        function showFormulaDetails(component) {
+            const componentDetails = {
+                'inputs': {
+                    title: 'Inputs (x₁, x₂) - The Raw Data',
+                    content: `
+                        <p><strong>Inputs Are Your Data Features</strong></p>
+                        <p>Inputs represent the measurable characteristics of whatever you're trying to classify or predict.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Input Examples by Domain:</strong><br>
+                            • <em>Medical:</em> age, blood pressure, cholesterol level<br>
+                            • <em>Finance:</em> income, credit score, debt-to-income ratio<br>
+                            • <em>Marketing:</em> clicks, time on site, previous purchases<br>
+                            • <em>Images:</em> pixel intensities, color values, texture metrics
+                        </div>
+                        
+                        <p><strong>Input Preprocessing:</strong></p>
+                        <ul>
+                            <li><strong>Normalization:</strong> Scale all inputs to similar ranges (0-1 or -1 to 1)</li>
+                            <li><strong>Standardization:</strong> Mean = 0, standard deviation = 1</li>
+                            <li><strong>Categorical Encoding:</strong> Convert text/categories to numbers</li>
+                            <li><strong>Missing Value Handling:</strong> Deal with incomplete data</li>
+                        </ul>
+                        
+                        <div class="modal-code">
+# Input preprocessing example
+import numpy as np
+
+# Raw data
+raw_inputs = {
+    'age': [25, 30, 45, 60],
+    'income': [40000, 60000, 80000, 120000],
+    'education': ['high_school', 'bachelor', 'master', 'phd']
+}
+
+# Normalize numerical inputs
+age_normalized = np.array(raw_inputs['age']) / 100  # Scale to 0-1
+income_normalized = np.array(raw_inputs['income']) / 150000
+
+# Encode categorical inputs
+education_map = {'high_school': 0, 'bachelor': 1, 'master': 2, 'phd': 3}
+education_encoded = [education_map[ed] for ed in raw_inputs['education']]
+education_normalized = np.array(education_encoded) / 3
+
+# Final input vectors
+for i in range(len(raw_inputs['age'])):
+    x1 = age_normalized[i]
+    x2 = income_normalized[i]
+    x3 = education_normalized[i]
+    print(f"Person {i+1}: [{x1:.2f}, {x2:.2f}, {x3:.2f}]")
+                        </code>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">📊 Feature Selection</div>
+                            <div style="color: #5c2706;">More inputs isn't always better! Choose inputs that are relevant to your prediction task and avoid redundant or noisy features.</div>
+                        </div>
+                        
+                        <p><strong>Quality of Inputs Matters:</strong></p>
+                        <ul>
+                            <li><strong>Relevance:</strong> Should be related to the output you want to predict</li>
+                            <li><strong>Discriminative:</strong> Should help distinguish between classes</li>
+                            <li><strong>Stable:</strong> Should not be too noisy or random</li>
+                            <li><strong>Available:</strong> Should be obtainable in real-world scenarios</li>
+                        </ul>
+                    `
+                },
+                'weights': {
+                    title: 'Weights (w₁, w₂) - The Importance Multipliers',
+                    content: `
+                        <p><strong>Weights Determine Feature Importance</strong></p>
+                        <p>Weights are the learned parameters that determine how much influence each input has on the final decision.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Weight Interpretation:</strong><br>
+                            • <em>Large positive weight:</em> Input strongly supports positive classification<br>
+                            • <em>Large negative weight:</em> Input strongly supports negative classification<br>
+                            • <em>Small weight:</em> Input has little influence on decision<br>
+                            • <em>Zero weight:</em> Input is ignored completely
+                        </div>
+                        
+                        <p><strong>How Weights Are Learned:</strong></p>
+                        <div class="modal-code">
+# Perceptron learning algorithm
+def train_perceptron(inputs, targets, learning_rate=0.1, epochs=100):
+    # Initialize weights randomly
+    weights = np.random.randn(len(inputs[0]))
+    bias = np.random.randn()
+    
+    for epoch in range(epochs):
+        for i, input_vector in enumerate(inputs):
+            # Make prediction
+            weighted_sum = np.dot(weights, input_vector) + bias
+            prediction = 1 if weighted_sum > 0 else 0
+            
+            # Calculate error
+            error = targets[i] - prediction
+            
+            # Update weights if prediction is wrong
+            if error != 0:
+                weights += learning_rate * error * input_vector
+                bias += learning_rate * error
+    
+    return weights, bias
+
+# Example: Training on simple data
+inputs = [[0, 0], [0, 1], [1, 0], [1, 1]]
+targets = [0, 0, 0, 1]  # AND gate
+weights, bias = train_perceptron(inputs, targets)
+print(f"Learned weights: {weights}")
+print(f"Learned bias: {bias}")
+                        </code>
+                        
+                        <p><strong>Weight Updates During Learning:</strong></p>
+                        <ul>
+                            <li><strong>Start Random:</strong> Weights begin with small random values</li>
+                            <li><strong>Error-Driven:</strong> Only update when prediction is wrong</li>
+                            <li><strong>Proportional:</strong> Larger errors cause larger weight changes</li>
+                            <li><strong>Input-Dependent:</strong> Larger inputs cause larger weight changes</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">⚖️ Weight Initialization</div>
+                            <div style="color: #5c2706;">Starting with random weights breaks symmetry. If all weights start the same, the perceptron can't learn different feature importances!</div>
+                        </div>
+                        
+                        <p><strong>Weight Analysis:</strong></p>
+                        <ul>
+                            <li><strong>Feature Importance:</strong> |weight| indicates how important the feature is</li>
+                            <li><strong>Direction:</strong> Sign shows whether feature supports positive/negative class</li>
+                            <li><strong>Relative Comparison:</strong> Compare weights to understand feature rankings</li>
+                            <li><strong>Interpretability:</strong> Weights provide insight into decision making</li>
+                        </ul>
+                        
+                        <p><strong>Common Weight Patterns:</strong></p>
+                        <ul>
+                            <li>All positive: All features support the positive class</li>
+                            <li>Mixed signs: Some features oppose each other</li>
+                            <li>One dominant: One feature much more important than others</li>
+                            <li>Balanced: All features contribute roughly equally</li>
+                        </ul>
+                    `
+                },
+                'bias': {
+                    title: 'Bias (b) - The Decision Threshold',
+                    content: `
+                        <p><strong>Bias: Making the Perceptron More Flexible</strong></p>
+                        <p>The bias allows the perceptron to make decisions even when all regular inputs are zero, and shifts the decision boundary for better data fitting.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Bias Effect Visualization:</strong><br>
+                            • <em>Without bias:</em> Decision line must pass through origin (0,0)<br>
+                            • <em>With positive bias:</em> Decision line shifts toward negative region<br>
+                            • <em>With negative bias:</em> Decision line shifts toward positive region<br>
+                            • <em>Bias magnitude:</em> Determines how far the line shifts
+                        </div>
+                        
+                        <p><strong>Mathematical Role of Bias:</strong></p>
+                        <div class="modal-code">
+# Decision boundary equation
+# Without bias: w1*x1 + w2*x2 = 0
+# With bias:    w1*x1 + w2*x2 + b = 0
+
+# Example: Email spam detection
+# w1 = 0.7 (weight for "suspicious words")
+# w2 = 0.3 (weight for "sender reputation") 
+# b = -0.2 (bias - slight preference for "not spam")
+
+def classify_email(suspicious_words, sender_reputation):
+    score = 0.7 * suspicious_words + 0.3 * sender_reputation - 0.2
+    return "SPAM" if score > 0 else "NOT SPAM"
+
+# Test cases:
+print(classify_email(0, 0))    # Score = -0.2 → NOT SPAM
+print(classify_email(0.5, 0))  # Score = 0.15 → SPAM  
+print(classify_email(0, 1))    # Score = 0.1 → SPAM
+                        </code>
+                        
+                        <p><strong>Bias Learning:</strong></p>
+                        <ul>
+                            <li><strong>Same as Weights:</strong> Updated using the same learning rule</li>
+                            <li><strong>Always Active:</strong> Always multiplied by 1 (constant input)</li>
+                            <li><strong>Error-Driven:</strong> Changes when predictions are wrong</li>
+                            <li><strong>No Input Dependency:</strong> Updates don't depend on input values</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🎯 Practical Importance</div>
+                            <div style="color: #5c2706;">Without bias, the perceptron can only solve problems where the optimal decision boundary passes through the origin. Most real-world problems need bias!</div>
+                        </div>
+                        
+                        <p><strong>Bias in Different Contexts:</strong></p>
+                        <ul>
+                            <li><strong>Classification:</strong> Represents prior probability of classes</li>
+                            <li><strong>Regression:</strong> Acts as the y-intercept</li>
+                            <li><strong>Decision Making:</strong> Represents default preference</li>
+                            <li><strong>Filtering:</strong> Sets the baseline threshold</li>
+                        </ul>
+                        
+                        <p><strong>Bias vs No Bias Comparison:</strong></p>
+                        <div class="modal-code">
+# Example: Classifying points above/below a line
+# True boundary: y = 2x + 3 (doesn't pass through origin)
+
+# Without bias - CANNOT learn this boundary
+# Perceptron limited to: y = 2x (passes through origin)
+
+# With bias - CAN learn this boundary  
+# Perceptron can learn: y = 2x + 3
+# Where weights = [2, -1] and bias = 3
+# Decision: 2*x - 1*y + 3 > 0
+                        </code>
+                    `
+                },
+                'activation': {
+                    title: 'Activation Function f() - The Decision Maker',
+                    content: `
+                        <p><strong>Activation Function: Converting Numbers to Decisions</strong></p>
+                        <p>The activation function transforms the weighted sum into the final output. For perceptrons, this is typically a step function.</p>
+                        
+                        <div class="modal-example">
+                            <strong>Step Function (Heaviside Function):</strong><br>
+                            • <em>Input > 0:</em> Output = 1 (positive class)<br>
+                            • <em>Input ≤ 0:</em> Output = 0 (negative class)<br>
+                            • <em>Sharp Transition:</em> Instant switch at threshold<br>
+                            • <em>Binary Output:</em> Only two possible values
+                        </div>
+                        
+                        <p><strong>Step Function Implementation:</strong></p>
+                        <div class="modal-code">
+# Classic step function
+def step_function(x):
+    return 1 if x > 0 else 0
+
+# Vectorized version using NumPy
+import numpy as np
+def step_function_vectorized(x):
+    return np.where(x > 0, 1, 0)
+
+# Alternative with different threshold
+def step_function_threshold(x, threshold=0):
+    return 1 if x > threshold else 0
+
+# Example usage
+weighted_sum = 0.7 * 0.8 + 0.3 * 0.6 - 0.2  # = 0.54
+output = step_function(weighted_sum)  # = 1
+print(f"Weighted sum: {weighted_sum:.2f}, Output: {output}")
+                        </code>
+                        
+                        <p><strong>Why Step Function for Perceptrons?</strong></p>
+                        <ul>
+                            <li><strong>Binary Decisions:</strong> Many problems need yes/no answers</li>
+                            <li><strong>Simplicity:</strong> Easy to understand and implement</li>
+                            <li><strong>Biological Inspiration:</strong> Neurons either fire or don't</li>
+                            <li><strong>Computational Efficiency:</strong> Fast to compute</li>
+                        </ul>
+                        
+                        <p><strong>Limitations of Step Function:</strong></p>
+                        <ul>
+                            <li><strong>Not Differentiable:</strong> Can't use gradient-based learning easily</li>
+                            <li><strong>No Gradient Information:</strong> All gradients are zero or undefined</li>
+                            <li><strong>Hard Transitions:</strong> No smooth probability outputs</li>
+                            <li><strong>Limited Expressiveness:</strong> Only linear decision boundaries</li>
+                        </ul>
+                        
+                        <div class="modal-tip">
+                            <div class="modal-tip-title">🔄 Modern Alternatives</div>
+                            <div style="color: #5c2706;">Modern neural networks use smooth functions like sigmoid, tanh, or ReLU instead of the step function for better learning properties.</div>
+                        </div>
+                        
+                        <p><strong>Alternative Activation Functions:</strong></p>
+                        <div class="modal-code">
+# Sigmoid: Smooth alternative to step function
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+# Sign function: Returns -1 or +1 instead of 0 or 1
+def sign_function(x):
+    return 1 if x > 0 else -1
+
+# Comparison for x = 0.5
+print(f"Step: {step_function(0.5)}")      # 1
+print(f"Sigmoid: {sigmoid(0.5):.3f}")     # 0.622
+print(f"Sign: {sign_function(0.5)}")      # 1
+                        </code>
+                        
+                        <p><strong>Geometric Interpretation:</strong></p>
+                        <ul>
+                            <li>Step function creates a sharp linear boundary</li>
+                            <li>Points exactly on the boundary are classified as 0</li>
+                            <li>No uncertainty or confidence measure</li>
+                            <li>Same decision for points far from or close to boundary</li>
+                        </ul>
+                    `
+                }
+            };
+            
+            const detail = componentDetails[component];
+            showModal(detail.title, detail.content);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                window.location.href = 'Week1_Slide5.html';
+            } else if (e.key === 'ArrowRight' || e.key === ' ') {
+                window.location.href = 'Week1_Slide7.html';
+            }
+        });
+
+        // Interactive animations
+        function animatePerceptron() {
+            const inputs = document.querySelectorAll('.perceptron-input');
+            const neuron = document.querySelector('.perceptron-neuron');
+            const output = document.querySelector('.perceptron-output');
+            
+            let step = 0;
+            setInterval(() => {
+                step = (step + 1) % 4;
+                
+                // Reset all animations
+                inputs.forEach(input => input.style.background = input.style.background.replace('scale(1.1)', ''));
+                neuron.style.background = neuron.style.background.replace('scale(1.1)', '');
+                output.style.background = output.style.background.replace('scale(1.1)', '');
+                
+                // Animate based on step
+                switch(step) {
+                    case 0:
+                        inputs[0].style.transform = 'scale(1.1)';
+                        break;
+                    case 1:
+                        inputs[1].style.transform = 'scale(1.1)';
+                        break;
+                    case 2:
+                        neuron.style.transform = 'translate(-50%, -50%) scale(1.1)';
+                        break;
+                    case 3:
+                        output.style.transform = 'translateY(-50%) scale(1.1)';
+                        break;
+                }
+                
+                setTimeout(() => {
+                    inputs.forEach(input => input.style.transform = '');
+                    neuron.style.transform = 'translate(-50%, -50%)';
+                    output.style.transform = 'translateY(-50%)';
+                }, 500);
+            }, 1500);
+        }
+
+        // Update SVG connections to exact positions
+        function updateConnections() {
+            const svg = document.querySelector('.perceptron-visual svg');
+            const lines = svg.querySelectorAll('line');
+            const visual = document.getElementById('perceptronVisual');
+            const visualRect = visual.getBoundingClientRect();
+            
+            // Get node centers
+            const input1 = document.getElementById('input1');
+            const input2 = document.getElementById('input2');
+            const inputBias = document.getElementById('inputBias');
+            const neuron = document.querySelector('.perceptron-neuron');
+            const output = document.querySelector('.perceptron-output');
+            
+            // Calculate center positions relative to visual container
+            const getCenterX = (elem) => {
+                const rect = elem.getBoundingClientRect();
+                return rect.left - visualRect.left + rect.width / 2;
+            };
+            const getCenterY = (elem) => {
+                const rect = elem.getBoundingClientRect();
+                return rect.top - visualRect.top + rect.height / 2;
+            };
+            
+            // Update lines if elements exist
+            if (input1 && neuron) {
+                lines[0].setAttribute('x1', getCenterX(input1));
+                lines[0].setAttribute('y1', getCenterY(input1));
+                lines[0].setAttribute('x2', getCenterX(neuron));
+                lines[0].setAttribute('y2', getCenterY(neuron));
+            }
+            
+            if (input2 && neuron) {
+                lines[1].setAttribute('x1', getCenterX(input2));
+                lines[1].setAttribute('y1', getCenterY(input2));
+                lines[1].setAttribute('x2', getCenterX(neuron));
+                lines[1].setAttribute('y2', getCenterY(neuron));
+            }
+            
+            if (inputBias && neuron) {
+                lines[2].setAttribute('x1', getCenterX(inputBias));
+                lines[2].setAttribute('y1', getCenterY(inputBias));
+                lines[2].setAttribute('x2', getCenterX(neuron));
+                lines[2].setAttribute('y2', getCenterY(neuron));
+            }
+            
+            if (neuron && output) {
+                lines[3].setAttribute('x1', getCenterX(neuron));
+                lines[3].setAttribute('y1', getCenterY(neuron));
+                lines[3].setAttribute('x2', getCenterX(output));
+                lines[3].setAttribute('y2', getCenterY(output));
+            }
+        }
+
+        // Start animation when page loads
+        window.onload = function() {
+            setTimeout(() => {
+                updateConnections();
+                animatePerceptron();
+            }, 100);
+        };
+        
+        // Update connections on window resize
+        window.addEventListener('resize', updateConnections);
+    </script>
+</body>
+</html>
